@@ -407,14 +407,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Direct Admin Control Switch (as requested to make admin accessible with password logic) */}
-            <button 
-              onClick={onNavigateToAdmin} 
-              className="text-xs bg-slate-100 hover:bg-[#9A2D55]/10 text-[#9A2D55] font-semibold py-1.5 px-3 rounded-lg flex items-center gap-1 border border-rose-200 cursor-pointer"
-              id="admin-switch-btn"
-            >
-              🔐 بوابة الإدارة
-            </button>
 
             {/* Cart Trigger Button */}
             <button 
@@ -829,7 +821,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <li><button onClick={() => { setActiveTab('shop'); window.scrollTo(0, 0); }} className="hover:text-[#E4A0A0]">تسوّق الكتالوج</button></li>
                 <li><button onClick={() => { setActiveTab('tracking'); window.scrollTo(0, 0); }} className="hover:text-[#E4A0A0]">تتبع الطلبات والشحنات</button></li>
                 <li><button onClick={() => setShowReviewsPopup(true)} className="hover:text-[#E4A0A0]">سجل آراء وتقييمات العملاء</button></li>
-                <li><button onClick={onNavigateToAdmin} className="text-[#E4A0A0] hover:underline">لوحة تحكم الأدمين (الخلفية الآمنة)</button></li>
               </ul>
             </div>
             <div>
@@ -846,11 +837,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </div>
 
-          <div className="border-t border-slate-800 pt-6 text-center text-[10px] text-slate-500 font-bold flex flex-col sm:flex-row items-center justify-between gap-4">
+         <div className="border-t border-slate-800 pt-6 text-center text-[10px] text-slate-500 font-bold">
             <p>© 2026 مخاوير ألماسة (almaasa.bh). جميع الحقوق محفوظة.</p>
-            <p className="text-[10px] text-[#9A2D55] bg-rose-50/5 px-2 py-1 rounded border border-rose-500/10 hover:border-rose-500/35 cursor-pointer" onClick={onNavigateToAdmin}>
-              أنت المشرف؟ اضغطي هنا لتعديل المحتوى والطلبات والأسعار والأدلة
-            </p>
           </div>
         </div>
       </footer>
