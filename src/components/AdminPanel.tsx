@@ -16,9 +16,11 @@ interface AdminPanelProps {
 
 export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   // Authorization State
-  const [isAdminAuth, setIsAdminAuth] = useState(false);
+ const [isAdminAuth, setIsAdminAuth] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Core backend state
   const [products, setProducts] = useState<Product[]>([]);
@@ -370,22 +372,38 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
     );
   };
 
-  const handleAuthSubmit = (e: React.FormEvent) => {
+const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
-    if (passwordInput === 'admin123' || passwordInput === '97337037697' || passwordInput === 'almaasa') {
-      setIsAdminAuth(true);
-      sessionStorage.setItem('ama_admin_authenticated', 'true');
-      addOperationLog(
-        'تسجيل دخول ناجح للأدمين',
-        'تم تسجيل الدخول إلى لوحة التحكم الإدارية بنجاح عبر بروتوكول آمن.',
-        'المشرف',
-        'system',
-        'success'
-      );
-      loadData();
-    } else {
-      setAuthError('الرقم السري المدخل غير صحيح. يرجى مراجعة إدارة مخاوير ألماسة.');
+    setIsLoggingIn(true);
+
+    try {
+      const response = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput, password: passwordInput })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsAdminAuth(true);
+        sessionStorage.setItem('ama_admin_authenticated', 'true');
+        addOperationLog(
+          'تسجيل دخول ناجح للأدمين',
+          `تم تسجيل الدخول إلى لوحة التحكم الإدارية بنجاح (${emailInput}).`,
+          'المشرف',
+          'system',
+          'success'
+        );
+        loadData();
+      } else {
+        setAuthError(data.error || 'البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+      }
+    } catch (err) {
+      setAuthError('تعذر الاتصال بالخادم. تحقق من الاتصال بالإنترنت.');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -632,23 +650,30 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
               <Lock className="w-8 h-8 animate-pulse" />
             </div>
             
-            <div className="space-y-2">
+          <div className="space-y-2">
               <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">بوابة ألماسة الآمنة 🔒</h2>
               <p className="text-slate-500 text-xs font-semibold">
-                يرجى إدخال الرقم السري الخاص بالإدارة والمبيعات لرؤية سجلات الطلبات التفصيلية وعمليات التشغيل.
-              </p>
-              <p className="text-[10px] bg-amber-50 border border-amber-200 text-amber-700 py-1.5 px-3 rounded-lg font-bold">
-                💡 تلميح العرض: أدخلي الرمز <code className="bg-white px-1.5 py-0.5 rounded text-red-600 font-mono">admin123</code> للمرور التلقائي الآمن.
+                يرجى إدخال البريد الإلكتروني وكلمة المرور للوصول إلى لوحة الإدارة.
               </p>
             </div>
 
             <form onSubmit={handleAuthSubmit} className="space-y-4">
               <input 
+                type="email" 
+                placeholder="البريد الإلكتروني"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                className="w-full bg-[#FAF6F6] text-slate-800 border-2 border-rose-100 rounded-xl px-4 py-3 text-right font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white"
+                id="admin-email-field"
+                required
+                dir="ltr"
+              />
+              <input 
                 type="password" 
-                placeholder="برجاء كتابة الرقم السري هنا..."
+                placeholder="كلمة المرور"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
-                className="w-full bg-[#FAF6F6] text-slate-800 border-2 border-rose-100 rounded-xl px-4 py-3 text-center font-bold text-lg focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white"
+                className="w-full bg-[#FAF6F6] text-slate-800 border-2 border-rose-100 rounded-xl px-4 py-3 text-right font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white"
                 id="admin-passcode-field"
                 required
               />
@@ -661,10 +686,11 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
               <button 
                 type="submit"
-                className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white font-extrabold py-3 px-4 rounded-xl shadow-lg transition-all text-sm tracking-wide cursor-pointer"
+                disabled={isLoggingIn}
+                className="w-full bg-[#9A2D55] hover:bg-[#802446] disabled:opacity-60 disabled:cursor-not-allowed text-white font-extrabold py-3 px-4 rounded-xl shadow-lg transition-all text-sm tracking-wide cursor-pointer"
                 id="admin-auth-submit-btn"
               >
-                تأكيد هويتي والولوج للوحة 🔐
+                {isLoggingIn ? 'جاري التحقق...' : 'تسجيل الدخول 🔐'}
               </button>
             </form>
 
