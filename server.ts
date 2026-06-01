@@ -12,6 +12,38 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Admin Login Endpoint - validates credentials against env vars
+  app.post("/api/admin-login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: "يرجى إدخال البريد الإلكتروني وكلمة المرور." });
+      }
+
+      const adminEmail = process.env.ADMIN_EMAIL;
+      const adminPassword = process.env.ADMIN_PASSWORD;
+
+      if (!adminEmail || !adminPassword) {
+        return res.status(500).json({
+          error: "لم يتم تهيئة بيانات اعتماد المشرف في الخادم. يرجى مراجعة الإعدادات."
+        });
+      }
+
+      const emailMatch = email.trim().toLowerCase() === adminEmail.trim().toLowerCase();
+      const passwordMatch = password === adminPassword;
+
+      if (emailMatch && passwordMatch) {
+        return res.json({ success: true });
+      } else {
+        return res.status(401).json({ error: "البريد الإلكتروني أو كلمة المرور غير صحيحة." });
+      }
+    } catch (error: any) {
+      console.error("Admin login error:", error);
+      return res.status(500).json({ error: "حدث خطأ في الخادم. يرجى المحاولة لاحقاً." });
+    }
+  });
+
   // AI Description Generator Endpoint
   app.post("/api/generate-description", async (req, res) => {
     try {
@@ -28,7 +60,6 @@ async function startServer() {
         });
       }
 
-      // Lazy load & initialize the GoogleGenAI client with required header
       const ai = new GoogleGenAI({
         apiKey: apiKey,
         httpOptions: {
@@ -39,7 +70,7 @@ async function startServer() {
       });
 
       const categoryPart = categoryName ? `من فئة ${categoryName}` : "";
-      
+
       const systemInstruction = `أنت كاتب تسويقي محترف ومبدع لمتجر "بوتيك ألماسة" (Almaasa Boutique) المتخصص في بيع المخاوير والجلابيات التقليدية الإماراتية والخليجية الفاخرة وتوابعها.
 اكتب وصفاً ترويجياً فخماً وجذاباً وراقياً جداً للمنتج، مستخدماً لغة عربية سليمة وعبارات أنيقة تشجع الزبائن على الشراء.
 اجعل الوصف قصيراً (من سطرين إلى ثلاثة أسطر كحد أقصى) ليتناسب مع قيود العرض. ركّز على التطريز الفاخر، جودة القماش (مثل الحرير والقطن)، والتطريز بالخرز أو الزري اللامع، ومناسبة هذا الموديل للأعياد والمناسبات والجمعات السعيدة.
@@ -52,7 +83,7 @@ async function startServer() {
       if (imageBase64 && imageBase64.startsWith("data:")) {
         const mimeType = imageBase64.substring(5, imageBase64.indexOf(";base64,"));
         const base64Data = imageBase64.substring(imageBase64.indexOf(";base64,") + 8);
-        
+
         contents = {
           parts: [
             {
