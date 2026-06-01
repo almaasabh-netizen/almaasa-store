@@ -705,7 +705,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
         <div className="flex-1 flex flex-col md:flex-row">
           
           {/* A. RIGHT NAVIGATION BAR - Luxurious Plum & Champagne gold */}
-          <aside className="w-full md:w-64 bg-[#23121D] text-[#ECD5E0] flex flex-col justify-between border-l border-[#3C1F32]" id="admin-sidebar shadow">
+          <aside className="w-full md:w-64 bg-[#23121D] text-[white] flex flex-col justify-between border-l border-[#3C1F32]" id="admin-sidebar shadow">
             
             <div className="p-4 space-y-6">
               {/* Branding header in Sidebar */}
@@ -719,7 +719,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
               {/* SECTION 1: SALES (المبيعات) */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#B58EA0] mb-2 font-bold select-none">المبيعات والعملاء ⚙️</p>
+                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">المبيعات والعملاء ⚙️</p>
                 <nav className="space-y-1 text-xs" id="sidebar-sales-menu">
                   <button 
                     onClick={() => setActiveMenu('dashboard')}
@@ -759,7 +759,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
               {/* SECTION 2: STORE MANAGEMENT (إدارة المتجر) */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#B58EA0] mb-2 font-bold select-none">إدارة المتجر الفعلي 🛍️</p>
+                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">إدارة المتجر الفعلي 🛍️</p>
                 <nav className="space-y-1 text-xs" id="sidebar-shop-mgmt">
                   <button 
                     onClick={() => setActiveMenu('categories')}
@@ -811,7 +811,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
               {/* SECTION 3: MARKETING & CONTENT (التسويق والمحتوى) */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#B58EA0] mb-2 font-bold select-none">التسويق والمقاسات 🏷️</p>
+                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">التسويق والمقاسات 🏷️</p>
                 <nav className="space-y-1 text-xs" id="sidebar-marketing">
                   <button 
                     onClick={() => setActiveMenu('coupons')}
@@ -840,7 +840,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
               </button>
               <button 
                 onClick={handleLogout} 
-                className="w-full border border-[#3C1F32] hover:bg-[#341C2B] text-[#B58EA0] font-bold text-[10px] py-1.5 px-3 rounded flex items-center justify-center gap-1 cursor-pointer"
+                className="w-full border border-[#3C1F32] hover:bg-[#341C2B] text-[#F4C9D8] font-bold text-[10px] py-1.5 px-3 rounded flex items-center justify-center gap-1 cursor-pointer"
               >
                 🔐 تسجيل خروج آمن
               </button>
