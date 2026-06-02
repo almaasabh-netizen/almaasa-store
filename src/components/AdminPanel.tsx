@@ -704,145 +704,131 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
         /* AUTHENTICATED PANEL LAYOUT WITH DYNAMIC ARABIC SIDEBAR */
         <div className="flex-1 flex flex-col md:flex-row">
           
-          {/* A. RIGHT NAVIGATION BAR - Luxurious Plum & Champagne gold */}
-          <aside className="w-full md:w-64 bg-[#23121D] text-[white] flex flex-col justify-between border-l border-[#3C1F32]" id="admin-sidebar shadow">
-            
-            <div className="p-4 space-y-6">
-              {/* Branding header in Sidebar */}
-              <div className="flex items-center justify-between border-b border-[#3C1F32] pb-4">
-                <span className="text-white font-black text-sm tracking-tight flex items-center gap-1.5">
-                  <span className="text-xl">💎</span>
-                  <span className="bg-gradient-to-l from-amber-200 to-rose-200 bg-clip-text text-transparent">لوحة تحكم ألماسة</span>
+          {/* A. RIGHT NAVIGATION BAR - Clean Slate */}
+          <aside className="w-full md:w-64 bg-slate-900 text-white flex flex-col justify-between border-l border-slate-800" id="admin-sidebar">
+
+            <div className="p-4 space-y-5 overflow-y-auto">
+              {/* Branding header */}
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span className="text-sm font-black tracking-tight bg-gradient-to-l from-slate-100 to-rose-200 bg-clip-text text-transparent">لوحة تحكم ألماسة</span>
                 </span>
-                <span className="text-[10px] bg-[#9A2D55] text-white font-bold px-2 py-0.5 rounded">مشرف</span>
+                <span className="text-[10px] bg-rose-500/20 text-rose-300 font-semibold px-2 py-0.5 rounded-full border border-rose-500/25 shrink-0">مشرف</span>
               </div>
 
-              {/* SECTION 1: SALES (المبيعات) */}
+              {/* SECTION 1: SALES */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">المبيعات والعملاء ⚙️</p>
-                <nav className="space-y-1 text-xs" id="sidebar-sales-menu">
-                  <button 
-                    onClick={() => setActiveMenu('dashboard')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'dashboard' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">🕹️ نظرة عامة</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('orders')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'orders' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">📦 طلبات الزبائن</span>
-                    {pendingOrdersCount > 0 && (
-                      <span className="bg-red-500 text-white text-[10px] px-2 py-0.2 rounded-full font-bold">{pendingOrdersCount}</span>
-                    )}
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('sales_log')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'sales_log' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">💵 المبيعات والمدخول</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('customers')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'customers' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">👥 دليل العملاء</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('shipping_bills')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'shipping_bills' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">📑 بوليصات الشحن الدولي</span>
-                  </button>
+                <p className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2 font-light select-none px-1">المبيعات والعملاء</p>
+                <nav className="space-y-0.5 text-xs">
+                  {(
+                    [
+                      { key: 'dashboard',      label: 'نظرة عامة',            Icon: LayoutGrid,  badge: null,               badgeStyle: '' },
+                      { key: 'orders',         label: 'طلبات الزبائن',         Icon: ShoppingBag, badge: pendingOrdersCount,  badgeStyle: 'bg-rose-500' },
+                      { key: 'sales_log',      label: 'المبيعات والمدخول',     Icon: Wallet,      badge: null,               badgeStyle: '' },
+                      { key: 'customers',      label: 'دليل العملاء',          Icon: Users,       badge: null,               badgeStyle: '' },
+                      { key: 'shipping_bills', label: 'بوليصات الشحن الدولي', Icon: FileText,    badge: null,               badgeStyle: '' },
+                    ] as const
+                  ).map(({ key, label, Icon, badge, badgeStyle }) => (
+                    <button
+                      key={key}
+                      onClick={() => setActiveMenu(key)}
+                      className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                        activeMenu === key
+                          ? 'bg-gradient-to-l from-slate-800 to-slate-700/50 text-white shadow-sm'
+                          : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-100'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeMenu === key ? 'text-rose-400' : 'text-slate-500'}`} />
+                        <span className="font-medium">{label}</span>
+                      </span>
+                      {badge != null && badge > 0 && (
+                        <span className={`${badgeStyle} text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full font-bold px-1`}>{badge}</span>
+                      )}
+                    </button>
+                  ))}
                 </nav>
               </div>
 
-              {/* SECTION 2: STORE MANAGEMENT (إدارة المتجر) */}
+              {/* SECTION 2: STORE MANAGEMENT */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">إدارة المتجر الفعلي 🛍️</p>
-                <nav className="space-y-1 text-xs" id="sidebar-shop-mgmt">
-                  <button 
-                    onClick={() => setActiveMenu('categories')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'categories' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>🗂️ التصنيفات</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('products')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'products' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>👗 المنتجات المعروضة</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('inventory')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'inventory' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">📦 إدارة المخزون والمقاطع</span>
-                    {lowStockProductsCount > 0 && (
-                      <span className="bg-amber-500 text-white text-[9px] px-1.5 py-0.2 rounded font-mono">{lowStockProductsCount}</span>
-                    )}
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('options')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'options' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>🎚️ خيارات المنتج والمطاط</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('reviews')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'reviews' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">⭐ تقييمات الزبائن العفوية</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('payment_gateways')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'payment_gateways' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">💳 إعدادات وبوابات الدفع</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('shipping_zones')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'shipping_zones' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">🚚 مناطق وطرق التوصيل</span>
-                  </button>
+                <p className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2 font-light select-none px-1">إدارة المتجر الفعلي</p>
+                <nav className="space-y-0.5 text-xs">
+                  {(
+                    [
+                      { key: 'categories',      label: 'التصنيفات',           Icon: FolderKanban, badge: null,                badgeStyle: '' },
+                      { key: 'products',        label: 'المنتجات المعروضة',   Icon: Layers,       badge: null,                badgeStyle: '' },
+                      { key: 'inventory',       label: 'إدارة المخزون',       Icon: ClipboardList,badge: lowStockProductsCount, badgeStyle: 'bg-amber-500' },
+                      { key: 'options',         label: 'خيارات المنتج',       Icon: Sliders,      badge: null,                badgeStyle: '' },
+                      { key: 'reviews',         label: 'تقييمات الزبائن',     Icon: Star,         badge: null,                badgeStyle: '' },
+                      { key: 'payment_gateways',label: 'بوابات الدفع',        Icon: CreditCard,   badge: null,                badgeStyle: '' },
+                      { key: 'shipping_zones',  label: 'مناطق التوصيل',       Icon: Truck,        badge: null,                badgeStyle: '' },
+                    ] as const
+                  ).map(({ key, label, Icon, badge, badgeStyle }) => (
+                    <button
+                      key={key}
+                      onClick={() => setActiveMenu(key)}
+                      className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                        activeMenu === key
+                          ? 'bg-gradient-to-l from-slate-800 to-slate-700/50 text-white shadow-sm'
+                          : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-100'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeMenu === key ? 'text-rose-400' : 'text-slate-500'}`} />
+                        <span className="font-medium">{label}</span>
+                      </span>
+                      {badge != null && badge > 0 && (
+                        <span className={`${badgeStyle} text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full font-bold px-1`}>{badge}</span>
+                      )}
+                    </button>
+                  ))}
                 </nav>
               </div>
 
-              {/* SECTION 3: MARKETING & CONTENT (التسويق والمحتوى) */}
+              {/* SECTION 3: MARKETING */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">التسويق والمقاسات 🏷️</p>
-                <nav className="space-y-1 text-xs" id="sidebar-marketing">
-                  <button 
-                    onClick={() => setActiveMenu('coupons')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'coupons' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>🎟️ الكوبونات الخصمية</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('size_guides')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'size_guides' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>📏 أدلة قياسات الخياط</span>
-                  </button>
+                <p className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2 font-light select-none px-1">التسويق والمقاسات</p>
+                <nav className="space-y-0.5 text-xs">
+                  {(
+                    [
+                      { key: 'coupons',     label: 'الكوبونات الخصمية',    Icon: Percent  },
+                      { key: 'size_guides', label: 'أدلة قياسات الخياط',   Icon: Compass  },
+                    ] as const
+                  ).map(({ key, label, Icon }) => (
+                    <button
+                      key={key}
+                      onClick={() => setActiveMenu(key)}
+                      className={`w-full text-right flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                        activeMenu === key
+                          ? 'bg-gradient-to-l from-slate-800 to-slate-700/50 text-white shadow-sm'
+                          : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-100'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeMenu === key ? 'text-rose-400' : 'text-slate-500'}`} />
+                      <span className="font-medium">{label}</span>
+                    </button>
+                  ))}
                 </nav>
               </div>
-
             </div>
 
             {/* Bottom Actions */}
-            <div className="p-4 border-t border-[#3C1F32] space-y-3">
-              <button 
-                onClick={onBackToStore} 
-                className="w-full bg-gradient-to-r from-[#9A2D55] to-[#731E3F] hover:opacity-90 text-white font-bold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1 cursor-pointer"
+            <div className="p-4 border-t border-slate-800 space-y-2">
+              <button
+                onClick={onBackToStore}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-semibold text-xs py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
               >
-                🌍 العودة للمتجر العام
+                <Globe className="w-3.5 h-3.5 text-rose-400" />
+                العودة للمتجر العام
               </button>
-              <button 
-                onClick={handleLogout} 
-                className="w-full border border-[#3C1F32] hover:bg-[#341C2B] text-[#F4C9D8] font-bold text-[10px] py-1.5 px-3 rounded flex items-center justify-center gap-1 cursor-pointer"
+              <button
+                onClick={handleLogout}
+                className="w-full hover:bg-slate-800 text-slate-500 hover:text-slate-300 font-medium text-[11px] py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
               >
-                🔐 تسجيل خروج آمن
+                <LogIn className="w-3.5 h-3.5" />
+                تسجيل خروج آمن
               </button>
             </div>
           </aside>
