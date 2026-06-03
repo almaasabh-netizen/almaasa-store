@@ -16,9 +16,11 @@ interface AdminPanelProps {
 
 export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   // Authorization State
-  const [isAdminAuth, setIsAdminAuth] = useState(false);
+ const [isAdminAuth, setIsAdminAuth] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Core backend state
   const [products, setProducts] = useState<Product[]>([]);
@@ -370,22 +372,38 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
     );
   };
 
-  const handleAuthSubmit = (e: React.FormEvent) => {
+const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
-    if (passwordInput === 'admin123' || passwordInput === '97337037697' || passwordInput === 'almaasa') {
-      setIsAdminAuth(true);
-      sessionStorage.setItem('ama_admin_authenticated', 'true');
-      addOperationLog(
-        'تسجيل دخول ناجح للأدمين',
-        'تم تسجيل الدخول إلى لوحة التحكم الإدارية بنجاح عبر بروتوكول آمن.',
-        'المشرف',
-        'system',
-        'success'
-      );
-      loadData();
-    } else {
-      setAuthError('الرقم السري المدخل غير صحيح. يرجى مراجعة إدارة مخاوير ألماسة.');
+    setIsLoggingIn(true);
+
+    try {
+      const response = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput, password: passwordInput })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsAdminAuth(true);
+        sessionStorage.setItem('ama_admin_authenticated', 'true');
+        addOperationLog(
+          'تسجيل دخول ناجح للأدمين',
+          `تم تسجيل الدخول إلى لوحة التحكم الإدارية بنجاح (${emailInput}).`,
+          'المشرف',
+          'system',
+          'success'
+        );
+        loadData();
+      } else {
+        setAuthError(data.error || 'البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+      }
+    } catch (err) {
+      setAuthError('تعذر الاتصال بالخادم. تحقق من الاتصال بالإنترنت.');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -632,23 +650,30 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
               <Lock className="w-8 h-8 animate-pulse" />
             </div>
             
-            <div className="space-y-2">
+          <div className="space-y-2">
               <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">بوابة ألماسة الآمنة 🔒</h2>
               <p className="text-slate-500 text-xs font-semibold">
-                يرجى إدخال الرقم السري الخاص بالإدارة والمبيعات لرؤية سجلات الطلبات التفصيلية وعمليات التشغيل.
-              </p>
-              <p className="text-[10px] bg-amber-50 border border-amber-200 text-amber-700 py-1.5 px-3 rounded-lg font-bold">
-                💡 تلميح العرض: أدخلي الرمز <code className="bg-white px-1.5 py-0.5 rounded text-red-600 font-mono">admin123</code> للمرور التلقائي الآمن.
+                يرجى إدخال البريد الإلكتروني وكلمة المرور للوصول إلى لوحة الإدارة.
               </p>
             </div>
 
             <form onSubmit={handleAuthSubmit} className="space-y-4">
               <input 
+                type="email" 
+                placeholder="البريد الإلكتروني"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                className="w-full bg-[#FAF6F6] text-slate-800 border-2 border-rose-100 rounded-xl px-4 py-3 text-right font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white"
+                id="admin-email-field"
+                required
+                dir="ltr"
+              />
+              <input 
                 type="password" 
-                placeholder="برجاء كتابة الرقم السري هنا..."
+                placeholder="كلمة المرور"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
-                className="w-full bg-[#FAF6F6] text-slate-800 border-2 border-rose-100 rounded-xl px-4 py-3 text-center font-bold text-lg focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white"
+                className="w-full bg-[#FAF6F6] text-slate-800 border-2 border-rose-100 rounded-xl px-4 py-3 text-right font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white"
                 id="admin-passcode-field"
                 required
               />
@@ -661,10 +686,11 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
               <button 
                 type="submit"
-                className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white font-extrabold py-3 px-4 rounded-xl shadow-lg transition-all text-sm tracking-wide cursor-pointer"
+                disabled={isLoggingIn}
+                className="w-full bg-[#9A2D55] hover:bg-[#802446] disabled:opacity-60 disabled:cursor-not-allowed text-white font-extrabold py-3 px-4 rounded-xl shadow-lg transition-all text-sm tracking-wide cursor-pointer"
                 id="admin-auth-submit-btn"
               >
-                تأكيد هويتي والولوج للوحة 🔐
+                {isLoggingIn ? 'جاري التحقق...' : 'تسجيل الدخول 🔐'}
               </button>
             </form>
 
@@ -678,145 +704,136 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
         /* AUTHENTICATED PANEL LAYOUT WITH DYNAMIC ARABIC SIDEBAR */
         <div className="flex-1 flex flex-col md:flex-row">
           
-          {/* A. RIGHT NAVIGATION BAR - Luxurious Plum & Champagne gold */}
-          <aside className="w-full md:w-64 bg-[#23121D] text-[#ECD5E0] flex flex-col justify-between border-l border-[#3C1F32]" id="admin-sidebar shadow">
-            
-            <div className="p-4 space-y-6">
-              {/* Branding header in Sidebar */}
-              <div className="flex items-center justify-between border-b border-[#3C1F32] pb-4">
-                <span className="text-white font-black text-sm tracking-tight flex items-center gap-1.5">
-                  <span className="text-xl">💎</span>
-                  <span className="bg-gradient-to-l from-amber-200 to-rose-200 bg-clip-text text-transparent">لوحة تحكم ألماسة</span>
-                </span>
-                <span className="text-[10px] bg-[#9A2D55] text-white font-bold px-2 py-0.5 rounded">مشرف</span>
-              </div>
+          {/* A. SIDEBAR - Modern redesign */}
+          <aside className="w-full md:w-60 bg-[#1A0D16] text-white flex flex-col shrink-0" id="admin-sidebar">
 
-              {/* SECTION 1: SALES (المبيعات) */}
+            {/* Brand Header */}
+            <div className="px-5 py-5 border-b border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#9A2D55] to-[#5C1532] flex items-center justify-center shadow-lg shadow-[#9A2D55]/30 shrink-0">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-black text-sm leading-tight">ألماسة</p>
+                  <p className="text-white/40 text-[10px] font-medium">لوحة التحكم</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Nav Sections */}
+            <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+
+              {/* Section: المبيعات */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#B58EA0] mb-2 font-bold select-none">المبيعات والعملاء ⚙️</p>
-                <nav className="space-y-1 text-xs" id="sidebar-sales-menu">
-                  <button 
-                    onClick={() => setActiveMenu('dashboard')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'dashboard' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">🕹️ نظرة عامة</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('orders')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'orders' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">📦 طلبات الزبائن</span>
-                    {pendingOrdersCount > 0 && (
-                      <span className="bg-red-500 text-white text-[10px] px-2 py-0.2 rounded-full font-bold">{pendingOrdersCount}</span>
-                    )}
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('sales_log')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'sales_log' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">💵 المبيعات والمدخول</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('customers')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'customers' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">👥 دليل العملاء</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('shipping_bills')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'shipping_bills' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">📑 بوليصات الشحن الدولي</span>
-                  </button>
+                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">المبيعات</p>
+                <nav className="space-y-0.5">
+                  {([
+                    { id: 'dashboard',      icon: BarChart3,    label: 'نظرة عامة',        badge: null,                badgeColor: '' },
+                    { id: 'orders',         icon: ShoppingBag,  label: 'طلبات الزبائن',    badge: pendingOrdersCount > 0 ? pendingOrdersCount : null, badgeColor: 'bg-rose-500' },
+                    { id: 'sales_log',      icon: CreditCard,   label: 'المبيعات والمدخول', badge: null,                badgeColor: '' },
+                    { id: 'customers',      icon: Users,        label: 'دليل العملاء',      badge: null,                badgeColor: '' },
+                    { id: 'shipping_bills', icon: FileText,     label: 'بوليصات الشحن',    badge: null,                badgeColor: '' },
+                  ] as const).map(({ id, icon: Icon, label, badge, badgeColor }) => (
+                    <button
+                      key={id}
+                      onClick={() => setActiveMenu(id)}
+                      className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
+                        activeMenu === id
+                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
+                          : 'text-white/50 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                        {label}
+                      </span>
+                      {badge != null && (
+                        <span className={`${badgeColor} text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1`}>{badge}</span>
+                      )}
+                    </button>
+                  ))}
                 </nav>
               </div>
 
-              {/* SECTION 2: STORE MANAGEMENT (إدارة المتجر) */}
+              <div className="h-px bg-white/5 mx-2" />
+
+              {/* Section: المتجر */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#B58EA0] mb-2 font-bold select-none">إدارة المتجر الفعلي 🛍️</p>
-                <nav className="space-y-1 text-xs" id="sidebar-shop-mgmt">
-                  <button 
-                    onClick={() => setActiveMenu('categories')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'categories' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>🗂️ التصنيفات</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('products')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'products' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>👗 المنتجات المعروضة</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('inventory')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'inventory' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">📦 إدارة المخزون والمقاطع</span>
-                    {lowStockProductsCount > 0 && (
-                      <span className="bg-amber-500 text-white text-[9px] px-1.5 py-0.2 rounded font-mono">{lowStockProductsCount}</span>
-                    )}
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('options')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'options' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>🎚️ خيارات المنتج والمطاط</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('reviews')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'reviews' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">⭐ تقييمات الزبائن العفوية</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('payment_gateways')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'payment_gateways' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">💳 إعدادات وبوابات الدفع</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('shipping_zones')}
-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'shipping_zones' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span className="flex items-center gap-2">🚚 مناطق وطرق التوصيل</span>
-                  </button>
+                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">إدارة المتجر</p>
+                <nav className="space-y-0.5">
+                  {([
+                    { id: 'categories',       icon: FolderKanban, label: 'التصنيفات',        badge: null, badgeColor: '' },
+                    { id: 'products',         icon: Layers,       label: 'المنتجات',          badge: null, badgeColor: '' },
+                    { id: 'inventory',        icon: ClipboardList,label: 'المخزون',           badge: lowStockProductsCount > 0 ? lowStockProductsCount : null, badgeColor: 'bg-amber-500' },
+                    { id: 'options',          icon: Sliders,      label: 'خيارات المنتج',    badge: null, badgeColor: '' },
+                    { id: 'reviews',          icon: Star,         label: 'تقييمات العملاء',  badge: null, badgeColor: '' },
+                    { id: 'payment_gateways', icon: CreditCard,   label: 'بوابات الدفع',     badge: null, badgeColor: '' },
+                    { id: 'shipping_zones',   icon: Truck,        label: 'مناطق الشحن',      badge: null, badgeColor: '' },
+                  ] as const).map(({ id, icon: Icon, label, badge, badgeColor }) => (
+                    <button
+                      key={id}
+                      onClick={() => setActiveMenu(id)}
+                      className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
+                        activeMenu === id
+                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
+                          : 'text-white/50 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                        {label}
+                      </span>
+                      {badge != null && (
+                        <span className={`${badgeColor} text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1`}>{badge}</span>
+                      )}
+                    </button>
+                  ))}
                 </nav>
               </div>
 
-              {/* SECTION 3: MARKETING & CONTENT (التسويق والمحتوى) */}
+              <div className="h-px bg-white/5 mx-2" />
+
+              {/* Section: التسويق */}
               <div>
-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#B58EA0] mb-2 font-bold select-none">التسويق والمقاسات 🏷️</p>
-                <nav className="space-y-1 text-xs" id="sidebar-marketing">
-                  <button 
-                    onClick={() => setActiveMenu('coupons')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'coupons' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>🎟️ الكوبونات الخصمية</span>
-                  </button>
-                  <button 
-                    onClick={() => setActiveMenu('size_guides')}
-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'size_guides' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
-                  >
-                    <span>📏 أدلة قياسات الخياط</span>
-                  </button>
+                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">التسويق</p>
+                <nav className="space-y-0.5">
+                  {([
+                    { id: 'coupons',     icon: Tag,     label: 'الكوبونات' },
+                    { id: 'size_guides', icon: Compass, label: 'أدلة المقاسات' },
+                  ] as const).map(({ id, icon: Icon, label }) => (
+                    <button
+                      key={id}
+                      onClick={() => setActiveMenu(id)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
+                        activeMenu === id
+                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
+                          : 'text-white/50 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                      {label}
+                    </button>
+                  ))}
                 </nav>
               </div>
 
             </div>
 
             {/* Bottom Actions */}
-            <div className="p-4 border-t border-[#3C1F32] space-y-3">
-              <button 
-                onClick={onBackToStore} 
-                className="w-full bg-gradient-to-r from-[#9A2D55] to-[#731E3F] hover:opacity-90 text-white font-bold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1 cursor-pointer"
+            <div className="px-3 py-4 border-t border-white/5 space-y-1">
+              <button
+                onClick={onBackToStore}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all duration-150 cursor-pointer group"
               >
-                🌍 العودة للمتجر العام
+                <Globe className="w-3.5 h-3.5 text-white/30 group-hover:text-white/60 shrink-0" />
+                العودة للمتجر
               </button>
-              <button 
-                onClick={handleLogout} 
-                className="w-full border border-[#3C1F32] hover:bg-[#341C2B] text-[#B58EA0] font-bold text-[10px] py-1.5 px-3 rounded flex items-center justify-center gap-1 cursor-pointer"
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400/60 hover:text-rose-300 hover:bg-rose-500/5 transition-all duration-150 cursor-pointer group"
               >
-                🔐 تسجيل خروج آمن
+                <LogIn className="w-3.5 h-3.5 shrink-0 rotate-180" />
+                تسجيل الخروج
               </button>
             </div>
           </aside>
