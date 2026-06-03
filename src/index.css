@@ -80,3 +80,42 @@ body {
 @media (max-width: 768px) {
   .has-bottom-nav { padding-bottom: 72px; }
 }
+
+/* ─── GLASS CARD ─────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+/* ─── HERO FADE ──────────────────────────────────────────── */
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-fade      { animation: heroFadeIn 0.75s cubic-bezier(.22,.68,0,1.2) forwards; }
+.hero-fade-2    { animation: heroFadeIn 0.75s 0.15s cubic-bezier(.22,.68,0,1.2) both; }
+.hero-fade-3    { animation: heroFadeIn 0.75s 0.3s  cubic-bezier(.22,.68,0,1.2) both; }
+
+/* ─── SMOOTH SCROLL SHADOW ───────────────────────────────── */
+.scroll-shadow-r { mask-image: linear-gradient(to left, transparent 0%, black 15%); }
+.scroll-shadow-l { mask-image: linear-gradient(to right, transparent 0%, black 15%); }
+
+/* ─── LINE CLAMP UTILITIES ───────────────────────────────── */
+.line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+.line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* ─── ADMIN SIDEBAR ──────────────────────────────────────── */
+.admin-sidebar-item {
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.admin-sidebar-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+.admin-sidebar-item.active {
+  background: #9A2D55;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(154,45,85,0.25);
+}

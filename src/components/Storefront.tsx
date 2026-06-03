@@ -298,15 +298,16 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       </div>
 
       {/* ── 1. ANNOUNCEMENT BAR ──────────────────────────────────── */}
-      <div className="bg-[#2C1810] text-[#E8D5C4] py-2 px-4 text-center text-[11px] font-semibold tracking-wide">
-        <span className="hidden sm:inline">✨ مخاوير العيد وصلت! </span>
-        توصيل دولي سريع لجميع دول الخليج والعالم
-        <span className="mx-3 text-[#C4956A]">|</span>
-        شحن مجاني للطلبات فوق 50 د.ب
-        <span className="hidden md:inline">
-          <span className="mx-3 text-[#C4956A]">|</span>
-          <button onClick={onNavigateToAdmin} className="underline opacity-50 hover:opacity-100 text-[10px]">إدارة المتجر</button>
-        </span>
+      <div className="bg-[#2C1810] text-[#E8D5C4] py-2 px-4 overflow-hidden">
+        <div className="flex items-center justify-center gap-8 text-[11px] font-semibold tracking-wide whitespace-nowrap animate-marquee-pause">
+          <span className="flex items-center gap-2">✨ مخاوير العيد وصلت! تسوّقي الآن</span>
+          <span className="text-[#C4956A]">◆</span>
+          <span>توصيل دولي سريع لجميع دول الخليج والعالم</span>
+          <span className="text-[#C4956A]">◆</span>
+          <span>شحن مجاني للطلبات فوق 50 د.ب 🎁</span>
+          <span className="text-[#C4956A]">◆</span>
+          <button onClick={onNavigateToAdmin} className="opacity-30 hover:opacity-70 text-[10px] transition-opacity">إدارة المتجر</button>
+        </div>
       </div>
 
       {/* ── 2. HEADER ────────────────────────────────────────────── */}
@@ -396,71 +397,118 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         <main>
 
           {/* ── 3. HERO SECTION ─────────────────────────────────── */}
-          <section className="relative overflow-hidden bg-[#2C1810]" style={{ minHeight: '70vh' }}>
-            {/* Background - gradient */}
-            <div className="absolute inset-0 bg-gradient-to-l from-[#1a0d08]/80 via-[#2C1810]/60 to-transparent z-10" />
+          <section className="relative overflow-hidden bg-[#F5EBE6]" style={{ minHeight: '82vh' }}>
+            {/* Soft warm gradient bg */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#F5EBE6] via-[#F0E0D6] to-[#EDD5CA]" />
 
-            {/* Hero image */}
-            {products.length > 0 && (
-              <img src={products[0].image} alt="hero"
-                referrerPolicy="no-referrer"
-                className="absolute inset-0 w-full h-full object-cover object-top opacity-60"
-              />
-            )}
+            {/* Decorative elements */}
+            <div className="absolute top-0 left-0 w-72 h-72 bg-[#9A2D55]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C4956A]/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
 
-            {/* Pattern overlay */}
-            <div className="absolute inset-0 opacity-10 z-10"
-              style={{ backgroundImage: 'radial-gradient(circle, #C4956A 1px, transparent 1px)', backgroundSize: '32px 32px' }}
-            />
+            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
+              <div className="flex flex-col md:flex-row items-center" style={{ minHeight: '82vh' }}>
 
-            <div className="relative z-20 max-w-7xl mx-auto px-4 flex items-center" style={{ minHeight: '70vh' }}>
-              <div className="max-w-xl py-16 fade-up">
-                <div className="inline-flex items-center gap-2 bg-[#C4956A]/20 border border-[#C4956A]/30 text-[#E8D5C4] text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-                  <Sparkles className="w-3.5 h-3.5 text-[#C4956A]" />
-                  مخاوير ألماسة — أناقة عصرية فاخرة
+                {/* Text content - right side (RTL) */}
+                <div className="flex-1 py-16 md:py-0 order-2 md:order-1 fade-up text-center md:text-right">
+                  <div className="inline-flex items-center gap-2 bg-[#9A2D55]/10 border border-[#9A2D55]/20 text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-6">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    مخاوير ألماسة — كولكشن 2026
+                  </div>
+
+                  <h1 className="text-[2.6rem] md:text-5xl lg:text-6xl font-black text-[#2C1810] leading-[1.15] mb-5">
+                    فخامة التفاصيل<br />
+                    <span className="text-[#9A2D55]">في كل خيط</span>
+                  </h1>
+
+                  <p className="text-[#8B7B78] text-sm md:text-base leading-relaxed mb-8 max-w-md mx-auto md:mx-0">
+                    تشكيلة راقية من المخاوير والأقمشة الفاخرة بتصاميم حصرية وجودة استثنائية بتصاميم عصرية وجودة استثنائية
+                  </p>
+
+                  <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                    <button
+                      onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="bg-[#9A2D55] hover:bg-[#802446] text-white font-bold px-8 py-3.5 rounded-full shadow-lg shadow-[#9A2D55]/20 transition-all hover:-translate-y-0.5 flex items-center gap-2 text-sm"
+                    >
+                      تسوّقي الآن
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('shop'); setSelectedCategory(categories.filter(c=>c.id!=='all')[0]?.id || 'all'); }}
+                      className="bg-white border border-[#E8D5C4] text-[#2C1810] font-semibold px-6 py-3.5 rounded-full hover:border-[#9A2D55] hover:text-[#9A2D55] transition-all text-sm"
+                    >
+                      تصفح المخاوير
+                    </button>
+                  </div>
+
+                  {/* Stats row */}
+                  <div className="flex gap-6 mt-10 justify-center md:justify-start">
+                    {[
+                      { num: `${products.length}+`, label: 'منتج فاخر' },
+                      { num: '500+', label: 'عميلة سعيدة' },
+                      { num: '4.9', label: 'تقييم متوسط ⭐' },
+                    ].map(({ num, label }) => (
+                      <div key={label} className="text-center md:text-right">
+                        <p className="text-xl font-black text-[#9A2D55]">{num}</p>
+                        <p className="text-[11px] text-[#8B7B78] font-medium">{label}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
-                  أناقة<br />
-                  <span className="text-[#E8D5C4]">استثنائية</span><br />
-                  <span className="text-[#C4956A]">تفاصيل تخطف الأنظار</span>
-                </h1>
-
-                <p className="text-[#C4956A]/80 text-sm md:text-base leading-relaxed mb-8 font-medium max-w-md">
-                  تشكيلة راقية من المخاوير والأقمشة الفاخرة بتصاميم حصرية وجودة استثنائية — لكل مناسبة أنيقة في حياتكِ
-                </p>
-
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="bg-[#9A2D55] hover:bg-[#802446] text-white font-bold px-8 py-3.5 rounded-full shadow-lg transition-all hover:shadow-[#9A2D55]/30 hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2"
-                  >
-                    تسوّقي الآن
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('tracking')}
-                    className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3.5 rounded-full backdrop-blur-sm transition-all"
-                  >
-                    تتبع طلبي ✈️
-                  </button>
+                {/* Hero image - left side */}
+                <div className="flex-1 order-1 md:order-2 relative flex justify-center items-end" style={{ minHeight: '60vw', maxHeight: '75vh' }}>
+                  {products.length > 0 && (
+                    <>
+                      {/* Main image card */}
+                      <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#9A2D55]/15 w-[75%] md:w-[85%] aspect-[3/4] max-h-[72vh]">
+                        <img src={products[0].image} alt="hero product"
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover object-top"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/40 via-transparent to-transparent" />
+                        {/* Price badge */}
+                        <div className="absolute bottom-5 right-5 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-lg">
+                          <p className="text-[10px] text-[#8B7B78] font-medium">{products[0].name.slice(0,18)}...</p>
+                          <p className="text-[#9A2D55] font-black text-base">{products[0].price.toFixed(2)} د.ب</p>
+                        </div>
+                      </div>
+                      {/* Floating second image */}
+                      {products[1] && (
+                        <div className="absolute left-0 bottom-10 w-[38%] aspect-[3/4] rounded-2xl overflow-hidden shadow-xl border-4 border-white hidden md:block">
+                          <img src={products[1].image} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {products.length === 0 && (
+                    <div className="w-full h-full bg-gradient-to-br from-[#F2E4DC] to-[#E8D5C4] rounded-[2.5rem] flex items-center justify-center">
+                      <Sparkles className="w-16 h-16 text-[#C4956A]/40" />
+                    </div>
+                  )}
                 </div>
+
               </div>
             </div>
 
-            {/* Trust badges */}
-            <div className="relative z-20 bg-[#9A2D55]/90 backdrop-blur-sm">
+            {/* Trust badges bar */}
+            <div className="relative z-10 border-t border-[#E8D5C4] bg-white/60 backdrop-blur-sm">
               <div className="max-w-7xl mx-auto px-4 py-3">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   {[
-                    { icon: Truck, label: 'شحن لجميع الدول' },
-                    { icon: BadgeCheck, label: 'جودة فاخرة مضمونة' },
-                    { icon: ShieldCheck, label: 'دفع آمن 100%' },
-                    { icon: Gift, label: 'تغليف هدايا مجاني' },
-                  ].map(({ icon: Icon, label }) => (
-                    <div key={label} className="flex items-center justify-center gap-2 text-white/90">
-                      <Icon className="w-4 h-4 text-[#E8D5C4] shrink-0" />
-                      <span className="text-xs font-semibold">{label}</span>
+                    { icon: Globe2, label: 'شحن لجميع الدول', sub: 'دول الخليج والعالم' },
+                    { icon: BadgeCheck, label: 'جودة فاخرة', sub: 'أقمشة مختارة بعناية' },
+                    { icon: ShieldCheck, label: 'دفع آمن 100%', sub: 'مشفر ومحمي' },
+                    { icon: Gift, label: 'تغليف هدايا', sub: 'مجاني مع كل طلب' },
+                  ].map(({ icon: Icon, label, sub }) => (
+                    <div key={label} className="flex items-center gap-2.5 justify-center md:justify-start">
+                      <div className="w-8 h-8 bg-[#F8EDE8] rounded-xl flex items-center justify-center shrink-0">
+                        <Icon className="w-4 h-4 text-[#9A2D55]" />
+                      </div>
+                      <div className="text-right hidden sm:block">
+                        <p className="text-xs font-bold text-[#2C1810]">{label}</p>
+                        <p className="text-[10px] text-[#8B7B78]">{sub}</p>
+                      </div>
+                      <span className="sm:hidden text-xs font-bold text-[#2C1810]">{label}</span>
                     </div>
                   ))}
                 </div>
@@ -751,20 +799,77 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 9. INSTAGRAM/WHATSAPP CTA ───────────────────────── */}
-          <section className="py-14 px-4 bg-gradient-to-br from-[#9A2D55] to-[#6B1E3A]">
-            <div className="max-w-2xl mx-auto text-center">
-              <Sparkles className="w-8 h-8 text-[#E8D5C4] mx-auto mb-4" />
-              <h2 className="text-2xl md:text-3xl font-black text-white mb-3">تواصلي معنا على الواتساب</h2>
-              <p className="text-[#E8D5C4] text-sm mb-7 leading-relaxed">
+          {/* ── 9. NEWSLETTER SECTION ───────────────────────────── */}
+          <section className="py-14 px-4 bg-[#F8EDE8]">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                {/* Left: CTA */}
+                <div className="md:col-span-2 space-y-2">
+                  <div className="flex items-center gap-2 text-[#9A2D55] text-xs font-bold">
+                    <Gift className="w-4 h-4" />
+                    <span>انضمي لعائلة ألماسة</span>
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-black text-[#2C1810]">اطلعي على جديدنا أولاً</h2>
+                  <p className="text-[#8B7B78] text-sm">عبر الجوال والبريد الإلكتروني — خصومات وعروض حصرية للأعضاء</p>
+                </div>
+                {/* Right: WhatsApp button */}
+                <div className="flex flex-col gap-3">
+                  <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                    className="flex items-center justify-center gap-2 bg-[#9A2D55] hover:bg-[#802446] text-white font-black px-6 py-3.5 rounded-2xl shadow-lg shadow-[#9A2D55]/20 transition-all hover:-translate-y-0.5 text-sm">
+                    <Phone className="w-4 h-4" />
+                    تواصلي على واتساب
+                  </a>
+                  <p className="text-[10px] text-center text-[#8B7B78] font-mono">+973 37037697 — نرد خلال دقائق 24/7</p>
+                </div>
+              </div>
+
+              {/* 3 perks */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
+                {[
+                  { icon: Gift, title: 'خصومات حصرية', desc: 'عروض خاصة للأعضاء على المخاوير والأقمشة' },
+                  { icon: Sparkles, title: 'اطلعي على الجديد أولاً', desc: 'تصاميم جديدة قبل الإعلان الرسمي' },
+                  { icon: BadgeCheck, title: 'مزايا عضوية ألماسة', desc: 'نقاط مكافآت وهدايا مع كل طلب' },
+                ].map(({ icon: Icon, title, desc }) => (
+                  <div key={title} className="bg-white rounded-2xl p-5 border border-[#F2E4DC] flex gap-4 items-start">
+                    <div className="w-10 h-10 bg-[#F8EDE8] rounded-xl flex items-center justify-center shrink-0">
+                      <Icon className="w-5 h-5 text-[#9A2D55]" />
+                    </div>
+                    <div>
+                      <p className="font-black text-[#2C1810] text-sm">{title}</p>
+                      <p className="text-[#8B7B78] text-xs mt-0.5 leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ── 10. WHATSAPP CTA ───────────────────────────────── */}
+          <section className="py-14 px-4" style={{ background: 'linear-gradient(135deg, #9A2D55 0%, #6B1E3A 50%, #4A1228 100%)' }}>
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <Sparkles className="w-7 h-7 text-[#E8D5C4]" />
+              </div>
+              <h2 className="text-2xl md:text-4xl font-black text-white mb-3 leading-tight">
+                أناقة استثنائية<br />
+                <span className="text-[#E8D5C4]">تفاصيل تخطف الأنظار</span>
+              </h2>
+              <p className="text-white/70 text-sm mb-8 max-w-lg mx-auto leading-relaxed">
                 للطلبات الخاصة والتفصيل المخصص والاستفسارات، فريقنا جاهز للخدمة 24/7
               </p>
-              <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                className="inline-flex items-center gap-2 bg-white text-[#9A2D55] font-black px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 text-sm">
-                <Phone className="w-4 h-4" />
-                تواصلي على واتساب الآن
-              </a>
-              <p className="text-white/40 text-xs mt-4 font-mono">+973 37037697</p>
+              <div className="flex flex-wrap gap-3 justify-center">
+                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-[#9A2D55] font-black px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 text-sm">
+                  <Phone className="w-4 h-4" />
+                  تواصلي على واتساب الآن
+                </a>
+                <button
+                  onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold px-8 py-4 rounded-full hover:bg-white/20 transition-all text-sm">
+                  تصفح التشكيلة
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </section>
 
@@ -860,41 +965,45 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       )}
 
       {/* ── FOOTER ──────────────────────────────────────────────── */}
-      <footer className="bg-[#1a0d08] text-[#8B7B78] mt-0">
-        <div className="max-w-7xl mx-auto px-4 py-14">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+      <footer className="bg-[#1a0d08] text-[#8B7B78]">
+        <div className="max-w-7xl mx-auto px-4 pt-14 pb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
 
             {/* Brand */}
-            <div className="md:col-span-2">
+            <div className="sm:col-span-2 md:col-span-1">
               <div className="mb-4">
                 <p className="text-3xl font-black text-white" style={{ fontFamily: "'Cairo', serif" }}>ألماسة</p>
-                <p className="text-[9px] tracking-[0.3em] text-[#C4956A] font-bold uppercase mt-1">ALMAASA BOUTIQUE</p>
+                <p className="text-[9px] tracking-[0.3em] text-[#C4956A] font-bold uppercase mt-0.5">ALMAASA BOUTIQUE</p>
               </div>
-              <p className="text-sm leading-relaxed text-[#8B7B78] font-medium max-w-xs">
+              <p className="text-[13px] leading-relaxed text-[#8B7B78] font-medium">
                 متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.
               </p>
-              <div className="flex gap-3 mt-5">
+              <div className="flex gap-2.5 mt-5">
                 <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                  className="w-9 h-9 bg-white/5 hover:bg-emerald-600 border border-white/10 rounded-xl flex items-center justify-center text-[#8B7B78] hover:text-white transition-all">
+                  className="w-9 h-9 bg-white/5 hover:bg-emerald-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
                   <Phone className="w-4 h-4" />
                 </a>
-                <a href="#" className="w-9 h-9 bg-white/5 hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-600 border border-white/10 rounded-xl flex items-center justify-center text-[#8B7B78] hover:text-white transition-all">
+                <a href="https://instagram.com/almaasa_store" target="_blank" rel="noreferrer"
+                  className="w-9 h-9 bg-white/5 hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
                   <Instagram className="w-4 h-4" />
                 </a>
               </div>
             </div>
 
-            {/* Links */}
+            {/* Shop links */}
             <div>
-              <p className="text-white font-bold text-sm mb-4">روابط سريعة</p>
+              <p className="text-white font-black text-sm mb-4">التسوق</p>
               <ul className="space-y-2.5">
                 {[
-                  { label: 'تسوّق المخاوير', action: () => setActiveTab('shop') },
-                  { label: 'تتبع طلبي ✈️', action: () => setActiveTab('tracking') },
-                  { label: 'آراء الزبائن ⭐', action: () => setShowReviewsPopup(true) },
+                  { label: 'جميع المنتجات', action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
+                  ...categories.filter(c=>c.id!=='all').slice(0,3).map(c => ({
+                    label: c.name,
+                    action: () => { setActiveTab('shop'); setSelectedCategory(c.id); }
+                  })),
+                  { label: 'العروض والتخفيضات', action: () => setActiveTab('shop') },
                 ].map(item => (
                   <li key={item.label}>
-                    <button onClick={item.action} className="text-sm hover:text-[#C4956A] transition-colors font-medium">
+                    <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium text-right">
                       {item.label}
                     </button>
                   </li>
@@ -902,30 +1011,58 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               </ul>
             </div>
 
-            {/* Payment */}
+            {/* Help links */}
             <div>
-              <p className="text-white font-bold text-sm mb-4">وسائل الدفع</p>
-              <div className="flex flex-wrap gap-2">
+              <p className="text-white font-black text-sm mb-4">المساعدة</p>
+              <ul className="space-y-2.5">
+                {[
+                  { label: 'تتبع طلبي ✈️', action: () => setActiveTab('tracking') },
+                  { label: 'آراء الزبائن ⭐', action: () => setShowReviewsPopup(true) },
+                  { label: 'تواصلي معنا', action: () => window.open('https://wa.me/97337037697','_blank') },
+                  { label: 'سياسة الإرجاع', action: () => {} },
+                ].map(item => (
+                  <li key={item.label}>
+                    <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium">
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Payment + contact */}
+            <div>
+              <p className="text-white font-black text-sm mb-4">وسائل الدفع</p>
+              <div className="flex flex-wrap gap-2 mb-5">
                 {['BenefitPay', 'KNet', 'Visa', 'Mastercard', 'Apple Pay'].map(p => (
                   <span key={p} className="bg-white/5 border border-white/10 text-[#8B7B78] text-[10px] font-bold px-2.5 py-1 rounded-lg">
                     {p}
                   </span>
                 ))}
               </div>
-              <div className="mt-5">
-                <p className="text-[#8B7B78] text-[11px] flex items-center gap-1.5">
+              <div className="space-y-2 text-[12px]">
+                <p className="flex items-center gap-1.5 text-[#8B7B78]">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   جميع المدفوعات مشفّرة وآمنة
                 </p>
+                <p className="flex items-center gap-1.5 text-[#8B7B78]">
+                  <MapPin className="w-3.5 h-3.5 text-[#C4956A] shrink-0" />
+                  المنامة، مملكة البحرين
+                </p>
               </div>
             </div>
+
           </div>
 
-          <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] text-[#8B7B78] font-medium">
+          <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[#8B7B78]/60 font-medium">
             <p>© 2026 مخاوير ألماسة — almaasa.bh — جميع الحقوق محفوظة</p>
-            <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-50 transition-opacity text-[10px]">
-              لوحة الإدارة
-            </button>
+            <div className="flex items-center gap-4">
+              <button className="hover:text-[#8B7B78] transition-colors">سياسة الخصوصية</button>
+              <button className="hover:text-[#8B7B78] transition-colors">الشروط والأحكام</button>
+              <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-60 transition-opacity">
+                إدارة المتجر
+              </button>
+            </div>
           </div>
         </div>
       </footer>

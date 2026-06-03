@@ -839,34 +839,49 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
           </aside>
 
           {/* B. MAIN INTERACTIVE VIEWER PANEL */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-8">
-            
-            {/* Top Bar Status bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-4 mb-6 gap-2">
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">
-                  {activeMenu === 'dashboard' ? 'لوحة القيادة الموحدة ونظرة عامة' : 
-                   activeMenu === 'orders' ? 'إدارة طرود وطلبيات المخاوير المعتمدة' :
-                   activeMenu === 'sales_log' ? 'البيانات المالية والأرباح المسجلة' :
-                   activeMenu === 'customers' ? 'دليل عملاء المتجر الفاعلين' :
-                   activeMenu === 'shipping_bills' ? 'تجهيز بوليصات التوصيل الجمركي' :
-                   activeMenu === 'categories' ? 'إدارة وتفريع تصنيفات السلع' :
-                   activeMenu === 'products' ? 'كتالوج ومخزون المنتجات' :
-                   activeMenu === 'inventory' ? 'إعادة شحن وقص المنسوجات والمخزون' :
-                   activeMenu === 'options' ? 'الخيارات المضافة واللمسات اليدوية' :
-                   activeMenu === 'reviews' ? 'فريق فحص معنويات وتقييمات العملاء' :
-                   activeMenu === 'coupons' ? 'أكواد وحملات تخفيض العيد' :
-                   activeMenu === 'payment_gateways' ? 'إعدادات وبوابات الدفع المسجلة لـ "ألماسة"' :
-                   activeMenu === 'shipping_zones' ? 'إدارة مناطق وبوابات شحن وتوصيل مخاوير ألماسة' :
-                   'أدلة المقاسات والتصميم بالبوصة'}
-                </h2>
-                <p className="text-slate-400 text-xs font-semibold">بوابة ألماسة الآمنة | التحديث فوري ومربوط بقاعدة خوادم التخزين.</p>
+          <main className="flex-1 overflow-y-auto bg-[#FAF5F2]">
+            {/* Top Bar */}
+            <div className="sticky top-0 z-20 bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-[#F8EDE8] rounded-lg flex items-center justify-center">
+                  {activeMenu === 'dashboard' ? <BarChart3 className="w-4 h-4 text-[#9A2D55]" /> :
+                   activeMenu === 'orders' ? <ShoppingBag className="w-4 h-4 text-[#9A2D55]" /> :
+                   activeMenu === 'products' ? <Layers className="w-4 h-4 text-[#9A2D55]" /> :
+                   activeMenu === 'customers' ? <Users className="w-4 h-4 text-[#9A2D55]" /> :
+                   <Settings className="w-4 h-4 text-[#9A2D55]" />}
+                </div>
+                <div>
+                  <h2 className="text-sm font-black text-slate-800">
+                    {activeMenu === 'dashboard' ? 'لوحة التحكم' :
+                     activeMenu === 'orders' ? 'الطلبات' :
+                     activeMenu === 'sales_log' ? 'المبيعات' :
+                     activeMenu === 'customers' ? 'العملاء' :
+                     activeMenu === 'categories' ? 'التصنيفات' :
+                     activeMenu === 'products' ? 'المنتجات' :
+                     activeMenu === 'inventory' ? 'المخزون' :
+                     activeMenu === 'reviews' ? 'التقييمات' :
+                     activeMenu === 'coupons' ? 'الكوبونات' :
+                     activeMenu === 'payment_gateways' ? 'بوابات الدفع' :
+                     activeMenu === 'shipping_zones' ? 'مناطق الشحن' :
+                     activeMenu === 'size_guides' ? 'أدلة المقاسات' : 'الإعدادات'}
+                  </h2>
+                  <p className="text-[10px] text-slate-400 font-medium">المدير — {new Date().toLocaleDateString('ar-BH', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}</p>
+                </div>
               </div>
-
-              <div className="text-xs bg-slate-100 border p-2 rounded-xl text-slate-600 font-mono text-center md:text-left self-start">
-                ⏱️ توقيت العمليات: {new Date().toISOString().replace('T', ' ').substring(0, 16)} UTC
+              <div className="flex items-center gap-2">
+                {pendingOrdersCount > 0 && (
+                  <button onClick={() => setActiveMenu('orders')} className="flex items-center gap-1.5 bg-[#FFF0F4] border border-rose-100 text-[#9A2D55] text-[11px] font-bold px-3 py-1.5 rounded-full">
+                    <span className="w-1.5 h-1.5 bg-[#9A2D55] rounded-full badge-pulse" />
+                    {pendingOrdersCount} طلب جديد
+                  </button>
+                )}
+                <button onClick={loadData} className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors" title="تحديث">
+                  <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
+                </button>
               </div>
             </div>
+
+            <div className="p-5 md:p-7">
 
             {/* =========================================
                 SECTION 1: OVERVIEW DASHBOARD VIEW
@@ -2386,6 +2401,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
               </div>
             )}
 
+            </div>{/* end p-5 md:p-7 */}
           </main>
 
           {/* C. MODAL overlay: Full Order Card Details (تفاصيل الطلب الكاملة وسجل العمليات) */}
