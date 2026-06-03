@@ -704,339 +704,409 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
         /* AUTHENTICATED PANEL LAYOUT WITH DYNAMIC ARABIC SIDEBAR */
         <div className="flex-1 flex flex-col md:flex-row">
           
-          {/* A. RIGHT NAVIGATION BAR - Clean Slate */}
-          <aside className="w-full md:w-64 bg-slate-900 text-white flex flex-col justify-between border-l border-slate-800" id="admin-sidebar">
+          {/* A. SIDEBAR - Modern redesign */}
+          <aside className="w-full md:w-60 bg-[#1A0D16] text-white flex flex-col shrink-0" id="admin-sidebar">
 
-            <div className="p-4 space-y-5 overflow-y-auto">
-              {/* Branding header */}
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                <span className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-rose-400 shrink-0" />
-                  <span className="text-sm font-black tracking-tight bg-gradient-to-l from-slate-100 to-rose-200 bg-clip-text text-transparent">لوحة تحكم ألماسة</span>
-                </span>
-                <span className="text-[10px] bg-rose-500/20 text-rose-300 font-semibold px-2 py-0.5 rounded-full border border-rose-500/25 shrink-0">مشرف</span>
-              </div>
-
-              {/* SECTION 1: SALES */}
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2 font-light select-none px-1">المبيعات والعملاء</p>
-                <nav className="space-y-0.5 text-xs">
-                  {(
-                    [
-                      { key: 'dashboard',      label: 'نظرة عامة',            Icon: LayoutGrid,  badge: null,               badgeStyle: '' },
-                      { key: 'orders',         label: 'طلبات الزبائن',         Icon: ShoppingBag, badge: pendingOrdersCount,  badgeStyle: 'bg-rose-500' },
-                      { key: 'sales_log',      label: 'المبيعات والمدخول',     Icon: Wallet,      badge: null,               badgeStyle: '' },
-                      { key: 'customers',      label: 'دليل العملاء',          Icon: Users,       badge: null,               badgeStyle: '' },
-                      { key: 'shipping_bills', label: 'بوليصات الشحن الدولي', Icon: FileText,    badge: null,               badgeStyle: '' },
-                    ] as const
-                  ).map(({ key, label, Icon, badge, badgeStyle }) => (
-                    <button
-                      key={key}
-                      onClick={() => setActiveMenu(key)}
-                      className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ${
-                        activeMenu === key
-                          ? 'bg-gradient-to-l from-slate-800 to-slate-700/50 text-white shadow-sm'
-                          : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-100'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2.5">
-                        <Icon className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeMenu === key ? 'text-rose-400' : 'text-slate-500'}`} />
-                        <span className="font-medium">{label}</span>
-                      </span>
-                      {badge != null && badge > 0 && (
-                        <span className={`${badgeStyle} text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full font-bold px-1`}>{badge}</span>
-                      )}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              {/* SECTION 2: STORE MANAGEMENT */}
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2 font-light select-none px-1">إدارة المتجر الفعلي</p>
-                <nav className="space-y-0.5 text-xs">
-                  {(
-                    [
-                      { key: 'categories',      label: 'التصنيفات',           Icon: FolderKanban, badge: null,                badgeStyle: '' },
-                      { key: 'products',        label: 'المنتجات المعروضة',   Icon: Layers,       badge: null,                badgeStyle: '' },
-                      { key: 'inventory',       label: 'إدارة المخزون',       Icon: ClipboardList,badge: lowStockProductsCount, badgeStyle: 'bg-amber-500' },
-                      { key: 'options',         label: 'خيارات المنتج',       Icon: Sliders,      badge: null,                badgeStyle: '' },
-                      { key: 'reviews',         label: 'تقييمات الزبائن',     Icon: Star,         badge: null,                badgeStyle: '' },
-                      { key: 'payment_gateways',label: 'بوابات الدفع',        Icon: CreditCard,   badge: null,                badgeStyle: '' },
-                      { key: 'shipping_zones',  label: 'مناطق التوصيل',       Icon: Truck,        badge: null,                badgeStyle: '' },
-                    ] as const
-                  ).map(({ key, label, Icon, badge, badgeStyle }) => (
-                    <button
-                      key={key}
-                      onClick={() => setActiveMenu(key)}
-                      className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ${
-                        activeMenu === key
-                          ? 'bg-gradient-to-l from-slate-800 to-slate-700/50 text-white shadow-sm'
-                          : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-100'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2.5">
-                        <Icon className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeMenu === key ? 'text-rose-400' : 'text-slate-500'}`} />
-                        <span className="font-medium">{label}</span>
-                      </span>
-                      {badge != null && badge > 0 && (
-                        <span className={`${badgeStyle} text-white text-[10px] min-w-[18px] h-[18px] flex items-center justify-center rounded-full font-bold px-1`}>{badge}</span>
-                      )}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              {/* SECTION 3: MARKETING */}
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2 font-light select-none px-1">التسويق والمقاسات</p>
-                <nav className="space-y-0.5 text-xs">
-                  {(
-                    [
-                      { key: 'coupons',     label: 'الكوبونات الخصمية',    Icon: Percent  },
-                      { key: 'size_guides', label: 'أدلة قياسات الخياط',   Icon: Compass  },
-                    ] as const
-                  ).map(({ key, label, Icon }) => (
-                    <button
-                      key={key}
-                      onClick={() => setActiveMenu(key)}
-                      className={`w-full text-right flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer ${
-                        activeMenu === key
-                          ? 'bg-gradient-to-l from-slate-800 to-slate-700/50 text-white shadow-sm'
-                          : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-100'
-                      }`}
-                    >
-                      <Icon className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeMenu === key ? 'text-rose-400' : 'text-slate-500'}`} />
-                      <span className="font-medium">{label}</span>
-                    </button>
-                  ))}
-                </nav>
+            {/* Brand Header */}
+            <div className="px-5 py-5 border-b border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#9A2D55] to-[#5C1532] flex items-center justify-center shadow-lg shadow-[#9A2D55]/30 shrink-0">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-black text-sm leading-tight">ألماسة</p>
+                  <p className="text-white/40 text-[10px] font-medium">لوحة التحكم</p>
+                </div>
               </div>
             </div>
 
+            {/* Nav Sections */}
+            <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+
+              {/* Section: المبيعات */}
+              <div>
+                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">المبيعات</p>
+                <nav className="space-y-0.5">
+                  {([
+                    { id: 'dashboard',      icon: BarChart3,    label: 'نظرة عامة',        badge: null,                badgeColor: '' },
+                    { id: 'orders',         icon: ShoppingBag,  label: 'طلبات الزبائن',    badge: pendingOrdersCount > 0 ? pendingOrdersCount : null, badgeColor: 'bg-rose-500' },
+                    { id: 'sales_log',      icon: CreditCard,   label: 'المبيعات والمدخول', badge: null,                badgeColor: '' },
+                    { id: 'customers',      icon: Users,        label: 'دليل العملاء',      badge: null,                badgeColor: '' },
+                    { id: 'shipping_bills', icon: FileText,     label: 'بوليصات الشحن',    badge: null,                badgeColor: '' },
+                  ] as const).map(({ id, icon: Icon, label, badge, badgeColor }) => (
+                    <button
+                      key={id}
+                      onClick={() => setActiveMenu(id)}
+                      className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
+                        activeMenu === id
+                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
+                          : 'text-white/50 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                        {label}
+                      </span>
+                      {badge != null && (
+                        <span className={`${badgeColor} text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1`}>{badge}</span>
+                      )}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              <div className="h-px bg-white/5 mx-2" />
+
+              {/* Section: المتجر */}
+              <div>
+                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">إدارة المتجر</p>
+                <nav className="space-y-0.5">
+                  {([
+                    { id: 'categories',       icon: FolderKanban, label: 'التصنيفات',        badge: null, badgeColor: '' },
+                    { id: 'products',         icon: Layers,       label: 'المنتجات',          badge: null, badgeColor: '' },
+                    { id: 'inventory',        icon: ClipboardList,label: 'المخزون',           badge: lowStockProductsCount > 0 ? lowStockProductsCount : null, badgeColor: 'bg-amber-500' },
+                    { id: 'options',          icon: Sliders,      label: 'خيارات المنتج',    badge: null, badgeColor: '' },
+                    { id: 'reviews',          icon: Star,         label: 'تقييمات العملاء',  badge: null, badgeColor: '' },
+                    { id: 'payment_gateways', icon: CreditCard,   label: 'بوابات الدفع',     badge: null, badgeColor: '' },
+                    { id: 'shipping_zones',   icon: Truck,        label: 'مناطق الشحن',      badge: null, badgeColor: '' },
+                  ] as const).map(({ id, icon: Icon, label, badge, badgeColor }) => (
+                    <button
+                      key={id}
+                      onClick={() => setActiveMenu(id)}
+                      className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
+                        activeMenu === id
+                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
+                          : 'text-white/50 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                        {label}
+                      </span>
+                      {badge != null && (
+                        <span className={`${badgeColor} text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1`}>{badge}</span>
+                      )}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              <div className="h-px bg-white/5 mx-2" />
+
+              {/* Section: التسويق */}
+              <div>
+                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">التسويق</p>
+                <nav className="space-y-0.5">
+                  {([
+                    { id: 'coupons',     icon: Tag,     label: 'الكوبونات' },
+                    { id: 'size_guides', icon: Compass, label: 'أدلة المقاسات' },
+                  ] as const).map(({ id, icon: Icon, label }) => (
+                    <button
+                      key={id}
+                      onClick={() => setActiveMenu(id)}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
+                        activeMenu === id
+                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
+                          : 'text-white/50 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
+                      {label}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+            </div>
+
             {/* Bottom Actions */}
-            <div className="p-4 border-t border-slate-800 space-y-2">
+            <div className="px-3 py-4 border-t border-white/5 space-y-1">
               <button
                 onClick={onBackToStore}
-                className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-semibold text-xs py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all duration-150 cursor-pointer group"
               >
-                <Globe className="w-3.5 h-3.5 text-rose-400" />
-                العودة للمتجر العام
+                <Globe className="w-3.5 h-3.5 text-white/30 group-hover:text-white/60 shrink-0" />
+                العودة للمتجر
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full hover:bg-slate-800 text-slate-500 hover:text-slate-300 font-medium text-[11px] py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400/60 hover:text-rose-300 hover:bg-rose-500/5 transition-all duration-150 cursor-pointer group"
               >
-                <LogIn className="w-3.5 h-3.5" />
-                تسجيل خروج آمن
+                <LogIn className="w-3.5 h-3.5 shrink-0 rotate-180" />
+                تسجيل الخروج
               </button>
             </div>
           </aside>
 
           {/* B. MAIN INTERACTIVE VIEWER PANEL */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-8">
-            
-            {/* Top Bar Status bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-4 mb-6 gap-2">
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">
-                  {activeMenu === 'dashboard' ? 'لوحة القيادة الموحدة ونظرة عامة' : 
-                   activeMenu === 'orders' ? 'إدارة طرود وطلبيات المخاوير المعتمدة' :
-                   activeMenu === 'sales_log' ? 'البيانات المالية والأرباح المسجلة' :
-                   activeMenu === 'customers' ? 'دليل عملاء المتجر الفاعلين' :
-                   activeMenu === 'shipping_bills' ? 'تجهيز بوليصات التوصيل الجمركي' :
-                   activeMenu === 'categories' ? 'إدارة وتفريع تصنيفات السلع' :
-                   activeMenu === 'products' ? 'كتالوج ومخزون المنتجات' :
-                   activeMenu === 'inventory' ? 'إعادة شحن وقص المنسوجات والمخزون' :
-                   activeMenu === 'options' ? 'الخيارات المضافة واللمسات اليدوية' :
-                   activeMenu === 'reviews' ? 'فريق فحص معنويات وتقييمات العملاء' :
-                   activeMenu === 'coupons' ? 'أكواد وحملات تخفيض العيد' :
-                   activeMenu === 'payment_gateways' ? 'إعدادات وبوابات الدفع المسجلة لـ "ألماسة"' :
-                   activeMenu === 'shipping_zones' ? 'إدارة مناطق وبوابات شحن وتوصيل مخاوير ألماسة' :
-                   'أدلة المقاسات والتصميم بالبوصة'}
-                </h2>
-                <p className="text-slate-400 text-xs font-semibold">بوابة ألماسة الآمنة | التحديث فوري ومربوط بقاعدة خوادم التخزين.</p>
+          <main className="flex-1 overflow-y-auto bg-[#FAF5F2]">
+            {/* Top Bar */}
+            <div className="sticky top-0 z-20 bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-[#F8EDE8] rounded-lg flex items-center justify-center">
+                  {activeMenu === 'dashboard' ? <BarChart3 className="w-4 h-4 text-[#9A2D55]" /> :
+                   activeMenu === 'orders' ? <ShoppingBag className="w-4 h-4 text-[#9A2D55]" /> :
+                   activeMenu === 'products' ? <Layers className="w-4 h-4 text-[#9A2D55]" /> :
+                   activeMenu === 'customers' ? <Users className="w-4 h-4 text-[#9A2D55]" /> :
+                   <Settings className="w-4 h-4 text-[#9A2D55]" />}
+                </div>
+                <div>
+                  <h2 className="text-sm font-black text-slate-800">
+                    {activeMenu === 'dashboard' ? 'لوحة التحكم' :
+                     activeMenu === 'orders' ? 'الطلبات' :
+                     activeMenu === 'sales_log' ? 'المبيعات' :
+                     activeMenu === 'customers' ? 'العملاء' :
+                     activeMenu === 'categories' ? 'التصنيفات' :
+                     activeMenu === 'products' ? 'المنتجات' :
+                     activeMenu === 'inventory' ? 'المخزون' :
+                     activeMenu === 'reviews' ? 'التقييمات' :
+                     activeMenu === 'coupons' ? 'الكوبونات' :
+                     activeMenu === 'payment_gateways' ? 'بوابات الدفع' :
+                     activeMenu === 'shipping_zones' ? 'مناطق الشحن' :
+                     activeMenu === 'size_guides' ? 'أدلة المقاسات' : 'الإعدادات'}
+                  </h2>
+                  <p className="text-[10px] text-slate-400 font-medium">المدير — {new Date().toLocaleDateString('ar-BH', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}</p>
+                </div>
               </div>
-
-              <div className="text-xs bg-slate-100 border p-2 rounded-xl text-slate-600 font-mono text-center md:text-left self-start">
-                ⏱️ توقيت العمليات: {new Date().toISOString().replace('T', ' ').substring(0, 16)} UTC
+              <div className="flex items-center gap-2">
+                {pendingOrdersCount > 0 && (
+                  <button onClick={() => setActiveMenu('orders')} className="flex items-center gap-1.5 bg-[#FFF0F4] border border-rose-100 text-[#9A2D55] text-[11px] font-bold px-3 py-1.5 rounded-full">
+                    <span className="w-1.5 h-1.5 bg-[#9A2D55] rounded-full badge-pulse" />
+                    {pendingOrdersCount} طلب جديد
+                  </button>
+                )}
+                <button onClick={loadData} className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors" title="تحديث">
+                  <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
+                </button>
               </div>
             </div>
+
+            <div className="p-5 md:p-7">
 
             {/* =========================================
                 SECTION 1: OVERVIEW DASHBOARD VIEW
                 ========================================= */}
             {activeMenu === 'dashboard' && (
               <div className="space-y-6" id="dashboard-statistics-dashboard">
-                
-                {/* A. Dynamic Stats Cards Grid */}
+
+                {/* A. Stats Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-white border rounded-2xl p-4 flex items-center gap-3 shadow-2xs">
-                    <div className="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center shrink-0">
-                      <Wallet className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-bold">إجمالي المداخيل المسددة</span>
-                      <strong className="text-slate-900 font-extrabold text-lg font-sans">{totalRevenue.toFixed(2)} د.ب</strong>
-                    </div>
-                  </div>
-
-                  <div className="bg-white border rounded-2xl p-4 flex items-center gap-3 shadow-2xs">
-                    <div className="w-10 h-10 bg-rose-50 text-[#9A2D55] rounded-full flex items-center justify-center shrink-0">
-                      <ShoppingBag className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-bold">الطرود قيد التفصيل</span>
-                      <strong className="text-slate-900 font-extrabold text-lg font-sans">{pendingOrdersCount} طلب فعال</strong>
-                    </div>
-                  </div>
-
-                  <div className="bg-white border rounded-2xl p-4 flex items-center gap-3 shadow-2xs">
-                    <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center shrink-0">
-                      <Users className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-bold">إجمالي الزبائن النشطين</span>
-                      <strong className="text-slate-900 font-extrabold text-lg font-sans">{totalClientsCount} عميل</strong>
-                    </div>
-                  </div>
-
-                  <div className="bg-white border rounded-2xl p-4 flex items-center gap-3 shadow-2xs">
-                    <div className="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center shrink-0">
-                      <BadgeAlert className="w-5 h-5 animate-pulse" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-bold">المخزونات المنخفضة لرمضان</span>
-                      <strong className="text-slate-900 font-extrabold text-lg font-sans">{lowStockProductsCount} منتج</strong>
-                    </div>
-                  </div>
-                </div>
-
-                {/* B. Visual Chart Line representing Sales Curve (using pure SVG coordinate mapping) */}
-                <div className="bg-white rounded-2xl border p-5">
-                  <div className="flex items-center justify-between mb-4 border-b border-rose-50 pb-2">
-                    <span className="font-bold text-slate-700 text-xs">منحنى المبيعات الإحصائي الأسبوعي لفريق الخياط</span>
-                    <span className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-2 py-0.5 rounded">صاعد بنسبة +14.5% ✓</span>
-                  </div>
-
-                  <div className="h-44 w-full">
-                    {/* Raw simple custom SVG drawing line chart */}
-                    <svg className="w-full h-full" viewBox="0 0 500 130" preserveAspectRatio="none">
-                      <defs>
-                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#9A2D55" stopOpacity="0.25" />
-                          <stop offset="100%" stopColor="#9A2D55" stopOpacity="0.0" />
-                        </linearGradient>
-                      </defs>
-                      
-                      {/* Grid Horizontal lines */}
-                      <line x1="0" y1="30" x2="500" y2="30" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3,3" />
-                      <line x1="0" y1="65" x2="500" y2="65" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3,3" />
-                      <line x1="0" y1="100" x2="500" y2="100" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3,3" />
-
-                      {/* Area Fill */}
-                      <path 
-                        d="M0,110 L50,105 L120,65 L190,95 L280,35 L370,55 L440,25 L500,5 C500,50 500,100 500,120 L0,120 Z" 
-                        fill="url(#chartGradient)" 
-                      />
-
-                      {/* Line Draw */}
-                      <path 
-                        d="M0,110 L50,105 L120,65 L190,95 L280,35 L370,55 L440,25 L500,5" 
-                        fill="none" 
-                        stroke="#9A2D55" 
-                        strokeWidth="2.5" 
-                        strokeLinecap="round" 
-                      />
-
-                      {/* Points highlights */}
-                      <circle cx="120" cy="65" r="4.5" fill="#9A2D55" stroke="white" strokeWidth="1.5" />
-                      <circle cx="280" cy="35" r="4.5" fill="#9A2D55" stroke="white" strokeWidth="1.5" />
-                      <circle cx="440" cy="25" r="4.5" fill="#9A2D55" stroke="white" strokeWidth="1.5" />
-                    </svg>
-
-                    <div className="flex items-center justify-between font-bold text-slate-400 text-[10px] mt-2 font-mono">
-                      <span>السبت (قبل أسبوع)</span>
-                      <span>الاثنين</span>
-                      <span>الأربعاء</span>
-                      <span>الجمعة</span>
-                      <span>الأحد (اليوم)</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* C. Two Column Section: Recent Orders on the Left & Operating Log (سجل العمليات) on the Right as requested */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  
-                  {/* C1: RECENT ORDERS QUEUE */}
-                  <div className="bg-white rounded-2xl border p-5 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-4 border-b pb-2">
-                        <span className="font-bold text-sm text-slate-700">آخر طلبيات الزبائن الواردة لمخيط ألماسة</span>
-                        <button onClick={() => setActiveMenu('orders')} className="text-xs text-[#9A2D55] underline font-bold">معاينة الكل</button>
+                  {[
+                    { label: 'إجمالي المبيعات', value: `${totalRevenue.toFixed(2)} د.ب`, growth: '+12.1%', icon: Wallet, color: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' },
+                    { label: 'إجمالي الطلبات', value: `${orders.length} طلب`, growth: `+${pendingOrdersCount} جديد`, icon: ShoppingBag, color: 'bg-rose-50 text-[#9A2D55]', border: 'border-rose-100' },
+                    { label: 'العملاء الجدد', value: `${totalClientsCount} عميل`, growth: '+8.3%', icon: Users, color: 'bg-blue-50 text-blue-600', border: 'border-blue-100' },
+                    { label: 'المخزون المنخفض', value: `${lowStockProductsCount} منتج`, growth: lowStockProductsCount > 0 ? '⚠️ يحتاج تجديد' : '✓ مستوى جيد', icon: BadgeAlert, color: lowStockProductsCount > 0 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600', border: lowStockProductsCount > 0 ? 'border-amber-100' : 'border-emerald-100' },
+                  ].map(({ label, value, growth, icon: Icon, color, border }) => (
+                    <div key={label} className={`bg-white border ${border} rounded-2xl p-4 shadow-sm`}>
+                      <div className="flex items-start justify-between mb-3">
+                        <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shrink-0`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <span className="text-[10px] text-emerald-600 bg-emerald-50 font-bold px-2 py-0.5 rounded-full">{growth}</span>
                       </div>
+                      <p className="text-[10px] text-slate-400 font-bold mb-1">{label}</p>
+                      <strong className="text-slate-800 font-black text-base">{value}</strong>
+                    </div>
+                  ))}
+                </div>
 
-                      <div className="space-y-3">
-                        {orders.slice(0, 3).map((ord) => (
-                          <div 
-                            key={ord.id} 
-                            onClick={() => setSelectedOrder(ord)}
-                            className="bg-slate-50 hover:bg-rose-50/15 border-2 border-rose-50/10 hover:border-rose-100 rounded-xl p-3.5 flex items-center justify-between text-xs cursor-pointer transition-all"
-                          >
-                            <div>
-                              <strong className="text-slate-800 block text-xs">{ord.customer.name}</strong>
-                              <span className="text-[10px] text-slate-400 font-mono block mt-1">تاريخ: {ord.date.substring(0, 10)} | كود: {ord.trackingCode}</span>
-                            </div>
-                            <div className="text-left">
-                              <strong className="text-[#9A2D55] block font-mono font-bold text-xs">{ord.total.toFixed(2)} د.ب</strong>
-                              <span className="text-[9px] text-[#E4A0A0] bg-rose-50 px-1 py-0.5 rounded font-bold block mt-1 text-center">
-                                {ord.shippingStatus === 'shipped' ? 'تم الشحن' : ord.shippingStatus === 'processing' ? 'قيد القص والتفصيل' : 'وارد جديد'}
+                {/* B. Charts Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                  {/* B1: Sales Line Chart */}
+                  <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="font-black text-sm text-slate-800">المبيعات</h3>
+                        <p className="text-[10px] text-slate-400 font-medium">آخر 30 يوم</p>
+                      </div>
+                      <span className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full">↑ +12.1% من الشهر الماضي</span>
+                    </div>
+                    <div className="h-48 w-full relative">
+                      <svg className="w-full h-full" viewBox="0 0 500 160" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#9A2D55" stopOpacity="0.15" />
+                            <stop offset="100%" stopColor="#9A2D55" stopOpacity="0" />
+                          </linearGradient>
+                        </defs>
+                        <line x1="0" y1="40" x2="500" y2="40" stroke="#f8f4f6" strokeWidth="1" />
+                        <line x1="0" y1="80" x2="500" y2="80" stroke="#f8f4f6" strokeWidth="1" />
+                        <line x1="0" y1="120" x2="500" y2="120" stroke="#f8f4f6" strokeWidth="1" />
+                        <text x="0" y="38" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">20K</text>
+                        <text x="0" y="78" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">15K</text>
+                        <text x="0" y="118" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">10K</text>
+                        <path d="M30,140 L80,130 L130,100 L180,115 L230,70 L280,90 L330,50 L380,65 L430,30 L480,15"
+                          fill="none" stroke="#9A2D55" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M30,140 L80,130 L130,100 L180,115 L230,70 L280,90 L330,50 L380,65 L430,30 L480,15 L480,155 L30,155 Z"
+                          fill="url(#salesGrad)" />
+                        {[[230,70],[330,50],[480,15]].map(([cx,cy],i) => (
+                          <circle key={i} cx={cx} cy={cy} r="4" fill="#9A2D55" stroke="white" strokeWidth="2" />
+                        ))}
+                      </svg>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-400 font-medium mt-1 px-1">
+                      {['1 مايو','5 مايو','10 مايو','15 مايو','20 مايو','25 مايو','30 مايو'].map(d => <span key={d}>{d}</span>)}
+                    </div>
+                  </div>
+
+                  {/* B2: Category Donut */}
+                  <div className="bg-white rounded-2xl border border-slate-100 p-5">
+                    <h3 className="font-black text-sm text-slate-800 mb-1">نسبة المبيعات حسب التصنيف</h3>
+                    <p className="text-[10px] text-slate-400 mb-4">الفئات الأكثر مبيعاً</p>
+                    <div className="flex justify-center mb-4">
+                      <svg viewBox="0 0 120 120" className="w-28 h-28">
+                        <circle cx="60" cy="60" r="45" fill="none" stroke="#f8ede8" strokeWidth="18" />
+                        <circle cx="60" cy="60" r="45" fill="none" stroke="#9A2D55" strokeWidth="18"
+                          strokeDasharray="127 155" strokeDashoffset="0" strokeLinecap="round" />
+                        <circle cx="60" cy="60" r="45" fill="none" stroke="#C4956A" strokeWidth="18"
+                          strokeDasharray="93 189" strokeDashoffset="-127" strokeLinecap="round" />
+                        <circle cx="60" cy="60" r="45" fill="none" stroke="#e8d5c4" strokeWidth="18"
+                          strokeDasharray="46 236" strokeDashoffset="-220" strokeLinecap="round" />
+                        <text x="60" y="56" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#2C1810" fontFamily="sans-serif">
+                          {orders.length}
+                        </text>
+                        <text x="60" y="68" textAnchor="middle" fontSize="8" fill="#9B8178" fontFamily="sans-serif">طلب</text>
+                      </svg>
+                    </div>
+                    <div className="space-y-2">
+                      {[
+                        { label: 'مخاوير', pct: '45%', color: 'bg-[#9A2D55]' },
+                        { label: 'أقمشة', pct: '30%', color: 'bg-[#C4956A]' },
+                        { label: 'تصاميم', pct: '15%', color: 'bg-[#e8d5c4]' },
+                        { label: 'أخرى', pct: '10%', color: 'bg-slate-200' },
+                      ].map(({ label, pct, color }) => (
+                        <div key={label} className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2.5 h-2.5 rounded-full ${color} shrink-0`} />
+                            <span className="text-slate-600 font-medium">{label}</span>
+                          </div>
+                          <span className="font-bold text-slate-700">{pct}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* C. Bottom Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                  {/* C1: Recent Orders Table */}
+                  <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                    <div className="flex items-center justify-between p-4 border-b border-slate-100">
+                      <h3 className="font-black text-sm text-slate-800">آخر الطلبات</h3>
+                      <button onClick={() => setActiveMenu('orders')} className="text-xs text-[#9A2D55] font-bold hover:underline">عرض الكل</button>
+                    </div>
+                    <table className="w-full text-xs text-right">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-400">
+                          <th className="p-3 font-bold">#</th>
+                          <th className="p-3 font-bold">العميل</th>
+                          <th className="p-3 font-bold">التاريخ</th>
+                          <th className="p-3 font-bold">المبلغ</th>
+                          <th className="p-3 font-bold">الحالة</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {orders.slice(0, 5).map(ord => (
+                          <tr key={ord.id} onClick={() => setSelectedOrder(ord)} className="hover:bg-[#FDF8F5] cursor-pointer transition-colors">
+                            <td className="p-3 font-mono text-[#9A2D55] font-bold">#{ord.id.slice(-4)}</td>
+                            <td className="p-3">
+                              <p className="font-bold text-slate-800">{ord.customer.name}</p>
+                              <p className="text-[10px] text-slate-400">{ord.date.substring(0,10)}</p>
+                            </td>
+                            <td className="p-3 text-slate-500 font-mono">{ord.date.substring(0,10)}</td>
+                            <td className="p-3 font-black text-slate-800">{ord.total.toFixed(2)} د.ب</td>
+                            <td className="p-3">
+                              <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${
+                                ord.shippingStatus === 'delivered' ? 'bg-emerald-100 text-emerald-700' :
+                                ord.shippingStatus === 'shipped' ? 'bg-blue-100 text-blue-700' :
+                                ord.shippingStatus === 'processing' ? 'bg-amber-100 text-amber-700' :
+                                'bg-rose-100 text-[#9A2D55]'
+                              }`}>
+                                {ord.shippingStatus === 'delivered' ? 'مكتمل' :
+                                 ord.shippingStatus === 'shipped' ? 'قيد الشحن' :
+                                 ord.shippingStatus === 'processing' ? 'قيد التجهيز' : 'ملغي'}
                               </span>
+                            </td>
+                          </tr>
+                        ))}
+                        {orders.length === 0 && (
+                          <tr><td colSpan={5} className="p-8 text-center text-slate-400 text-xs font-medium">لا توجد طلبات بعد</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* C2: Orders Overview + Top Products */}
+                  <div className="space-y-4">
+
+                    {/* Orders Overview Donut */}
+                    <div className="bg-white rounded-2xl border border-slate-100 p-4">
+                      <h3 className="font-black text-sm text-slate-800 mb-3">نظرة عامة على الطلبات</h3>
+                      <div className="flex items-center gap-3">
+                        <svg viewBox="0 0 80 80" className="w-20 h-20 shrink-0">
+                          <circle cx="40" cy="40" r="30" fill="none" stroke="#f1f5f9" strokeWidth="12" />
+                          {(() => {
+                            const total = orders.length || 1;
+                            const delivered = orders.filter(o => o.shippingStatus === 'delivered').length;
+                            const processing = orders.filter(o => o.shippingStatus === 'processing').length;
+                            const shipped = orders.filter(o => o.shippingStatus === 'shipped').length;
+                            const circ = 2 * Math.PI * 30;
+                            let offset = 0;
+                            return [
+                              { count: delivered, color: '#10b981' },
+                              { count: processing, color: '#f59e0b' },
+                              { count: shipped, color: '#3b82f6' },
+                              { count: Math.max(0, total - delivered - processing - shipped), color: '#9A2D55' },
+                            ].map(({ count, color }, i) => {
+                              const dash = (count / total) * circ;
+                              const el = <circle key={i} cx="40" cy="40" r="30" fill="none" stroke={color} strokeWidth="12"
+                                strokeDasharray={`${dash} ${circ}`} strokeDashoffset={-offset}
+                                transform="rotate(-90 40 40)" strokeLinecap="butt" />;
+                              offset += dash;
+                              return el;
+                            });
+                          })()}
+                          <text x="40" y="36" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#2C1810" fontFamily="sans-serif">{orders.length}</text>
+                          <text x="40" y="47" textAnchor="middle" fontSize="7" fill="#9B8178" fontFamily="sans-serif">إجمالي</text>
+                        </svg>
+                        <div className="space-y-1.5 text-[10px] flex-1">
+                          {[
+                            { label: 'مكتمل', count: orders.filter(o=>o.shippingStatus==='delivered').length, color: 'bg-emerald-500' },
+                            { label: 'قيد التجهيز', count: orders.filter(o=>o.shippingStatus==='processing').length, color: 'bg-amber-400' },
+                            { label: 'قيد الشحن', count: orders.filter(o=>o.shippingStatus==='shipped').length, color: 'bg-blue-500' },
+                            { label: 'ملغي', count: orders.filter(o=>o.shippingStatus==='pending').length, color: 'bg-[#9A2D55]' },
+                          ].map(({ label, count, color }) => (
+                            <div key={label} className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <div className={`w-2 h-2 rounded-full ${color}`} />
+                                <span className="text-slate-500 font-medium">{label}</span>
+                              </div>
+                              <span className="font-bold text-slate-700">{count}</span>
                             </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Top Products */}
+                    <div className="bg-white rounded-2xl border border-slate-100 p-4">
+                      <h3 className="font-black text-sm text-slate-800 mb-3">أفضل المنتجات مبيعاً</h3>
+                      <div className="space-y-3">
+                        {products.slice(0, 3).map((p, i) => (
+                          <div key={p.id} className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#F8EDE8] shrink-0">
+                              <img src={p.image} alt={p.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[11px] font-bold text-slate-700 truncate">{p.name}</p>
+                              <p className="text-[10px] text-slate-400">{p.reviewCount} مبيع</p>
+                            </div>
+                            <span className="text-xs font-black text-[#9A2D55] shrink-0">{p.price.toFixed(0)} د.ب</span>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  </div>
-
-                  {/* C2: DETAILED LIVE OPERATIONS LOGS VIEW (سجل العمليات) */}
-                  <div className="bg-white rounded-2xl border p-5">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 border-b pb-2">
-                      <span className="font-bold text-sm text-slate-700">سجل العمليات الفنية والمالية (Audit Log)</span>
-                      
-                      {/* Filter selectors for logs */}
-                      <select 
-                        value={logTypeFilter}
-                        onChange={(e) => setLogTypeFilter(e.target.value)}
-                        className="bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[10px] font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
-                      >
-                        <option value="all">عرض كافة الإشعارات</option>
-                        <option value="order">إشعارات الطلبيات</option>
-                        <option value="payment">العمليات المالية والدفع</option>
-                        <option value="product">شؤون الكتالوج والمخزن</option>
-                        <option value="system">إشعارات الخادم فنية</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-3.5 max-h-[240px] overflow-y-auto pr-1">
-                      {logs.filter(l => logTypeFilter === 'all' || l.type === logTypeFilter).map((log) => (
-                        <div key={log.id} className="border-r-4 border-[#9A2D55] bg-[#FAF6F6] p-3 rounded-l-xl text-xs space-y-1">
-                          <div className="flex justify-between font-bold">
-                            <span className="text-slate-800">{log.action}</span>
-                            <span className="text-[9px] text-slate-400 font-mono">{log.date}</span>
-                          </div>
-                          <p className="text-slate-500 text-[11px] leading-relaxed font-semibold">{log.details}</p>
-                          <div className="flex items-center justify-between text-[9px] mt-2 font-bold text-slate-400">
-                            <span>الفاعل: {log.operator}</span>
-                            <span className={`px-2 py-0.5 rounded ${
-                              log.severity === 'success' ? 'bg-emerald-50 text-emerald-600' :
-                              log.severity === 'warning' ? 'bg-amber-50 text-amber-600' :
-                              log.severity === 'danger' ? 'bg-red-50 text-red-600' :
-                              'bg-slate-100 text-slate-500'
-                            }`}>{log.type}</span>
-                          </div>
-                        </div>
-                      ))}
                     </div>
                   </div>
 
@@ -2331,6 +2401,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
               </div>
             )}
 
+            </div>{/* end p-5 md:p-7 */}
           </main>
 
           {/* C. MODAL overlay: Full Order Card Details (تفاصيل الطلب الكاملة وسجل العمليات) */}

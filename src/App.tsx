@@ -41,7 +41,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 antialiased selection:bg-[#9A2D55] selection:text-white">
+    <div className="min-h-screen antialiased" style={{ backgroundColor: 'var(--color-cream)', fontFamily: "'Cairo', system-ui, sans-serif" }}>
       <AnimatePresence mode="wait">
         {view === 'customer' ? (
           <motion.div
