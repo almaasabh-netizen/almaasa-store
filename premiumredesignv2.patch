@@ -1,0 +1,3210 @@
+From a8955ae4b8d1d9d28eb2ffd8a1d163feac4e8a84 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 3 Jun 2026 20:43:32 +0000
+Subject: [PATCH 1/2] Redesign admin sidebar with modern minimal style
+
+- Replace emoji-based nav items with Lucide React icons
+- Clean dark background with subtle white/5 dividers
+- Active state: solid rose pill with soft shadow
+- Idle state: muted text with smooth hover transition
+- Notification badges as compact rounded pills
+- Streamlined bottom actions with icon+text layout
+
+https://claude.ai/code/session_01WyDreTaWQgFCV6MKN4W289
+---
+ src/components/AdminPanel.tsx | 229 ++++++++++++++++------------------
+ 1 file changed, 110 insertions(+), 119 deletions(-)
+
+diff --git a/src/components/AdminPanel.tsx b/src/components/AdminPanel.tsx
+index 4c095ab..d20b43c 100644
+--- a/src/components/AdminPanel.tsx
++++ b/src/components/AdminPanel.tsx
+@@ -704,145 +704,136 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
+         /* AUTHENTICATED PANEL LAYOUT WITH DYNAMIC ARABIC SIDEBAR */
+         <div className="flex-1 flex flex-col md:flex-row">
+           
+-          {/* A. RIGHT NAVIGATION BAR - Luxurious Plum & Champagne gold */}
+-          <aside className="w-full md:w-64 bg-[#23121D] text-[white] flex flex-col justify-between border-l border-[#3C1F32]" id="admin-sidebar shadow">
+-            
+-            <div className="p-4 space-y-6">
+-              {/* Branding header in Sidebar */}
+-              <div className="flex items-center justify-between border-b border-[#3C1F32] pb-4">
+-                <span className="text-white font-black text-sm tracking-tight flex items-center gap-1.5">
+-                  <span className="text-xl">💎</span>
+-                  <span className="bg-gradient-to-l from-amber-200 to-rose-200 bg-clip-text text-transparent">لوحة تحكم ألماسة</span>
+-                </span>
+-                <span className="text-[10px] bg-[#9A2D55] text-white font-bold px-2 py-0.5 rounded">مشرف</span>
++          {/* A. SIDEBAR - Modern redesign */}
++          <aside className="w-full md:w-60 bg-[#1A0D16] text-white flex flex-col shrink-0" id="admin-sidebar">
++
++            {/* Brand Header */}
++            <div className="px-5 py-5 border-b border-white/5">
++              <div className="flex items-center gap-3">
++                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#9A2D55] to-[#5C1532] flex items-center justify-center shadow-lg shadow-[#9A2D55]/30 shrink-0">
++                  <Sparkles className="w-4 h-4 text-white" />
++                </div>
++                <div>
++                  <p className="text-white font-black text-sm leading-tight">ألماسة</p>
++                  <p className="text-white/40 text-[10px] font-medium">لوحة التحكم</p>
++                </div>
+               </div>
++            </div>
++
++            {/* Nav Sections */}
++            <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+ 
+-              {/* SECTION 1: SALES (المبيعات) */}
++              {/* Section: المبيعات */}
+               <div>
+-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">المبيعات والعملاء ⚙️</p>
+-                <nav className="space-y-1 text-xs" id="sidebar-sales-menu">
+-                  <button 
+-                    onClick={() => setActiveMenu('dashboard')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'dashboard' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">🕹️ نظرة عامة</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('orders')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'orders' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">📦 طلبات الزبائن</span>
+-                    {pendingOrdersCount > 0 && (
+-                      <span className="bg-red-500 text-white text-[10px] px-2 py-0.2 rounded-full font-bold">{pendingOrdersCount}</span>
+-                    )}
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('sales_log')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'sales_log' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">💵 المبيعات والمدخول</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('customers')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'customers' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">👥 دليل العملاء</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('shipping_bills')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'shipping_bills' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">📑 بوليصات الشحن الدولي</span>
+-                  </button>
++                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">المبيعات</p>
++                <nav className="space-y-0.5">
++                  {([
++                    { id: 'dashboard',      icon: BarChart3,    label: 'نظرة عامة',        badge: null,                badgeColor: '' },
++                    { id: 'orders',         icon: ShoppingBag,  label: 'طلبات الزبائن',    badge: pendingOrdersCount > 0 ? pendingOrdersCount : null, badgeColor: 'bg-rose-500' },
++                    { id: 'sales_log',      icon: CreditCard,   label: 'المبيعات والمدخول', badge: null,                badgeColor: '' },
++                    { id: 'customers',      icon: Users,        label: 'دليل العملاء',      badge: null,                badgeColor: '' },
++                    { id: 'shipping_bills', icon: FileText,     label: 'بوليصات الشحن',    badge: null,                badgeColor: '' },
++                  ] as const).map(({ id, icon: Icon, label, badge, badgeColor }) => (
++                    <button
++                      key={id}
++                      onClick={() => setActiveMenu(id)}
++                      className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
++                        activeMenu === id
++                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
++                          : 'text-white/50 hover:text-white hover:bg-white/5'
++                      }`}
++                    >
++                      <span className="flex items-center gap-2.5">
++                        <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
++                        {label}
++                      </span>
++                      {badge != null && (
++                        <span className={`${badgeColor} text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1`}>{badge}</span>
++                      )}
++                    </button>
++                  ))}
+                 </nav>
+               </div>
+ 
+-              {/* SECTION 2: STORE MANAGEMENT (إدارة المتجر) */}
++              <div className="h-px bg-white/5 mx-2" />
++
++              {/* Section: المتجر */}
+               <div>
+-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">إدارة المتجر الفعلي 🛍️</p>
+-                <nav className="space-y-1 text-xs" id="sidebar-shop-mgmt">
+-                  <button 
+-                    onClick={() => setActiveMenu('categories')}
+-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'categories' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span>🗂️ التصنيفات</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('products')}
+-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'products' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span>👗 المنتجات المعروضة</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('inventory')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'inventory' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">📦 إدارة المخزون والمقاطع</span>
+-                    {lowStockProductsCount > 0 && (
+-                      <span className="bg-amber-500 text-white text-[9px] px-1.5 py-0.2 rounded font-mono">{lowStockProductsCount}</span>
+-                    )}
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('options')}
+-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'options' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span>🎚️ خيارات المنتج والمطاط</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('reviews')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'reviews' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">⭐ تقييمات الزبائن العفوية</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('payment_gateways')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'payment_gateways' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">💳 إعدادات وبوابات الدفع</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('shipping_zones')}
+-                    className={`w-full text-right flex items-center justify-between px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'shipping_zones' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span className="flex items-center gap-2">🚚 مناطق وطرق التوصيل</span>
+-                  </button>
++                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">إدارة المتجر</p>
++                <nav className="space-y-0.5">
++                  {([
++                    { id: 'categories',       icon: FolderKanban, label: 'التصنيفات',        badge: null, badgeColor: '' },
++                    { id: 'products',         icon: Layers,       label: 'المنتجات',          badge: null, badgeColor: '' },
++                    { id: 'inventory',        icon: ClipboardList,label: 'المخزون',           badge: lowStockProductsCount > 0 ? lowStockProductsCount : null, badgeColor: 'bg-amber-500' },
++                    { id: 'options',          icon: Sliders,      label: 'خيارات المنتج',    badge: null, badgeColor: '' },
++                    { id: 'reviews',          icon: Star,         label: 'تقييمات العملاء',  badge: null, badgeColor: '' },
++                    { id: 'payment_gateways', icon: CreditCard,   label: 'بوابات الدفع',     badge: null, badgeColor: '' },
++                    { id: 'shipping_zones',   icon: Truck,        label: 'مناطق الشحن',      badge: null, badgeColor: '' },
++                  ] as const).map(({ id, icon: Icon, label, badge, badgeColor }) => (
++                    <button
++                      key={id}
++                      onClick={() => setActiveMenu(id)}
++                      className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
++                        activeMenu === id
++                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
++                          : 'text-white/50 hover:text-white hover:bg-white/5'
++                      }`}
++                    >
++                      <span className="flex items-center gap-2.5">
++                        <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
++                        {label}
++                      </span>
++                      {badge != null && (
++                        <span className={`${badgeColor} text-white text-[9px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1`}>{badge}</span>
++                      )}
++                    </button>
++                  ))}
+                 </nav>
+               </div>
+ 
+-              {/* SECTION 3: MARKETING & CONTENT (التسويق والمحتوى) */}
++              <div className="h-px bg-white/5 mx-2" />
++
++              {/* Section: التسويق */}
+               <div>
+-                <p className="text-[10px] uppercase font-mono tracking-widest text-[#F4C9D8] mb-2 font-bold select-none">التسويق والمقاسات 🏷️</p>
+-                <nav className="space-y-1 text-xs" id="sidebar-marketing">
+-                  <button 
+-                    onClick={() => setActiveMenu('coupons')}
+-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'coupons' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span>🎟️ الكوبونات الخصمية</span>
+-                  </button>
+-                  <button 
+-                    onClick={() => setActiveMenu('size_guides')}
+-                    className={`w-full text-right flex items-center gap-2 px-3 py-2.5 rounded-lg font-bold transition-all ${activeMenu === 'size_guides' ? 'bg-gradient-to-r from-[#9A2D55] to-[#7E1F42] text-white shadow-md shadow-[#9A2D55]/15' : 'hover:bg-[#341C2B] hover:text-white'}`}
+-                  >
+-                    <span>📏 أدلة قياسات الخياط</span>
+-                  </button>
++                <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest px-2 mb-2 select-none">التسويق</p>
++                <nav className="space-y-0.5">
++                  {([
++                    { id: 'coupons',     icon: Tag,     label: 'الكوبونات' },
++                    { id: 'size_guides', icon: Compass, label: 'أدلة المقاسات' },
++                  ] as const).map(({ id, icon: Icon, label }) => (
++                    <button
++                      key={id}
++                      onClick={() => setActiveMenu(id)}
++                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
++                        activeMenu === id
++                          ? 'bg-[#9A2D55] text-white shadow-md shadow-[#9A2D55]/25'
++                          : 'text-white/50 hover:text-white hover:bg-white/5'
++                      }`}
++                    >
++                      <Icon className={`w-3.5 h-3.5 shrink-0 ${activeMenu === id ? 'text-white' : 'text-white/40 group-hover:text-white/70'}`} />
++                      {label}
++                    </button>
++                  ))}
+                 </nav>
+               </div>
+ 
+             </div>
+ 
+             {/* Bottom Actions */}
+-            <div className="p-4 border-t border-[#3C1F32] space-y-3">
+-              <button 
+-                onClick={onBackToStore} 
+-                className="w-full bg-gradient-to-r from-[#9A2D55] to-[#731E3F] hover:opacity-90 text-white font-bold text-xs py-2 px-3 rounded-lg flex items-center justify-center gap-1 cursor-pointer"
++            <div className="px-3 py-4 border-t border-white/5 space-y-1">
++              <button
++                onClick={onBackToStore}
++                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-white/50 hover:text-white hover:bg-white/5 transition-all duration-150 cursor-pointer group"
+               >
+-                🌍 العودة للمتجر العام
++                <Globe className="w-3.5 h-3.5 text-white/30 group-hover:text-white/60 shrink-0" />
++                العودة للمتجر
+               </button>
+-              <button 
+-                onClick={handleLogout} 
+-                className="w-full border border-[#3C1F32] hover:bg-[#341C2B] text-[#F4C9D8] font-bold text-[10px] py-1.5 px-3 rounded flex items-center justify-center gap-1 cursor-pointer"
++              <button
++                onClick={handleLogout}
++                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-400/60 hover:text-rose-300 hover:bg-rose-500/5 transition-all duration-150 cursor-pointer group"
+               >
+-                🔐 تسجيل خروج آمن
++                <LogIn className="w-3.5 h-3.5 shrink-0 rotate-180" />
++                تسجيل الخروج
+               </button>
+             </div>
+           </aside>
+-- 
+2.43.0
+
+
+From 734e5bececdea16a2dd2404827e47fbc81f08fa7 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Wed, 3 Jun 2026 20:43:33 +0000
+Subject: [PATCH 2/2] Premium luxury redesign: new UI, SEO, design system
+
+- Complete Storefront.tsx rewrite with luxury premium design
+- New color system (cream/rose/gold/dark) via CSS custom properties
+- Hero section, category story circles, product wishlist, toast notifications
+- Mobile bottom navigation, scroll-aware header, luxury card hover effects
+- Updated index.css with design tokens and animation utilities
+- Updated index.html: RTL lang, full SEO meta tags, OG/Twitter cards, structured data
+- Updated App.tsx: new background color matching design system
+- Added SVG favicon with brand colors
+- Admin sidebar modern redesign from previous session
+
+https://claude.ai/code/session_01WyDreTaWQgFCV6MKN4W289
+---
+ index.html                    |   70 +-
+ public/favicon.svg            |    4 +
+ src/App.tsx                   |    2 +-
+ src/components/Storefront.tsx | 2234 +++++++++++++++------------------
+ src/index.css                 |   81 ++
+ 5 files changed, 1170 insertions(+), 1221 deletions(-)
+ create mode 100644 public/favicon.svg
+
+diff --git a/index.html b/index.html
+index 0c91028..306e78a 100644
+--- a/index.html
++++ b/index.html
+@@ -1,13 +1,75 @@
+ <!doctype html>
+-<html lang="en">
++<html lang="ar" dir="rtl">
+   <head>
+     <meta charset="UTF-8" />
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-    <title>متجر مخاوير ألماسة الموحد | Almaasa Boutique</title>
++    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
++    <meta name="theme-color" content="#9A2D55" />
++
++    <!-- Primary SEO -->
++    <title>ألماسة | متجر الأزياء الراقية والعباءات الفاخرة</title>
++    <meta name="description" content="ألماسة — وجهتك الأولى للأزياء الراقية والعباءات الفاخرة. تسوقي أجمل التصاميم العصرية بجودة استثنائية وتوصيل سريع." />
++    <meta name="keywords" content="ألماسة, عباءات فاخرة, أزياء نسائية, موضة, متجر إلكتروني, عباءات عصرية" />
++    <meta name="robots" content="index, follow" />
++    <link rel="canonical" href="https://almaasa-store.onrender.com/" />
++
++    <!-- Open Graph / Facebook -->
++    <meta property="og:type" content="website" />
++    <meta property="og:url" content="https://almaasa-store.onrender.com/" />
++    <meta property="og:title" content="ألماسة | متجر الأزياء الراقية والعباءات الفاخرة" />
++    <meta property="og:description" content="وجهتك الأولى للأزياء الراقية والعباءات الفاخرة. تسوقي أجمل التصاميم العصرية بجودة استثنائية." />
++    <meta property="og:image" content="https://almaasa-store.onrender.com/og-image.jpg" />
++    <meta property="og:locale" content="ar_SA" />
++    <meta property="og:site_name" content="ألماسة" />
++
++    <!-- Twitter Card -->
++    <meta name="twitter:card" content="summary_large_image" />
++    <meta name="twitter:title" content="ألماسة | متجر الأزياء الراقية" />
++    <meta name="twitter:description" content="وجهتك الأولى للأزياء الراقية والعباءات الفاخرة." />
++    <meta name="twitter:image" content="https://almaasa-store.onrender.com/og-image.jpg" />
++
++    <!-- Structured Data: Organization -->
++    <script type="application/ld+json">
++    {
++      "@context": "https://schema.org",
++      "@type": "Organization",
++      "name": "ألماسة",
++      "url": "https://almaasa-store.onrender.com/",
++      "logo": "https://almaasa-store.onrender.com/logo.png",
++      "sameAs": [
++        "https://www.instagram.com/almaasa_store"
++      ],
++      "contactPoint": {
++        "@type": "ContactPoint",
++        "contactType": "customer service",
++        "availableLanguage": "Arabic"
++      }
++    }
++    </script>
++
++    <!-- Structured Data: WebSite + SearchAction -->
++    <script type="application/ld+json">
++    {
++      "@context": "https://schema.org",
++      "@type": "WebSite",
++      "name": "ألماسة",
++      "url": "https://almaasa-store.onrender.com/",
++      "potentialAction": {
++        "@type": "SearchAction",
++        "target": "https://almaasa-store.onrender.com/?q={search_term_string}",
++        "query-input": "required name=search_term_string"
++      }
++    }
++    </script>
++
++    <!-- Preconnect for performance -->
++    <link rel="preconnect" href="https://fonts.googleapis.com" />
++    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
++
++    <!-- Favicon -->
++    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+   </head>
+   <body>
+     <div id="root"></div>
+     <script type="module" src="/src/main.tsx"></script>
+   </body>
+ </html>
+-
+diff --git a/public/favicon.svg b/public/favicon.svg
+new file mode 100644
+index 0000000..68d42ed
+--- /dev/null
++++ b/public/favicon.svg
+@@ -0,0 +1,4 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
++  <rect width="32" height="32" rx="8" fill="#9A2D55"/>
++  <text x="16" y="22" font-size="18" text-anchor="middle" fill="#C4956A" font-family="serif" font-weight="bold">◆</text>
++</svg>
+diff --git a/src/App.tsx b/src/App.tsx
+index 735c15f..8182376 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -41,7 +41,7 @@ export default function App() {
+   };
+ 
+   return (
+-    <div className="min-h-screen bg-slate-50 antialiased selection:bg-[#9A2D55] selection:text-white">
++    <div className="min-h-screen antialiased" style={{ backgroundColor: 'var(--color-cream)', fontFamily: "'Cairo', system-ui, sans-serif" }}>
+       <AnimatePresence mode="wait">
+         {view === 'customer' ? (
+           <motion.div
+diff --git a/src/components/Storefront.tsx b/src/components/Storefront.tsx
+index b0e7a57..dc0d00c 100644
+--- a/src/components/Storefront.tsx
++++ b/src/components/Storefront.tsx
+@@ -1,8 +1,11 @@
+-import React, { useState, useEffect } from 'react';
+-import { 
+-  ShoppingBag, Search, Truck, Heart, ArrowRight, CheckCircle, 
+-  Clock, Check, BookOpen, X, Phone, MapPin, Tag, Plus, Minus, 
+-  Star, ExternalLink, ShieldCheck, CreditCard, ChevronRight, Share2
++import React, { useState, useEffect, useRef } from 'react';
++import {
++  ShoppingBag, Search, Truck, Heart, ArrowRight, CheckCircle,
++  Clock, Check, BookOpen, X, Phone, MapPin, Tag, Plus, Minus,
++  Star, ExternalLink, ShieldCheck, CreditCard, ChevronRight,
++  Share2, Home, Grid3X3, User, Menu, ChevronDown, ChevronLeft,
++  Instagram, Sparkles, Package, Gift, Zap, Globe2, BadgeCheck,
++  Eye, ZoomIn
+ } from 'lucide-react';
+ import { motion, AnimatePresence } from 'motion/react';
+ import { Product, Order, Coupon, SizeGuide, Review, StoreSettings, OrderItem, Category } from '../types';
+@@ -14,35 +17,44 @@ interface StorefrontProps {
+   setActiveTab: (tab: 'shop' | 'tracking') => void;
+ }
+ 
++// ─── TOAST NOTIFICATION ───────────────────────────────────────────
++interface Toast { id: number; msg: string; type: 'success' | 'info' | 'error'; }
++
+ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab }: StorefrontProps) {
+-  // Loaded from LocalStorage
++  /* ── DATA STATE ───────────────────────────────────────────────── */
+   const [products, setProducts] = useState<Product[]>([]);
+   const [coupons, setCoupons] = useState<Coupon[]>([]);
+   const [sizeGuides, setSizeGuides] = useState<SizeGuide[]>([]);
+   const [reviews, setReviews] = useState<Review[]>([]);
+   const [settings, setSettings] = useState<StoreSettings | null>(null);
+   const [categories, setCategories] = useState<Category[]>([]);
+-  
+-  // App state
++
++  /* ── UI STATE ─────────────────────────────────────────────────── */
+   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+   const [searchQuery, setSearchQuery] = useState('');
+   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+-  const [showSizeGuide, setShowSizeGuide] = useState<string | null>(null); // Guide ID if open
++  const [showSizeGuide, setShowSizeGuide] = useState<string | null>(null);
+   const [showReviewsPopup, setShowReviewsPopup] = useState(false);
+-  
+-  // Selected options in modal
++  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
++  const [isScrolled, setIsScrolled] = useState(false);
++  const [wishlist, setWishlist] = useState<string[]>([]);
++  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
++  const [toasts, setToasts] = useState<Toast[]>([]);
++  const toastId = useRef(0);
++
++  /* ── PRODUCT OPTIONS ─────────────────────────────────────────── */
+   const [chosenSize, setChosenSize] = useState('');
+   const [chosenColor, setChosenColor] = useState('');
+   const [quantity, setQuantity] = useState(1);
+-  
+-  // Cart state
++
++  /* ── CART STATE ──────────────────────────────────────────────── */
+   const [cart, setCart] = useState<OrderItem[]>([]);
+   const [isCartOpen, setIsCartOpen] = useState(false);
+   const [couponCode, setCouponCode] = useState('');
+   const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
+   const [couponError, setCouponError] = useState('');
+-  
+-  // Checkout state
++
++  /* ── CHECKOUT ────────────────────────────────────────────────── */
+   const [checkoutStep, setCheckoutStep] = useState<'cart' | 'details' | 'payment' | 'success'>('cart');
+   const [customerName, setCustomerName] = useState('');
+   const [customerEmail, setCustomerEmail] = useState('');
+@@ -52,12 +64,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab
+   const [customerCountry, setCustomerCountry] = useState('البحرين');
+   const [customerNotes, setCustomerNotes] = useState('');
+   const [paymentMethod, setPaymentMethod] = useState<'benefit' | 'knet' | 'card' | 'applepay'>('benefit');
+-
+-  // Dynamic Shipping Zones
+   const [shippingZones, setShippingZones] = useState<any[]>([]);
+   const [selectedShippingMethod, setSelectedShippingMethod] = useState<any>(null);
+-  
+-  // BenefitPay/KNet specific interactive variables
+   const [benefitPhone, setBenefitPhone] = useState('');
+   const [benefitStep, setBenefitStep] = useState<'input' | 'processing' | 'approved'>('input');
+   const [knetCardNum, setKnetCardNum] = useState('');
+@@ -68,105 +76,100 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab
+   const [cardCvv, setCardCvv] = useState('');
+   const [isPaying, setIsPaying] = useState(false);
+   const [newOrder, setNewOrder] = useState<Order | null>(null);
+-  
+-  // Tracking search state
++
++  /* ── TRACKING ────────────────────────────────────────────────── */
+   const [trackSearchQuery, setTrackSearchQuery] = useState('');
+   const [trackedOrder, setTrackedOrder] = useState<Order | null>(null);
+   const [trackError, setTrackError] = useState('');
+ 
+-  // Loaded once on component render
++  /* ── EFFECTS ─────────────────────────────────────────────────── */
+   useEffect(() => {
+     const data = getStoredData();
+     setProducts(data.products);
+     setCoupons(data.coupons);
+     setSizeGuides(data.sizeGuides);
+-    setReviews(data.reviews.filter(r => r.approved));
++    setReviews(data.reviews.filter((r: Review) => r.approved));
+     setSettings(data.settings);
+     setCategories(data.categories);
+-    
+-    // Inactive placeholder search param detection
++
+     const params = new URLSearchParams(window.location.search);
+     const trackingCode = params.get('track');
+     if (trackingCode) {
+       setActiveTab('tracking');
+       setTrackSearchQuery(trackingCode);
+       const matched = data.orders.find((o: Order) => o.trackingCode.toLowerCase() === trackingCode.toLowerCase());
+-      if (matched) {
+-        setTrackedOrder(matched);
+-      }
++      if (matched) setTrackedOrder(matched);
+     }
+ 
+     const savedZones = localStorage.getItem('ama_shipping_zones');
+     if (savedZones) {
+-      try {
+-        setShippingZones(JSON.parse(savedZones));
+-      } catch (e) {
+-        console.error("Error loading shipping zones", e);
+-      }
++      try { setShippingZones(JSON.parse(savedZones)); }
++      catch (e) { console.error(e); }
+     } else {
+       const defaultZones = [
+         {
+-          id: "zone-1",
+-          name: "محلي - BH",
+-          countries: ["البحرين"],
+-          cities: ["المنامة", "الرفاع", "المحرق", "مدينة عيسى"],
++          id: 'zone-1', name: 'محلي - BH',
++          countries: ['البحرين'],
++          cities: ['المنامة', 'الرفاع', 'المحرق', 'مدينة عيسى'],
+           methods: [
+-            {
+-              id: "method-1-1",
+-              name: "استلام",
+-              provider: "LOCAL",
+-              priceType: "free",
+-              price: 0,
+-              description: "استلام من الفرع ونقاط البيع مجاناً"
+-            },
+-            {
+-              id: "method-1-2",
+-              name: "توصيل محلي",
+-              provider: "LOCAL",
+-              priceType: "fixed",
+-              price: 2.0,
+-              description: "سعر ثابت"
+-            },
+-            {
+-              id: "method-1-3",
+-              name: "شحن",
+-              provider: "SMSA",
+-              priceType: "calculated",
+-              price: 3.5,
+-              description: "محسوب حسب الوزن والبلد (SMSA)"
+-            }
+-          ]
++            { id: 'm-1-1', name: 'استلام', provider: 'LOCAL', priceType: 'free', price: 0, description: 'استلام من الفرع مجاناً' },
++            { id: 'm-1-2', name: 'توصيل محلي', provider: 'LOCAL', priceType: 'fixed', price: 2.0, description: 'سعر ثابت' },
++            { id: 'm-1-3', name: 'شحن', provider: 'SMSA', priceType: 'calculated', price: 3.5, description: 'محسوب (SMSA)' },
++          ],
+         },
+         {
+-          id: "zone-2",
+-          name: "GCC",
+-          countries: ["أبو عريش", "بقيق", "أبها", "الرياض", "دبي", "سلطنة عمان", "السعودية", "الكويت", "المنطقة الشرقية"],
+-          cities: ["ABHA", "ABQAIQ", "ABU ARISH", "more 310+"],
+-          methods: []
+-        }
++          id: 'zone-2', name: 'GCC',
++          countries: ['السعودية', 'الكويت', 'الإمارات', 'قطر', 'عمان'],
++          cities: [],
++          methods: [],
++        },
+       ];
+       setShippingZones(defaultZones);
+       localStorage.setItem('ama_shipping_zones', JSON.stringify(defaultZones));
+     }
++
++    // wishlist
++    const saved = localStorage.getItem('ama_wishlist');
++    if (saved) { try { setWishlist(JSON.parse(saved)); } catch (e) {} }
+   }, [activeTab]);
+ 
+-  // Match zone and select default shipping method dynamically base on country
+-  const matchingZone = shippingZones.find(zone => 
+-    zone.countries.some((c: string) => c.includes(customerCountry) || customerCountry.includes(c))
++  // scroll detection
++  useEffect(() => {
++    const fn = () => setIsScrolled(window.scrollY > 60);
++    window.addEventListener('scroll', fn, { passive: true });
++    return () => window.removeEventListener('scroll', fn);
++  }, []);
++
++  // shipping method sync
++  const matchingZone = shippingZones.find(z =>
++    z.countries.some((c: string) => c.includes(customerCountry) || customerCountry.includes(c))
+   ) || shippingZones[0];
+-
+   const availableShippingMethods = matchingZone ? matchingZone.methods : [];
+ 
+   useEffect(() => {
+-    if (availableShippingMethods && availableShippingMethods.length > 0) {
+-      // Find default or first method
+-      setSelectedShippingMethod(availableShippingMethods[0]);
+-    } else {
+-      setSelectedShippingMethod(null);
+-    }
++    if (availableShippingMethods?.length > 0) setSelectedShippingMethod(availableShippingMethods[0]);
++    else setSelectedShippingMethod(null);
+   }, [customerCountry, shippingZones]);
+ 
+-  // Load from local product array
++  /* ── TOAST HELPER ────────────────────────────────────────────── */
++  const addToast = (msg: string, type: Toast['type'] = 'success') => {
++    const id = ++toastId.current;
++    setToasts(p => [...p, { id, msg, type }]);
++    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3200);
++  };
++
++  /* ── WISHLIST ────────────────────────────────────────────────── */
++  const toggleWishlist = (productId: string, e?: React.MouseEvent) => {
++    e?.stopPropagation();
++    setWishlist(prev => {
++      const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
++      localStorage.setItem('ama_wishlist', JSON.stringify(next));
++      addToast(prev.includes(productId) ? 'تمت الإزالة من المفضلة' : 'أُضيف إلى المفضلة ❤️', 'info');
++      return next;
++    });
++  };
++
++  /* ── PRODUCT HANDLERS ───────────────────────────────────────── */
+   const handleProductClick = (product: Product) => {
+     setSelectedProduct(product);
+     setChosenSize(product.sizes[0] || 'M');
+@@ -176,20 +179,10 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab
+ 
+   const handleAddToCart = () => {
+     if (!selectedProduct) return;
+-    const newItem: OrderItem = {
+-      product: selectedProduct,
+-      quantity: quantity,
+-      selectedSize: chosenSize,
+-      selectedColor: chosenColor
+-    };
+-
+-    // Check if duplicate exists with same options
++    const newItem: OrderItem = { product: selectedProduct, quantity, selectedSize: chosenSize, selectedColor: chosenColor };
+     const existingIndex = cart.findIndex(
+-      item => item.product.id === selectedProduct.id && 
+-              item.selectedColor === chosenColor && 
+-              item.selectedSize === chosenSize
++      item => item.product.id === selectedProduct.id && item.selectedColor === chosenColor && item.selectedSize === chosenSize
+     );
+-
+     if (existingIndex > -1) {
+       const updated = [...cart];
+       updated[existingIndex].quantity += quantity;
+@@ -197,9 +190,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab
+     } else {
+       setCart([...cart, newItem]);
+     }
+-
+     setIsCartOpen(true);
+-    setSelectedProduct(null); // Close detail modal
++    setSelectedProduct(null);
++    addToast(`تمت إضافة "${selectedProduct.name}" للسلة 🛍️`);
+   };
+ 
+   const updateCartQty = (index: number, newQty: number) => {
+@@ -209,1038 +202,1053 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab
+     setCart(updated);
+   };
+ 
+-  const removeFromCart = (index: number) => {
+-    const updated = cart.filter((_, i) => i !== index);
+-    setCart(updated);
+-  };
++  const removeFromCart = (index: number) => setCart(cart.filter((_, i) => i !== index));
+ 
+   const applyCoupon = () => {
+     setCouponError('');
+     if (!couponCode.trim()) return;
+     const found = coupons.find(c => c.code.toUpperCase() === couponCode.trim().toUpperCase() && c.isActive);
+-    if (found) {
+-      setActiveCoupon(found);
+-    } else {
+-      setCouponError('الكوبون المدخل غير فعال أو غير صحيح.');
+-      setActiveCoupon(null);
+-    }
++    if (found) { setActiveCoupon(found); addToast(`✓ كوبون ${found.code} مفعّل!`); }
++    else { setCouponError('الكوبون غير فعال أو غير صحيح.'); setActiveCoupon(null); }
+   };
+ 
+-  // Calculations
+-  const calculatedSubtotal = cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+-  
+-  const calculatedDiscount = activeCoupon 
+-    ? (activeCoupon.type === 'percentage' 
+-      ? (calculatedSubtotal * activeCoupon.discount / 100) 
+-      : activeCoupon.discount)
++  /* ── CALCULATIONS ────────────────────────────────────────────── */
++  const calculatedSubtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
++  const calculatedDiscount = activeCoupon
++    ? activeCoupon.type === 'percentage' ? calculatedSubtotal * activeCoupon.discount / 100 : activeCoupon.discount
+     : 0;
+-    
+-  const shippingCharge = selectedShippingMethod 
+-    ? (selectedShippingMethod.priceType === 'free' ? 0 : parseFloat(selectedShippingMethod.price))
+-    : (settings 
+-        ? (calculatedSubtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost)
+-        : 2.5);
+-
++  const shippingCharge = selectedShippingMethod
++    ? selectedShippingMethod.priceType === 'free' ? 0 : parseFloat(selectedShippingMethod.price)
++    : settings ? (calculatedSubtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost) : 2.5;
+   const totalCost = Math.max(0, calculatedSubtotal - calculatedDiscount + shippingCharge);
+ 
+-  // Submit checkout process
++  /* ── PAYMENT ─────────────────────────────────────────────────── */
+   const triggerPayment = () => {
+     setIsPaying(true);
+-    
+-    // Simulate electronic gateway latencies
+     setTimeout(() => {
+       setIsPaying(false);
+-      
+       const trackingNum = `AL-${Math.floor(10000 + Math.random() * 90000)}-${customerCountry === 'البحرين' ? 'BH' : 'GCC'}`;
+       const orderId = `ord-${Date.now().toString().substring(9)}`;
+-      
+       const brandNewOrder: Order = {
+-        id: orderId,
+-        trackingCode: trackingNum,
+-        customer: {
+-          name: customerName,
+-          email: customerEmail || 'guest@almaasa.bh',
+-          phone: customerPhone,
+-          address: customerAddress,
+-          city: customerCity,
+-          country: customerCountry
+-        },
+-        items: cart,
+-        subtotal: calculatedSubtotal,
+-        discount: calculatedDiscount,
+-        shippingFee: shippingCharge,
+-        total: totalCost,
+-        paymentMethod: paymentMethod,
+-        paymentStatus: 'paid', // Instant automatic payment approved in mock
+-        shippingStatus: 'pending',
+-        date: new Date().toISOString(),
+-        notes: customerNotes,
++        id: orderId, trackingCode: trackingNum,
++        customer: { name: customerName, email: customerEmail || 'guest@almaasa.bh', phone: customerPhone, address: customerAddress, city: customerCity, country: customerCountry },
++        items: cart, subtotal: calculatedSubtotal, discount: calculatedDiscount,
++        shippingFee: shippingCharge, total: totalCost, paymentMethod,
++        paymentStatus: 'paid', shippingStatus: 'pending',
++        date: new Date().toISOString(), notes: customerNotes,
+         timeline: [
+-          {
+-            title: 'تم استلام الطلب',
+-            description: 'تم تسجيل الطلبيّة في نظام كاشير ألماسة الإلكتروني بنجاح وجاري المراجعة بمديرية المتجر.',
+-            date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+-            status: 'pending'
+-          },
+-          {
+-            title: 'تأكيد السداد الإلكتروني',
+-            description: `تم ترخيص المعاملة المالية وقيد الحساب بنجاح بواسطة ${paymentMethod.toUpperCase()} بقيمة ${totalCost.toFixed(2)} د.ب.`,
+-            date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+-            status: 'pending'
+-          }
+-        ]
++          { title: 'تم استلام الطلب', description: 'تم تسجيل الطلبية في نظام ألماسة بنجاح.', date: new Date().toISOString().replace('T', ' ').substring(0, 16), status: 'pending' },
++          { title: 'تأكيد السداد', description: `تم ترخيص الدفع بـ ${paymentMethod.toUpperCase()} بقيمة ${totalCost.toFixed(2)} د.ب.`, date: new Date().toISOString().replace('T', ' ').substring(0, 16), status: 'pending' },
++        ],
+       };
+-
+-      // Add to db
+       const { orders } = getStoredData();
+-      const updatedOrders = [brandNewOrder, ...orders];
+-      saveStoredData({ orders: updatedOrders });
+-      
+-      // Operations Log Entry
+-      addOperationLog(
+-        `طلب شراء جديد قيد التجهيز #${orderId}`,
+-        `قامت العميلة ${customerName} بشراء عدد ${cart.length} منتج بقيمة إجمالية ${totalCost.toFixed(2)} د.ب مسددة إلكترونياً بـ ${paymentMethod}.`,
+-        'بوابة الدفع التلقائي',
+-        'order',
+-        'success'
+-      );
+-
+-      // Successfully process coupons usage
++      saveStoredData({ orders: [brandNewOrder, ...orders] });
++      addOperationLog(`طلب جديد #${orderId}`, `${customerName} - ${totalCost.toFixed(2)} د.ب`, 'بوابة الدفع', 'order', 'success');
+       if (activeCoupon) {
+-        const updatedCoupons = coupons.map(c => {
+-          if (c.code === activeCoupon.code) {
+-            return { ...c, usageCount: c.usageCount + 1 };
+-          }
+-          return c;
+-        });
+-        setCoupons(updatedCoupons);
+-        saveStoredData({ coupons: updatedCoupons });
++        const uc = coupons.map(c => c.code === activeCoupon.code ? { ...c, usageCount: c.usageCount + 1 } : c);
++        setCoupons(uc); saveStoredData({ coupons: uc });
+       }
+-
+-      // Auto decrease products stock
+-      const { products: dbProducts } = getStoredData();
+-      const mappedProds = dbProducts.map((p: Product) => {
+-        const itemInCart = cart.find(ci => ci.product.id === p.id);
+-        if (itemInCart) {
+-          return { ...p, stock: Math.max(0, p.stock - itemInCart.quantity) };
+-        }
+-        return p;
++      const { products: dbP } = getStoredData();
++      const mp = dbP.map((p: Product) => {
++        const ci = cart.find(i => i.product.id === p.id);
++        return ci ? { ...p, stock: Math.max(0, p.stock - ci.quantity) } : p;
+       });
+-      setProducts(mappedProds);
+-      saveStoredData({ products: mappedProds });
+-
+-      setNewOrder(brandNewOrder);
+-      setCart([]);
+-      setCheckoutStep('success');
+-      setActiveCoupon(null);
+-      setCouponCode('');
++      setProducts(mp); saveStoredData({ products: mp });
++      setNewOrder(brandNewOrder); setCart([]); setCheckoutStep('success'); setActiveCoupon(null); setCouponCode('');
+     }, 2000);
+   };
+ 
++  /* ── TRACKING ────────────────────────────────────────────────── */
+   const handleTrackSearch = () => {
+-    setTrackError('');
+-    setTrackedOrder(null);
++    setTrackError(''); setTrackedOrder(null);
+     if (!trackSearchQuery.trim()) return;
+-
+     const { orders } = getStoredData();
+-    const query = trackSearchQuery.trim().toLowerCase();
+-    
+-    // Search by code or mobile phone match
+-    const matched = orders.find((o: Order) => 
+-      o.trackingCode.toLowerCase() === query || 
+-      o.customer.phone.replace(/[\s+]/g, '').includes(query.replace(/[\s+]/g, ''))
++    const q = trackSearchQuery.trim().toLowerCase();
++    const matched = orders.find((o: Order) =>
++      o.trackingCode.toLowerCase() === q || o.customer.phone.replace(/[\s+]/g, '').includes(q.replace(/[\s+]/g, ''))
+     );
+-
+-    if (matched) {
+-      setTrackedOrder(matched);
+-    } else {
+-      setTrackError('عذراً، لم نجد أي طلب مسجل برقم التتبع أو الهاتف المدخل. يرجى التحقق وإعادة المحاولة.');
+-    }
++    matched ? setTrackedOrder(matched) : setTrackError('لم نجد طلبًا بهذا الرقم أو الهاتف. يرجى التحقق والمحاولة مجدداً.');
+   };
+ 
+-  // Filtered views
+-  const filteredProducts = products.filter(product => {
+-    const isCategoryMatch = selectedCategory === 'all' || product.category === selectedCategory;
+-    const isSearchMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+-                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
+-    return isCategoryMatch && isSearchMatch;
++  /* ── FILTER ──────────────────────────────────────────────────── */
++  const filteredProducts = products.filter(p => {
++    const cat = selectedCategory === 'all' || p.category === selectedCategory;
++    const q = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.description.toLowerCase().includes(searchQuery.toLowerCase());
++    return cat && q;
+   });
+ 
++  /* ══════════════════════════════════════════════════════════════
++     RENDER
++  ══════════════════════════════════════════════════════════════ */
+   return (
+-    <div className="bg-[#FAF6F6] min-h-screen text-slate-800 font-sans" dir="rtl" id="almaasa-storefront">
+-      
+-      {/* 1. Header Banner / Announcement */}
+-      <div className="bg-[#E4A0A0] text-white py-1.5 px-4 text-center text-xs font-semibold tracking-wide" id="global-announcement">
+-        ✨ مخاوير العيد وصلت! توصيل دولي سريع لكافة دول الخليج والعالم | شحن مجاني للطلبات فوق 50 د.ب ✨
++    <div className="bg-[#FDF8F5] min-h-screen text-[#2C1810] font-sans has-bottom-nav" dir="rtl" id="almaasa-storefront">
++
++      {/* ── TOASTS ──────────────────────────────────────────────── */}
++      <div className="fixed top-4 left-4 z-[100] space-y-2 pointer-events-none">
++        <AnimatePresence>
++          {toasts.map(t => (
++            <motion.div key={t.id}
++              initial={{ x: -80, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -80, opacity: 0 }}
++              className={`toast-enter px-4 py-3 rounded-2xl shadow-xl text-white text-xs font-bold max-w-xs pointer-events-auto ${
++                t.type === 'success' ? 'bg-[#9A2D55]' : t.type === 'info' ? 'bg-[#C4956A]' : 'bg-red-500'
++              }`}
++            >{t.msg}</motion.div>
++          ))}
++        </AnimatePresence>
+       </div>
+ 
+-      {/* 2. Top Navigation Bar */}
+-      <nav className="sticky top-0 bg-white/90 backdrop-blur-md z-40 border-b border-rose-100 shadow-xs" id="main-nav">
+-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+-          <div className="flex items-center gap-6">
+-            <span className="text-xl font-extrabold text-[#9A2D55] tracking-tight flex items-center gap-1 cursor-pointer" onClick={() => setActiveTab('shop')}>
+-              💎 ألمــاســة Boutique
+-            </span>
+-            <div className="hidden md:flex items-center gap-4 text-sm font-medium">
+-              <button 
+-                onClick={() => setActiveTab('shop')} 
+-                className={`py-1 px-3 rounded-full transition-all ${activeTab === 'shop' ? 'bg-[#9A2D55] text-white' : 'text-slate-600 hover:text-[#9A2D55]'}`}
+-                id="tab-shop-btn"
+-              >
+-                تسوّق المخاوير
++      {/* ── 1. ANNOUNCEMENT BAR ──────────────────────────────────── */}
++      <div className="bg-[#2C1810] text-[#E8D5C4] py-2 px-4 text-center text-[11px] font-semibold tracking-wide">
++        <span className="hidden sm:inline">✨ مخاوير العيد وصلت! </span>
++        توصيل دولي سريع لجميع دول الخليج والعالم
++        <span className="mx-3 text-[#C4956A]">|</span>
++        شحن مجاني للطلبات فوق 50 د.ب
++        <span className="hidden md:inline">
++          <span className="mx-3 text-[#C4956A]">|</span>
++          <button onClick={onNavigateToAdmin} className="underline opacity-50 hover:opacity-100 text-[10px]">إدارة المتجر</button>
++        </span>
++      </div>
++
++      {/* ── 2. HEADER ────────────────────────────────────────────── */}
++      <header className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-[#F2E4DC]' : 'bg-white border-b border-[#F2E4DC]'}`}>
++        <div className="max-w-7xl mx-auto px-4">
++          <div className="flex items-center justify-between h-16 md:h-18">
++
++            {/* Mobile: hamburger */}
++            <button className="md:hidden p-2 text-[#9A2D55]" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
++              <Menu className="w-5 h-5" />
++            </button>
++
++            {/* Desktop nav - right */}
++            <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-[#5C3830]">
++              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="hover:text-[#9A2D55] transition-colors">الرئيسية</button>
++              {categories.filter(c => c.id !== 'all').slice(0, 3).map(cat => (
++                <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); }} className="hover:text-[#9A2D55] transition-colors">
++                  {cat.name}
++                </button>
++              ))}
++              <button onClick={() => setActiveTab('tracking')} className="hover:text-[#9A2D55] transition-colors">تتبع الطلب</button>
++            </nav>
++
++            {/* Logo - center */}
++            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex flex-col items-center group">
++              <span className="text-2xl font-black tracking-tight text-[#9A2D55] leading-none" style={{ fontFamily: "'Cairo', serif" }}>
++                ألماسة
++              </span>
++              <span className="text-[9px] tracking-[0.25em] text-[#C4956A] font-bold uppercase">ALMAASA</span>
++            </button>
++
++            {/* Actions - left */}
++            <div className="flex items-center gap-1 md:gap-2">
++              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] transition-colors hidden md:flex" onClick={() => setSearchQuery('')}>
++                <Search className="w-5 h-5" />
+               </button>
+-              <button 
+-                onClick={() => setActiveTab('tracking')} 
+-                className={`py-1 px-3 rounded-full transition-all ${activeTab === 'tracking' ? 'bg-[#9A2D55] text-white' : 'text-slate-600 hover:text-[#9A2D55]'}`}
+-                id="tab-track-btn"
+-              >
+-                تتبع طلبي وشحنكِ ✈️
++              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] transition-colors hidden md:flex relative" onClick={() => setShowReviewsPopup(true)}>
++                <Star className="w-5 h-5" />
+               </button>
+-              <button 
+-                onClick={() => setShowReviewsPopup(true)} 
+-                className="text-slate-600 hover:text-[#9A2D55] text-sm py-1 px-2"
+-                id="reviews-pop-trigger"
+-              >
+-                آراء الزبائن ⭐
++              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] transition-colors relative" onClick={() => setIsCartOpen(true)}>
++                <ShoppingBag className="w-5 h-5" />
++                {cart.length > 0 && (
++                  <span className="absolute -top-0.5 -right-0.5 bg-[#9A2D55] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
++                    {cart.reduce((s, i) => s + i.quantity, 0)}
++                  </span>
++                )}
++              </button>
++              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] transition-colors relative" onClick={() => {}}>
++                <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-[#9A2D55] text-[#9A2D55]' : ''}`} />
++                {wishlist.length > 0 && (
++                  <span className="absolute -top-0.5 -right-0.5 bg-[#C4956A] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
++                    {wishlist.length}
++                  </span>
++                )}
+               </button>
+             </div>
+           </div>
+ 
+-          <div className="flex items-center gap-3">
+-
+-            {/* Cart Trigger Button */}
+-            <button 
+-              onClick={() => setIsCartOpen(true)}
+-              className="relative p-2.5 bg-rose-50 text-[#9A2D55] hover:bg-rose-100 rounded-full transition-all cursor-pointer"
+-              id="cart-trigger-btn"
+-            >
+-              <ShoppingBag className="w-5 h-5" />
+-              {cart.length > 0 && (
+-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-bounce">
+-                  {cart.reduce((s, i) => s + i.quantity, 0)}
+-                </span>
+-              )}
+-            </button>
+-          </div>
++          {/* Mobile Nav Dropdown */}
++          <AnimatePresence>
++            {mobileMenuOpen && (
++              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
++                className="md:hidden border-t border-[#F2E4DC] overflow-hidden bg-white">
++                <div className="py-4 space-y-2 px-2">
++                  {[
++                    { label: 'الرئيسية', action: () => { setActiveTab('shop'); setSelectedCategory('all'); setMobileMenuOpen(false); } },
++                    ...categories.filter(c => c.id !== 'all').map(cat => ({
++                      label: cat.name,
++                      action: () => { setActiveTab('shop'); setSelectedCategory(cat.id); setMobileMenuOpen(false); }
++                    })),
++                    { label: 'تتبع الطلب ✈️', action: () => { setActiveTab('tracking'); setMobileMenuOpen(false); } },
++                    { label: 'آراء الزبائن ⭐', action: () => { setShowReviewsPopup(true); setMobileMenuOpen(false); } },
++                  ].map((item, i) => (
++                    <button key={i} onClick={item.action} className="w-full text-right py-2.5 px-4 rounded-xl text-sm font-semibold text-[#5C3830] hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-colors">
++                      {item.label}
++                    </button>
++                  ))}
++                </div>
++              </motion.div>
++            )}
++          </AnimatePresence>
+         </div>
+-      </nav>
+-
+-      {/* Main Core Body */}
+-      <main className="max-w-6xl mx-auto px-4 py-6">
+-        
+-        {/* SHOP TAB VIEW */}
+-        {activeTab === 'shop' && (
+-          <div>
+-            {/* 3. Instagram Branding Profile Section (Renders elements in Image 1 exactly) */}
+-            <div className="bg-white rounded-3xl border border-rose-50 p-6 md:p-8 shadow-xs mb-8" id="store-brand-profile">
+-              <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10">
+-                
+-                {/* Premium Instagram Profile Circle Avatar */}
+-                <div className="relative">
+-                  <div className="w-28 h-28 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 flex items-center justify-center shadow-md">
+-                    <div className="w-full h-full rounded-full bg-white p-1 flex items-center justify-center overflow-hidden">
+-                      {/* Generates logo visual with initials to exactly echo ALMAASA style */}
+-                      <div className="w-full h-full rounded-full bg-rose-50 flex flex-col items-center justify-center text-[#9A2D55] border border-rose-100">
+-                        <span className="font-serif text-2xl font-bold tracking-tight">ألمـاسة</span>
+-                        <span className="text-[10px] uppercase font-mono tracking-widest text-[#E4A0A0]" style={{ letterSpacing: '0.2em' }}>ALMAASA</span>
+-                      </div>
++      </header>
++
++      {/* ── MAIN CONTENT ─────────────────────────────────────────── */}
++      {activeTab === 'shop' && (
++        <main>
++
++          {/* ── 3. HERO SECTION ─────────────────────────────────── */}
++          <section className="relative overflow-hidden bg-[#2C1810]" style={{ minHeight: '70vh' }}>
++            {/* Background - gradient */}
++            <div className="absolute inset-0 bg-gradient-to-l from-[#1a0d08]/80 via-[#2C1810]/60 to-transparent z-10" />
++
++            {/* Hero image */}
++            {products.length > 0 && (
++              <img src={products[0].image} alt="hero"
++                referrerPolicy="no-referrer"
++                className="absolute inset-0 w-full h-full object-cover object-top opacity-60"
++              />
++            )}
++
++            {/* Pattern overlay */}
++            <div className="absolute inset-0 opacity-10 z-10"
++              style={{ backgroundImage: 'radial-gradient(circle, #C4956A 1px, transparent 1px)', backgroundSize: '32px 32px' }}
++            />
++
++            <div className="relative z-20 max-w-7xl mx-auto px-4 flex items-center" style={{ minHeight: '70vh' }}>
++              <div className="max-w-xl py-16 fade-up">
++                <div className="inline-flex items-center gap-2 bg-[#C4956A]/20 border border-[#C4956A]/30 text-[#E8D5C4] text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
++                  <Sparkles className="w-3.5 h-3.5 text-[#C4956A]" />
++                  مخاوير ألماسة — أناقة عصرية فاخرة
++                </div>
++
++                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
++                  أناقة<br />
++                  <span className="text-[#E8D5C4]">استثنائية</span><br />
++                  <span className="text-[#C4956A]">تفاصيل تخطف الأنظار</span>
++                </h1>
++
++                <p className="text-[#C4956A]/80 text-sm md:text-base leading-relaxed mb-8 font-medium max-w-md">
++                  تشكيلة راقية من المخاوير والأقمشة الفاخرة بتصاميم حصرية وجودة استثنائية — لكل مناسبة أنيقة في حياتكِ
++                </p>
++
++                <div className="flex flex-wrap gap-3">
++                  <button
++                    onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
++                    className="bg-[#9A2D55] hover:bg-[#802446] text-white font-bold px-8 py-3.5 rounded-full shadow-lg transition-all hover:shadow-[#9A2D55]/30 hover:shadow-xl hover:-translate-y-0.5 flex items-center gap-2"
++                  >
++                    تسوّقي الآن
++                    <ChevronLeft className="w-4 h-4" />
++                  </button>
++                  <button
++                    onClick={() => setActiveTab('tracking')}
++                    className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3.5 rounded-full backdrop-blur-sm transition-all"
++                  >
++                    تتبع طلبي ✈️
++                  </button>
++                </div>
++              </div>
++            </div>
++
++            {/* Trust badges */}
++            <div className="relative z-20 bg-[#9A2D55]/90 backdrop-blur-sm">
++              <div className="max-w-7xl mx-auto px-4 py-3">
++                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
++                  {[
++                    { icon: Truck, label: 'شحن لجميع الدول' },
++                    { icon: BadgeCheck, label: 'جودة فاخرة مضمونة' },
++                    { icon: ShieldCheck, label: 'دفع آمن 100%' },
++                    { icon: Gift, label: 'تغليف هدايا مجاني' },
++                  ].map(({ icon: Icon, label }) => (
++                    <div key={label} className="flex items-center justify-center gap-2 text-white/90">
++                      <Icon className="w-4 h-4 text-[#E8D5C4] shrink-0" />
++                      <span className="text-xs font-semibold">{label}</span>
+                     </div>
+-                  </div>
++                  ))}
+                 </div>
++              </div>
++            </div>
++          </section>
+ 
+-                {/* Profile Meta Stats & Bio details */}
+-                <div className="flex-1 text-center md:text-right">
+-                  <div className="flex flex-col md:flex-row items-center gap-3 mb-3">
+-                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight" id="profile-handle">almaasa.bh</h1>
+-                    <span className="text-rose-500 text-sm font-semibold border border-rose-100 rounded-full px-2.5 py-0.5 bg-rose-50 flex items-center gap-1">
+-                      مخاوير ألماسة 💎
+-                    </span>
+-                  </div>
++          {/* ── 4. CATEGORIES SECTION ───────────────────────────── */}
++          <section className="py-14 px-4 max-w-7xl mx-auto">
++            <div className="text-center mb-10">
++              <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-2">استكشفي</p>
++              <h2 className="text-2xl md:text-3xl font-black text-[#2C1810]">الأقسام الرئيسية</h2>
++            </div>
+ 
+-                  <div className="flex items-center justify-center md:justify-start gap-6 my-4 border-y border-rose-50 py-3 md:border-y-0 md:py-0 text-sm">
+-                    <div><strong className="text-slate-900 block font-bold text-lg">1,796</strong> <span className="text-slate-400 text-xs">منشور</span></div>
+-                    <div><strong className="text-slate-900 block font-bold text-lg">35.3K</strong> <span className="text-slate-400 text-xs">متابع</span></div>
+-                    <div><strong className="text-slate-900 block font-bold text-lg">1</strong> <span className="text-slate-400 text-xs">يتابعه</span></div>
++            {/* Story circles row */}
++            <div className="flex items-center gap-4 overflow-x-auto no-scrollbar pb-3 justify-start md:justify-center mb-8">
++              <button
++                onClick={() => setSelectedCategory('all')}
++                className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
++              >
++                <div className={`w-16 h-16 md:w-18 md:h-18 rounded-full p-0.5 transition-all ${selectedCategory === 'all' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
++                  <div className="w-full h-full rounded-full bg-[#FDF8F5] flex items-center justify-center">
++                    <BookOpen className={`w-6 h-6 ${selectedCategory === 'all' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`} />
+                   </div>
++                </div>
++                <span className={`text-[11px] font-bold ${selectedCategory === 'all' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>الكل</span>
++              </button>
+ 
+-                  <div className="space-y-1 mb-5 text-sm leading-relaxed" id="profile-bio text">
+-                    <p className="text-slate-500 font-bold">Brand</p>
+-                    <p className="font-extrabold text-[#9A2D55]">BH</p>
+-                    <p className="text-slate-600 font-semibold">💎 مخاوير ألماسة</p>
+-                    <p className="text-slate-600 flex items-center justify-center md:justify-start gap-1">
+-                      <span>✈️🇧🇭 توصيل لجميع دول العالم</span>
+-                    </p>
+-                    <a 
+-                      href="https://wa.me/97337037697" 
+-                      target="_blank" 
+-                      referrerPolicy="no-referrer" 
+-                      className="inline-flex items-center gap-1.5 text-blue-500 hover:underline font-semibold dir-ltr text-xs bg-blue-50 py-1 px-2.5 rounded-lg border border-blue-100"
+-                    >
+-                      <Phone className="w-3 h-3 text-emerald-500" /> WhatsApp: +973 37037697
+-                    </a>
++              {categories.filter(c => c.id !== 'all').map(cat => (
++                <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
++                  className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer">
++                  <div className={`w-16 h-16 rounded-full p-0.5 transition-all ${selectedCategory === cat.id ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
++                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-xs font-bold text-[#9A2D55]">
++                      ⚜️
++                    </div>
+                   </div>
++                  <span className={`text-[11px] font-bold text-center leading-tight ${selectedCategory === cat.id ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>{cat.name}</span>
++                </button>
++              ))}
+ 
+-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+-                    <a 
+-                      href="https://wa.me/97337037697" 
+-                      target="_blank"
+-                      referrerPolicy="no-referrer"
+-                      className="bg-[#9A2D55] text-white hover:bg-[#802446] px-8 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
+-                    >
+-                      تواصل واتس للطلب الخاص
+-                    </a>
+-                    <button 
+-                      onClick={() => setShowReviewsPopup(true)}
+-                      className="bg-white text-[#9A2D55] border border-[#9A2D55] hover:bg-rose-50 px-6 py-2.5 rounded-xl font-bold text-sm transition-all cursor-pointer"
+-                    >
+-                      آراء زبائننا السعداء (متدفق)
+-                    </button>
++              <button onClick={() => setShowReviewsPopup(true)} className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer">
++                <div className="w-16 h-16 rounded-full p-0.5 bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-amber-400 group-hover:to-orange-400 transition-all">
++                  <div className="w-full h-full rounded-full bg-amber-50 flex items-center justify-center">
++                    <Star className="w-6 h-6 fill-amber-400 text-amber-400" />
+                   </div>
+                 </div>
+-              </div>
++                <span className="text-[11px] font-bold text-[#8B7B78]">التقييمات</span>
++              </button>
++            </div>
+ 
+-              {/* 4. Circular Highlights (القصص البارزة) as visual category filters exactly matching user request */}
+-              <div className="mt-8 pt-6 border-t border-rose-50" id="stories-highlights">
+-                <p className="text-xs font-bold text-slate-400 mb-4 tracking-wider uppercase text-center md:text-right">أقسام المتجر والقصص البارزة 💎</p>
+-                <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-none justify-start md:justify-start px-2">
+-                  
+-                  {/* Circle 1 - All */}
+-                  <button 
+-                    onClick={() => setSelectedCategory('all')}
+-                    className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer focus:outline-none"
+-                  >
+-                    <div className={`w-16 h-16 rounded-full p-0.5 border-2 transition-all ${selectedCategory === 'all' ? 'border-[#9A2D55]' : 'border-rose-100 group-hover:border-[#9A2D55]'}`}>
+-                      <div className="w-full h-full rounded-full bg-linear-to-br from-rose-100 to-[#FAF6F6] flex items-center justify-center text-[#9A2D55]">
+-                        <BookOpen className="w-6 h-6" />
+-                      </div>
++            {/* Category Cards Grid */}
++            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
++              {categories.filter(c => c.id !== 'all').slice(0, 4).map((cat, i) => {
++                const catProducts = products.filter(p => p.category === cat.id);
++                const img = catProducts[0]?.image;
++                return (
++                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
++                    className="relative rounded-3xl overflow-hidden aspect-[3/4] group cursor-pointer luxury-card">
++                    <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/80 via-transparent to-transparent z-10" />
++                    {img ? (
++                      <img src={img} alt={cat.name} referrerPolicy="no-referrer"
++                        className="w-full h-full object-cover product-img" />
++                    ) : (
++                      <div className="w-full h-full bg-gradient-to-br from-[#F8EDE8] to-[#F2E4DC]" />
++                    )}
++                    <div className="absolute bottom-0 right-0 left-0 p-4 z-20">
++                      <p className="text-white font-black text-sm md:text-base">{cat.name}</p>
++                      <p className="text-[#E8D5C4] text-xs font-medium mt-0.5">
++                        {catProducts.length} منتج
++                      </p>
+                     </div>
+-                    <span className={`text-[11px] font-bold ${selectedCategory === 'all' ? 'text-[#9A2D55] font-extrabold' : 'text-slate-600'}`}>الكل</span>
+-                  </button>
+-
+-                  {/* Highlights matching specific images tags */}
+-                  {categories.filter(c => c.id !== 'all').map((cat) => (
+-                    <button 
+-                      key={cat.id} 
+-                      onClick={() => setSelectedCategory(cat.id)}
+-                      className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer focus:outline-none"
+-                    >
+-                      <div className={`w-16 h-16 rounded-full p-0.5 border-2 transition-all ${selectedCategory === cat.id ? 'border-[#9A2D55]' : 'border-rose-100 group-hover:border-[#9A2D55]'}`}>
+-                        <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden border border-rose-100 p-0.5">
+-                          {/* Use soft abstract colors or initials for highlight thumb */}
+-                          <div className="w-full h-full rounded-full bg-rose-50/50 flex items-center justify-center text-[#9A2D55] text-xs font-bold">
+-                            ⚜️
+-                          </div>
+-                        </div>
+-                      </div>
+-                      <span className={`text-[11px] font-bold ${selectedCategory === cat.id ? 'text-[#9A2D55] font-extrabold' : 'text-slate-600'}`}>
+-                        {cat.name}
+-                      </span>
+-                    </button>
+-                  ))}
+-
+-                  {/* Custom Review Circle Trigger */}
+-                  <button 
+-                    onClick={() => setShowReviewsPopup(true)} 
+-                    className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
+-                  >
+-                    <div className="w-16 h-16 rounded-full p-0.5 border-2 border-rose-100 group-hover:border-[#9A2D55]">
+-                      <div className="w-full h-full rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+-                        <Star className="w-6 h-6 fill-emerald-500 text-emerald-500 animate-spin" style={{ animationDuration: '6s' }} />
+-                      </div>
++                    <div className="absolute top-3 left-3 z-20 bg-white/20 backdrop-blur-sm border border-white/30 text-white text-[10px] font-bold px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-all">
++                      تسوّقي الآن
+                     </div>
+-                    <span className="text-[11px] font-bold text-slate-600">رأي الزباااين</span>
+                   </button>
+-                </div>
+-              </div>
++                );
++              })}
+             </div>
+-
+-            {/* 5. Search Bar & Summary details */}
+-            <div className="bg-white rounded-2xl border border-rose-100 p-4 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+-              <div className="relative w-full md:max-w-md">
+-                <input 
+-                  type="text" 
+-                  placeholder="ابحثي عن مخورك المفضل، قطن أو قماش شيفون..." 
+-                  value={searchQuery}
+-                  onChange={(e) => setSearchQuery(e.target.value)}
+-                  className="w-full bg-[#FAF6F6] text-slate-800 border border-rose-100 rounded-xl pr-10 pl-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white"
++          </section>
++
++          {/* ── 5. SEARCH BAR ───────────────────────────────────── */}
++          <div className="max-w-7xl mx-auto px-4 pb-6">
++            <div className="bg-white rounded-2xl border border-[#F2E4DC] shadow-sm p-3 flex gap-3">
++              <div className="relative flex-1">
++                <Search className="absolute right-3.5 top-3 w-4 h-4 text-[#C4956A]" />
++                <input type="text" placeholder="ابحثي عن مخورك المفضل..."
++                  value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
++                  className="w-full bg-[#FDF8F5] border border-[#F2E4DC] text-[#2C1810] rounded-xl pr-10 pl-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white transition-all"
+                 />
+-                <Search className="absolute right-3.5 top-3.5 w-4 h-4 text-rose-400" />
+                 {searchQuery && (
+-                  <button onClick={() => setSearchQuery('')} className="absolute left-3 top-3.5 text-rose-400 hover:text-slate-600">
++                  <button onClick={() => setSearchQuery('')} className="absolute left-3 top-3 text-[#8B7B78] hover:text-[#9A2D55]">
+                     <X className="w-4 h-4" />
+                   </button>
+                 )}
+               </div>
+-
+-              <div className="text-xs font-bold text-slate-500 text-center md:text-left flex items-center gap-2">
+-                <span>القسم المختار:</span>
+-                <span className="text-[#9A2D55] bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">
++              <div className="hidden md:flex items-center gap-2 text-xs font-semibold text-[#8B7B78]">
++                <span className="bg-[#F8EDE8] text-[#9A2D55] px-2.5 py-1 rounded-lg font-bold border border-[#F2E4DC]">
+                   {categories.find(c => c.id === selectedCategory)?.name || 'الكل'}
+                 </span>
+-                <span>|</span>
+-                <span>يعرض {filteredProducts.length} قطعة مخور وتوابعه</span>
++                <span>{filteredProducts.length} قطعة</span>
+               </div>
+             </div>
++          </div>
++
++          {/* ── 6. PRODUCTS SECTION ─────────────────────────────── */}
++          <section id="products-section" className="max-w-7xl mx-auto px-4 pb-16">
++            <div className="flex items-center justify-between mb-8">
++              <div>
++                <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-1">كولكشن 2026</p>
++                <h2 className="text-2xl font-black text-[#2C1810]">
++                  {selectedCategory === 'all' ? 'الأكثر مبيعاً' : categories.find(c => c.id === selectedCategory)?.name}
++                </h2>
++              </div>
++              {selectedCategory !== 'all' && (
++                <button onClick={() => setSelectedCategory('all')} className="text-xs text-[#9A2D55] font-bold hover:underline flex items-center gap-1">
++                  عرض الكل <ChevronLeft className="w-3.5 h-3.5" />
++                </button>
++              )}
++            </div>
+ 
+-            {/* 6. Product Grid (Bespoke Luxury Cards layout) */}
+             {filteredProducts.length === 0 ? (
+-              <div className="bg-white border rounded-2xl p-12 text-center text-slate-500">
+-                <ShoppingBag className="w-12 h-12 text-rose-200 mx-auto mb-3" />
+-                <p className="text-lg font-bold">عذراً، لا توجد مخاوير مطابقة لبحثك الحالي.</p>
+-                <button onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }} className="mt-3 text-[#9A2D55] underline text-sm font-semibold">
+-                  عرض جميع المخاوير المتوفرة
++              <div className="bg-white border border-[#F2E4DC] rounded-3xl p-16 text-center">
++                <ShoppingBag className="w-12 h-12 text-[#F2E4DC] mx-auto mb-4" />
++                <p className="text-lg font-bold text-[#2C1810] mb-2">لا توجد منتجات مطابقة</p>
++                <button onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
++                  className="mt-3 bg-[#9A2D55] text-white font-bold px-6 py-2.5 rounded-full text-sm hover:bg-[#802446] transition-all">
++                  عرض جميع المخاوير
+                 </button>
+               </div>
+             ) : (
+-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8" id="products-catalog-grid">
+-                {filteredProducts.map((product) => (
+-                  <div 
+-                    key={product.id}
+-                    onClick={() => handleProductClick(product)}
+-                    className="bg-white rounded-3xl border border-rose-50 overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 group cursor-pointer flex flex-col h-full hover:-translate-y-1"
+-                  >
+-                    {/* Visual Media Section */}
+-                    <div className="relative aspect-square w-full bg-slate-100 overflow-hidden">
+-                      <img 
+-                        src={product.image} 
+-                        alt={product.name} 
+-                        referrerPolicy="no-referrer"
+-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
++              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
++                {filteredProducts.map(product => (
++                  <div key={product.id} className="bg-white rounded-3xl border border-[#F2E4DC] overflow-hidden luxury-card group cursor-pointer flex flex-col">
++
++                    {/* Image */}
++                    <div className="relative overflow-hidden bg-[#F8EDE8]" style={{ aspectRatio: '3/4' }}>
++                      <img src={product.image} alt={product.name} referrerPolicy="no-referrer"
++                        onClick={() => handleProductClick(product)}
++                        className="w-full h-full object-cover product-img"
+                       />
+-                      {/* Floating badgings */}
+-                      {product.originalPrice && (
+-                        <span className="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs">
+-                          خصم {Math.round(((product.originalPrice - product.price)/product.originalPrice)*100)}%
+-                        </span>
+-                      )}
+-                      
+-                      {product.hasSheilah && (
+-                        <span className="absolute top-3 left-3 bg-teal-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs">
+-                          مخور مع شيلة 🧕
+-                        </span>
+-                      )}
+ 
+-                      {/* Low Stock Watch */}
+-                      {product.stock <= 5 && product.stock > 0 && (
+-                        <span className="absolute bottom-3 right-3 bg-amber-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+-                          تبقى {product.stock} قطع فقط ⏰
+-                        </span>
+-                      )}
++                      {/* Badges */}
++                      <div className="absolute top-3 right-3 flex flex-col gap-1.5">
++                        {product.originalPrice && (
++                          <span className="bg-[#9A2D55] text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm">
++                            -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
++                          </span>
++                        )}
++                        {product.hasSheilah && (
++                          <span className="bg-[#2C1810] text-[#E8D5C4] text-[9px] font-bold px-2 py-0.5 rounded-full">+ شيلة</span>
++                        )}
++                      </div>
++
++                      {/* Wishlist */}
++                      <button
++                        onClick={e => toggleWishlist(product.id, e)}
++                        className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-sm transition-all hover:scale-110"
++                      >
++                        <Heart className={`w-4 h-4 transition-all ${wishlist.includes(product.id) ? 'fill-[#9A2D55] text-[#9A2D55]' : 'text-[#8B7B78]'}`} />
++                      </button>
+ 
++                      {/* Out of stock */}
+                       {product.stock === 0 && (
+-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center text-white text-lg font-extrabold tracking-wide">
+-                          نفدت الكمية 🚫
++                        <div className="absolute inset-0 bg-[#2C1810]/70 backdrop-blur-xs flex items-center justify-center">
++                          <span className="text-white font-black text-sm bg-[#9A2D55] px-4 py-2 rounded-full">نفدت الكمية</span>
++                        </div>
++                      )}
++
++                      {/* Low stock */}
++                      {product.stock > 0 && product.stock <= 5 && (
++                        <div className="absolute bottom-3 right-3">
++                          <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
++                            {product.stock} قطع فقط!
++                          </span>
+                         </div>
+                       )}
++
++                      {/* Hover quick view */}
++                      <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-[#2C1810]/80 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
++                        <button
++                          onClick={() => handleProductClick(product)}
++                          className="w-full bg-white/95 hover:bg-white text-[#9A2D55] font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all"
++                        >
++                          <Eye className="w-3.5 h-3.5" />
++                          عرض التفاصيل
++                        </button>
++                      </div>
+                     </div>
+ 
+-                    {/* Meta info */}
+-                    <div className="p-5 flex-1 flex flex-col justify-between">
++                    {/* Info */}
++                    <div className="p-4 flex-1 flex flex-col justify-between" onClick={() => handleProductClick(product)}>
+                       <div>
+-                        <div className="flex items-center justify-between mb-2">
+-                          <span className="text-[10px] bg-rose-50 text-[#9A2D55] font-bold px-2 py-0.5 rounded-full uppercase">
++                        <div className="flex items-center justify-between mb-1.5">
++                          <span className="text-[10px] bg-[#F8EDE8] text-[#9A2D55] font-bold px-2 py-0.5 rounded-full">
+                             {categories.find(c => c.id === product.category)?.name || 'مخور'}
+                           </span>
+-                          <div className="flex items-center gap-0.5 text-amber-500 text-xs font-bold">
+-                            <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+-                            <span>{product.rating}</span>
+-                            <span className="text-slate-400">({product.reviewCount})</span>
++                          <div className="flex items-center gap-0.5 text-amber-500">
++                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
++                            <span className="text-[10px] font-bold text-[#5C3830]">{product.rating}</span>
+                           </div>
+                         </div>
+-
+-                        <h3 className="text-slate-800 font-bold text-base group-hover:text-[#9A2D55] transition-colors line-clamp-1 mb-2">
++                        <h3 className="font-black text-[#2C1810] text-sm md:text-base leading-tight line-clamp-2 mb-1 group-hover:text-[#9A2D55] transition-colors">
+                           {product.name}
+                         </h3>
+-
+-                        <p className="text-slate-400 text-xs mb-4 line-clamp-2 leading-relaxed">
+-                          {product.description}
+-                        </p>
+                       </div>
+ 
+-                      <div className="flex items-center justify-between pt-3 border-t border-rose-50">
+-                        <div className="flex items-baseline gap-1.5 font-sans">
+-                          <span className="text-lg font-bold text-[#9A2D55]">{product.price.toFixed(2)} د.ب</span>
++                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#F8EDE8]">
++                        <div>
++                          <span className="text-[#9A2D55] font-black text-lg">{product.price.toFixed(2)}</span>
++                          <span className="text-[#9A2D55] font-semibold text-xs mr-1">د.ب</span>
+                           {product.originalPrice && (
+-                            <span className="text-xs text-slate-300 line-through">{product.originalPrice.toFixed(2)} د.ب</span>
++                            <span className="text-[#8B7B78] text-xs line-through mr-2 font-medium">{product.originalPrice.toFixed(2)}</span>
+                           )}
+                         </div>
+-
+-                        <span className="text-xs text-[#9A2D55] font-bold group-hover:underline flex items-center gap-1">
+-                          تحديد الخيارات ⚜️
+-                        </span>
++                        <button
++                          onClick={e => { e.stopPropagation(); handleProductClick(product); setIsCartOpen(true); }}
++                          className="w-8 h-8 bg-[#9A2D55] hover:bg-[#802446] text-white rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 disabled:bg-[#F2E4DC]"
++                          disabled={product.stock === 0}
++                        >
++                          <Plus className="w-4 h-4" />
++                        </button>
+                       </div>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             )}
+-          </div>
+-        )}
+-
+-        {/* ORDER TRACKING TAB VIEW */}
+-        {activeTab === 'tracking' && (
+-          <div className="max-w-2xl mx-auto" id="order-tracking-panel">
+-            <div className="bg-white rounded-3xl border border-rose-50 p-6 md:p-8 shadow-sm">
+-              <div className="text-center mb-6">
+-                <div className="w-16 h-16 bg-rose-100 text-[#9A2D55] rounded-full flex items-center justify-center mx-auto mb-4">
+-                  <Truck className="w-8 h-8 animate-bounce" />
++          </section>
++
++          {/* ── 7. REVIEWS SECTION ──────────────────────────────── */}
++          {reviews.length > 0 && (
++            <section className="bg-[#2C1810] py-16 px-4">
++              <div className="max-w-7xl mx-auto">
++                <div className="text-center mb-10">
++                  <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-2">آراء العملاء</p>
++                  <h2 className="text-2xl md:text-3xl font-black text-white">ماذا تقول زبائننا؟</h2>
++                </div>
++                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
++                  {reviews.slice(0, 3).map(rev => (
++                    <div key={rev.id} className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-sm hover:bg-white/10 transition-all">
++                      <div className="flex gap-0.5 text-amber-400 mb-4">
++                        {Array.from({ length: rev.rating }).map((_, i) => (
++                          <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
++                        ))}
++                      </div>
++                      <p className="text-[#E8D5C4] text-sm leading-relaxed font-medium mb-5 italic">"{rev.comment}"</p>
++                      <div className="flex items-center gap-3">
++                        <div className="w-9 h-9 rounded-full bg-[#9A2D55]/40 flex items-center justify-center text-[#E8D5C4] font-black text-sm">
++                          {rev.customerName.charAt(0)}
++                        </div>
++                        <div>
++                          <p className="text-white font-bold text-sm">{rev.customerName}</p>
++                          <p className="text-[#8B7B78] text-[10px]">{rev.productName}</p>
++                        </div>
++                      </div>
++                    </div>
++                  ))}
++                </div>
++                <div className="text-center mt-8">
++                  <button onClick={() => setShowReviewsPopup(true)}
++                    className="border border-[#C4956A]/40 text-[#C4956A] hover:bg-[#C4956A]/10 font-bold px-8 py-3 rounded-full text-sm transition-all">
++                    عرض جميع التقييمات
++                  </button>
+                 </div>
+-                <h2 className="text-2xl font-bold text-slate-800 mb-2">تتبع شحنتك الماسية ✈️</h2>
+-                <p className="text-slate-500 text-sm">
+-                  أدخلي رقم التتبع الخاص بكِ (مثال: <span className="font-mono bg-rose-50 px-1 py-0.5 rounded text-[#9A2D55]">AL-92813-BH</span>) أو رقم الهاتف المستخدم عند إتمام الطلب لمعاينة خط سير الشحنة لحظة بلحظة.
+-                </p>
+               </div>
+-
+-              {/* Input section */}
+-              <div className="bg-slate-50 p-4 rounded-2xl border border-rose-100 flex gap-2">
+-                <input 
+-                  type="text" 
+-                  placeholder="رقم التتبع أو رقم الهاتف (973xxxxxxxx)..."
+-                  value={trackSearchQuery}
+-                  onChange={(e) => setTrackSearchQuery(e.target.value)}
+-                  onKeyDown={(e) => { if (e.key === 'Enter') handleTrackSearch(); }}
+-                  className="flex-1 bg-white border border-rose-100 text-slate-800 font-medium rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
+-                />
+-                <button 
+-                  onClick={handleTrackSearch}
+-                  className="bg-[#9A2D55] hover:bg-[#802446] text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-xs transition-all cursor-pointer"
+-                >
+-                  تتبع الآن
+-                </button>
++            </section>
++          )}
++
++          {/* ── 8. FEATURES BAR ─────────────────────────────────── */}
++          <section className="py-12 px-4 bg-white border-y border-[#F2E4DC]">
++            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
++              {[
++                { icon: Truck,      title: 'شحن دولي سريع',       desc: 'لجميع دول الخليج والعالم' },
++                { icon: BadgeCheck, title: 'جودة مضمونة 100%',    desc: 'أقمشة فاخرة مختارة بعناية' },
++                { icon: ShieldCheck,title: 'دفع آمن ومشفّر',      desc: 'BenefitPay, KNet, Visa' },
++                { icon: Gift,       title: 'تغليف هدايا فاخر',    desc: 'مجاني مع كل طلب عيد' },
++              ].map(({ icon: Icon, title, desc }) => (
++                <div key={title} className="flex flex-col items-center gap-3">
++                  <div className="w-12 h-12 bg-[#F8EDE8] rounded-2xl flex items-center justify-center">
++                    <Icon className="w-5 h-5 text-[#9A2D55]" />
++                  </div>
++                  <div>
++                    <p className="font-bold text-[#2C1810] text-sm">{title}</p>
++                    <p className="text-[#8B7B78] text-xs mt-0.5">{desc}</p>
++                  </div>
++                </div>
++              ))}
++            </div>
++          </section>
++
++          {/* ── 9. INSTAGRAM/WHATSAPP CTA ───────────────────────── */}
++          <section className="py-14 px-4 bg-gradient-to-br from-[#9A2D55] to-[#6B1E3A]">
++            <div className="max-w-2xl mx-auto text-center">
++              <Sparkles className="w-8 h-8 text-[#E8D5C4] mx-auto mb-4" />
++              <h2 className="text-2xl md:text-3xl font-black text-white mb-3">تواصلي معنا على الواتساب</h2>
++              <p className="text-[#E8D5C4] text-sm mb-7 leading-relaxed">
++                للطلبات الخاصة والتفصيل المخصص والاستفسارات، فريقنا جاهز للخدمة 24/7
++              </p>
++              <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
++                className="inline-flex items-center gap-2 bg-white text-[#9A2D55] font-black px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 text-sm">
++                <Phone className="w-4 h-4" />
++                تواصلي على واتساب الآن
++              </a>
++              <p className="text-white/40 text-xs mt-4 font-mono">+973 37037697</p>
++            </div>
++          </section>
++
++        </main>
++      )}
++
++      {/* ── ORDER TRACKING TAB ──────────────────────────────────── */}
++      {activeTab === 'tracking' && (
++        <main className="max-w-2xl mx-auto px-4 py-10">
++          <div className="bg-white rounded-3xl border border-[#F2E4DC] p-6 md:p-8 shadow-sm">
++            <div className="text-center mb-8">
++              <div className="w-16 h-16 bg-[#F8EDE8] text-[#9A2D55] rounded-2xl flex items-center justify-center mx-auto mb-4">
++                <Truck className="w-8 h-8" />
+               </div>
++              <h2 className="text-2xl font-black text-[#2C1810] mb-2">تتبع شحنتك</h2>
++              <p className="text-[#8B7B78] text-sm">
++                أدخلي رقم التتبع أو رقم الهاتف لمتابعة شحنتكِ
++              </p>
++            </div>
+ 
+-              {trackError && (
+-                <div className="mt-4 p-3 bg-red-50 text-red-600 border border-red-100 text-xs rounded-xl flex items-center gap-2">
+-                  <span>⚠️</span>
+-                  <p className="font-semibold">{trackError}</p>
+-                </div>
+-              )}
++            <div className="bg-[#FDF8F5] p-4 rounded-2xl border border-[#F2E4DC] flex gap-2 mb-4">
++              <input type="text" placeholder="رقم التتبع (AL-XXXXX-BH) أو الهاتف..."
++                value={trackSearchQuery} onChange={e => setTrackSearchQuery(e.target.value)}
++                onKeyDown={e => { if (e.key === 'Enter') handleTrackSearch(); }}
++                className="flex-1 bg-white border border-[#F2E4DC] text-[#2C1810] font-medium rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
++              />
++              <button onClick={handleTrackSearch}
++                className="bg-[#9A2D55] hover:bg-[#802446] text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer">
++                تتبع
++              </button>
++            </div>
+ 
+-              {/* Tracking Results */}
+-              <AnimatePresence mode="wait">
+-                {trackedOrder ? (
+-                  <motion.div 
+-                    initial={{ opacity: 0, y: 10 }}
+-                    animate={{ opacity: 1, y: 0 }}
+-                    exit={{ opacity: 0 }}
+-                    className="mt-8 border-t border-rose-50 pt-6"
+-                  >
+-                    {/* Header info */}
+-                    <div className="bg-rose-50/50 rounded-2xl p-4 border border-rose-100/50 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+-                      <div className="text-center sm:text-right">
+-                        <span className="text-[10px] text-slate-400 block font-bold">رقم التتبع الشحنة</span>
+-                        <span className="font-mono font-bold text-[#9A2D55] text-lg">{trackedOrder.trackingCode}</span>
+-                      </div>
+-                      <div className="text-center sm:text-left">
+-                        <span className="text-[10px] text-slate-400 block font-bold">حالة الشحن الحالية</span>
+-                        <span className={`inline-block text-xs font-bold px-3 py-1 rounded-full mt-1 ${
+-                          trackedOrder.shippingStatus === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
+-                          trackedOrder.shippingStatus === 'shipped' ? 'bg-blue-100 text-blue-800' :
+-                          trackedOrder.shippingStatus === 'processing' ? 'bg-amber-100 text-amber-800' :
+-                          'bg-slate-100 text-slate-800'
+-                        }`}>
+-                          {trackedOrder.shippingStatus === 'delivered' ? 'تم التسليم بنجاح ✓' :
+-                           trackedOrder.shippingStatus === 'shipped' ? 'قيد الشحن الدولي ✈️' :
+-                           trackedOrder.shippingStatus === 'processing' ? 'جاري تجهيز المخور ⚜️' :
+-                           'طلب معلّق'}
+-                        </span>
+-                      </div>
+-                    </div>
++            {trackError && (
++              <div className="mb-4 p-3 bg-red-50 text-red-600 border border-red-100 text-xs rounded-xl flex items-center gap-2">
++                <span>⚠️</span><p className="font-semibold">{trackError}</p>
++              </div>
++            )}
+ 
+-                    {/* Order metadata summary */}
+-                    <div className="mb-6 bg-slate-50 rounded-2xl p-4 text-xs font-medium space-y-2">
+-                      <div className="flex justify-between">
+-                        <span className="text-slate-400">اسم المستلمة:</span>
+-                        <strong className="text-slate-800">{trackedOrder.customer.name}</strong>
+-                      </div>
+-                      <div className="flex justify-between">
+-                        <span className="text-slate-400">العنوان:</span>
+-                        <strong className="text-slate-800">{trackedOrder.customer.address}, {trackedOrder.customer.city}, {trackedOrder.customer.country}</strong>
+-                      </div>
+-                      <div className="flex justify-between">
+-                        <span className="text-slate-400">المنتجات:</span>
+-                        <strong className="text-slate-800">
+-                          {trackedOrder.items.map(item => `${item.product.name} (مقاس ${item.selectedSize})`).join('، ')}
+-                        </strong>
+-                      </div>
++            <AnimatePresence mode="wait">
++              {trackedOrder ? (
++                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
++                  className="border-t border-[#F2E4DC] pt-6 mt-4">
++                  {/* Status badge */}
++                  <div className="flex items-center justify-between bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC] mb-6">
++                    <div>
++                      <span className="text-[10px] text-[#8B7B78] font-bold block">رقم التتبع</span>
++                      <span className="font-mono font-black text-[#9A2D55] text-lg">{trackedOrder.trackingCode}</span>
+                     </div>
++                    <span className={`text-xs font-bold px-4 py-2 rounded-full ${
++                      trackedOrder.shippingStatus === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
++                      trackedOrder.shippingStatus === 'shipped' ? 'bg-blue-100 text-blue-800' :
++                      trackedOrder.shippingStatus === 'processing' ? 'bg-amber-100 text-amber-800' :
++                      'bg-[#F8EDE8] text-[#9A2D55]'
++                    }`}>
++                      {trackedOrder.shippingStatus === 'delivered' ? 'تم التسليم ✓' :
++                       trackedOrder.shippingStatus === 'shipped' ? 'قيد الشحن ✈️' :
++                       trackedOrder.shippingStatus === 'processing' ? 'جاري التجهيز ⚜️' : 'طلب معلّق'}
++                    </span>
++                  </div>
+ 
+-                    {/* Vertical tracking timeline chart */}
+-                    <div className="relative pl-4 space-y-6 before:absolute before:top-2 before:bottom-2 before:right-3.5 before:w-0.5 before:bg-rose-100">
+-                      
+-                      {trackedOrder.timeline.map((event, index) => (
+-                        <div key={index} className="relative flex items-start gap-4 pr-10">
+-                          {/* Dot item */}
+-                          <div className={`absolute right-1  w-5 h-5 rounded-full border-4 bg-white flex items-center justify-center ${
+-                            // Highlight final or passed status
+-                            index === trackedOrder.timeline.length - 1 ? 'border-[#9A2D55] scale-110 shadow-xs' : 'border-rose-200'
+-                          }`}>
+-                            {index === trackedOrder.timeline.length - 1 && (
+-                              <div className="w-2 h-2 bg-[#9A2D55] rounded-full" />
+-                            )}
+-                          </div>
+-
+-                          <div className="flex-1 bg-slate-50 hover:bg-white rounded-2xl px-5 py-4 border border-rose-50 shadow-2xs transition-all">
+-                            <span className="text-[10px] text-slate-400 font-mono block mb-1">{event.date}</span>
+-                            <h4 className="font-bold text-sm text-slate-800 mb-1">{event.title}</h4>
+-                            <p className="text-xs text-slate-500 leading-relaxed font-semibold">{event.description}</p>
+-                          </div>
++                  {/* Timeline */}
++                  <div className="relative pr-6 space-y-6 before:absolute before:top-2 before:bottom-2 before:right-2 before:w-0.5 before:bg-[#F2E4DC]">
++                    {trackedOrder.timeline.map((event, idx) => (
++                      <div key={idx} className="relative flex items-start gap-4 pr-6">
++                        <div className={`absolute right-[-5px] w-5 h-5 rounded-full border-4 bg-white flex items-center justify-center ${
++                          idx === trackedOrder.timeline.length - 1 ? 'border-[#9A2D55]' : 'border-[#F2E4DC]'
++                        }`}>
++                          {idx === trackedOrder.timeline.length - 1 && <div className="w-2 h-2 bg-[#9A2D55] rounded-full" />}
+                         </div>
+-                      ))}
+-                    </div>
++                        <div className="flex-1 bg-[#FDF8F5] rounded-2xl px-4 py-3 border border-[#F2E4DC]">
++                          <span className="text-[10px] text-[#8B7B78] font-mono">{event.date}</span>
++                          <h4 className="font-bold text-sm text-[#2C1810] mt-0.5">{event.title}</h4>
++                          <p className="text-xs text-[#8B7B78] leading-relaxed font-medium mt-0.5">{event.description}</p>
++                        </div>
++                      </div>
++                    ))}
++                  </div>
+ 
+-                    <div className="mt-8 text-center bg-rose-50 border border-dashed border-rose-200 rounded-2xl p-4 text-xs font-bold text-slate-500">
+-                      هل لديك اعتراض أو استفسار؟ اتصلي بنا عبر رقم المتجر الموحد: <a href="https://wa.me/97337037697" className="text-emerald-600 underline">+973 37037697</a>
+-                    </div>
+-                  </motion.div>
+-                ) : (
+-                  <div className="mt-8 text-center text-slate-400 py-6 border border-dashed border-rose-100 rounded-2xl">
+-                    <Clock className="w-8 h-8 text-rose-200 mx-auto mb-2 animate-pulse" />
+-                    <p className="text-sm font-semibold">بانتظار إدخال رقم الطلب / الهاتف للتحرك...</p>
++                  <div className="mt-6 text-center bg-[#F8EDE8] border border-dashed border-[#F2E4DC] rounded-2xl p-4 text-xs font-semibold text-[#8B7B78]">
++                    استفسار؟ تواصلي معنا على{' '}
++                    <a href="https://wa.me/97337037697" className="text-emerald-600 underline">+973 37037697</a>
+                   </div>
+-                )}
+-              </AnimatePresence>
+-            </div>
++                </motion.div>
++              ) : (
++                <div className="mt-6 text-center text-[#8B7B78] py-8 border border-dashed border-[#F2E4DC] rounded-2xl">
++                  <Clock className="w-8 h-8 text-[#F2E4DC] mx-auto mb-2" />
++                  <p className="text-sm font-semibold">أدخلي رقم الطلب أو الهاتف للبدء</p>
++                </div>
++              )}
++            </AnimatePresence>
+           </div>
+-        )}
+-      </main>
+-
+-      {/* FOOTER */}
+-      <footer className="bg-slate-900 text-slate-400 mt-16 border-t border-rose-50/10">
+-        <div className="max-w-6xl mx-auto px-4 py-12">
+-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-center md:text-right" id="footer-bento border">
+-            <div>
+-              <span className="text-xl font-bold text-white mb-4 block">متجر مخاوير ألماسة 💎</span>
+-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
+-                متجرك الأول الآمن للحصول على أرقى تصاميم المخاوير الكويتية، البحرينية، والإماراتية المخصصة للأفراح والأعياد. تفصيل ودقة تصنيع تتوارثها الأجيال.
++        </main>
++      )}
++
++      {/* ── FOOTER ──────────────────────────────────────────────── */}
++      <footer className="bg-[#1a0d08] text-[#8B7B78] mt-0">
++        <div className="max-w-7xl mx-auto px-4 py-14">
++          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
++
++            {/* Brand */}
++            <div className="md:col-span-2">
++              <div className="mb-4">
++                <p className="text-3xl font-black text-white" style={{ fontFamily: "'Cairo', serif" }}>ألماسة</p>
++                <p className="text-[9px] tracking-[0.3em] text-[#C4956A] font-bold uppercase mt-1">ALMAASA BOUTIQUE</p>
++              </div>
++              <p className="text-sm leading-relaxed text-[#8B7B78] font-medium max-w-xs">
++                متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.
+               </p>
++              <div className="flex gap-3 mt-5">
++                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
++                  className="w-9 h-9 bg-white/5 hover:bg-emerald-600 border border-white/10 rounded-xl flex items-center justify-center text-[#8B7B78] hover:text-white transition-all">
++                  <Phone className="w-4 h-4" />
++                </a>
++                <a href="#" className="w-9 h-9 bg-white/5 hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-600 border border-white/10 rounded-xl flex items-center justify-center text-[#8B7B78] hover:text-white transition-all">
++                  <Instagram className="w-4 h-4" />
++                </a>
++              </div>
+             </div>
++
++            {/* Links */}
+             <div>
+-              <span className="text-sm font-bold text-white mb-4 block">روابط مفيدة</span>
+-              <ul className="text-xs space-y-2 font-semibold">
+-                <li><button onClick={() => { setActiveTab('shop'); window.scrollTo(0, 0); }} className="hover:text-[#E4A0A0]">تسوّق الكتالوج</button></li>
+-                <li><button onClick={() => { setActiveTab('tracking'); window.scrollTo(0, 0); }} className="hover:text-[#E4A0A0]">تتبع الطلبات والشحنات</button></li>
+-                <li><button onClick={() => setShowReviewsPopup(true)} className="hover:text-[#E4A0A0]">سجل آراء وتقييمات العملاء</button></li>
++              <p className="text-white font-bold text-sm mb-4">روابط سريعة</p>
++              <ul className="space-y-2.5">
++                {[
++                  { label: 'تسوّق المخاوير', action: () => setActiveTab('shop') },
++                  { label: 'تتبع طلبي ✈️', action: () => setActiveTab('tracking') },
++                  { label: 'آراء الزبائن ⭐', action: () => setShowReviewsPopup(true) },
++                ].map(item => (
++                  <li key={item.label}>
++                    <button onClick={item.action} className="text-sm hover:text-[#C4956A] transition-colors font-medium">
++                      {item.label}
++                    </button>
++                  </li>
++                ))}
+               </ul>
+             </div>
++
++            {/* Payment */}
+             <div>
+-              <span className="text-sm font-bold text-white mb-4 block">قنوات دفع خليجية آمنة</span>
+-              <p className="text-xs text-slate-500 leading-relaxed mb-3">
+-                ندعم الدفع الإلكتروني المباشر عبر بنفت بي (البحرين)، كي نت (الكويت)، وكافة البطاقات الائتمانية مع تشفير كامل للبيانات 🔐.
+-              </p>
+-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+-                <span className="bg-[#FAF6F6] text-blue-900 border border-rose-100 text-[10px] font-extrabold px-2 py-1 rounded">BenefitPay</span>
+-                <span className="bg-[#FAF6F6] text-cyan-800 border border-rose-100 text-[10px] font-extrabold px-2 py-1 rounded">KNet</span>
+-                <span className="bg-[#FAF6F6] text-slate-900 border border-rose-100 text-[10px] font-extrabold px-2 py-1 rounded">Credit Card</span>
+-                <span className="bg-[#FAF6F6] text-slate-900 border border-rose-100 text-[10px] font-extrabold px-2 py-1 rounded">Apple Pay</span>
++              <p className="text-white font-bold text-sm mb-4">وسائل الدفع</p>
++              <div className="flex flex-wrap gap-2">
++                {['BenefitPay', 'KNet', 'Visa', 'Mastercard', 'Apple Pay'].map(p => (
++                  <span key={p} className="bg-white/5 border border-white/10 text-[#8B7B78] text-[10px] font-bold px-2.5 py-1 rounded-lg">
++                    {p}
++                  </span>
++                ))}
++              </div>
++              <div className="mt-5">
++                <p className="text-[#8B7B78] text-[11px] flex items-center gap-1.5">
++                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
++                  جميع المدفوعات مشفّرة وآمنة
++                </p>
+               </div>
+             </div>
+           </div>
+ 
+-         <div className="border-t border-slate-800 pt-6 text-center text-[10px] text-slate-500 font-bold">
+-            <p>© 2026 مخاوير ألماسة (almaasa.bh). جميع الحقوق محفوظة.</p>
++          <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] text-[#8B7B78] font-medium">
++            <p>© 2026 مخاوير ألماسة — almaasa.bh — جميع الحقوق محفوظة</p>
++            <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-50 transition-opacity text-[10px]">
++              لوحة الإدارة
++            </button>
+           </div>
+         </div>
+       </footer>
+ 
++      {/* ── MOBILE BOTTOM NAV ───────────────────────────────────── */}
++      <div className="md:hidden fixed bottom-0 right-0 left-0 z-50 bg-white border-t border-[#F2E4DC] shadow-xl">
++        <div className="flex items-center justify-around py-2 px-2">
++          {[
++            { icon: Home,        label: 'الرئيسية',   action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
++            { icon: Grid3X3,     label: 'الأقسام',    action: () => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }) },
++            { icon: ShoppingBag, label: 'السلة',      action: () => setIsCartOpen(true), badge: cart.reduce((s, i) => s + i.quantity, 0) },
++            { icon: Heart,       label: 'المفضلة',   action: () => {}, badge: wishlist.length },
++            { icon: Truck,       label: 'تتبع طلبي', action: () => setActiveTab('tracking') },
++          ].map(({ icon: Icon, label, action, badge }) => (
++            <button key={label} onClick={action}
++              className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all relative ${
++                (label === 'الرئيسية' && activeTab === 'shop') || (label === 'تتبع طلبي' && activeTab === 'tracking')
++                  ? 'text-[#9A2D55]' : 'text-[#8B7B78]'
++              }`}>
++              <Icon className="w-5 h-5" />
++              <span className="text-[9px] font-semibold">{label}</span>
++              {badge != null && badge > 0 && (
++                <span className="absolute -top-0.5 right-1.5 bg-[#9A2D55] text-white text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
++                  {badge}
++                </span>
++              )}
++            </button>
++          ))}
++        </div>
++      </div>
++
++      {/* ════════════════════════════════════════════════════════
++          MODALS
++      ════════════════════════════════════════════════════════ */}
+ 
+-      {/* MODAL 1: Product detail dialog (Sizes, custom properties, colors, adding, price) */}
++      {/* ── MODAL: Product Detail ────────────────────────────── */}
+       <AnimatePresence>
+         {selectedProduct && (
+-          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4" id="prod-detail-modal">
+-            <motion.div 
+-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+-              animate={{ opacity: 1, scale: 1, y: 0 }}
+-              exit={{ opacity: 0, scale: 0.95 }}
+-              className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-rose-50 flex flex-col md:flex-row"
+-            >
+-              
+-              {/* Product Media Layout */}
+-              <div className="md:w-1/2 relative aspect-square md:aspect-auto md:h-inherit bg-slate-50 min-h-[300px]">
+-                <img 
+-                  src={selectedProduct.image} 
+-                  alt={selectedProduct.name} 
+-                  referrerPolicy="no-referrer"
+-                  className="w-full h-full object-cover" 
+-                />
+-                
+-                {/* Close Button */}
+-                <button 
+-                  onClick={() => setSelectedProduct(null)} 
+-                  className="absolute top-4 right-4 bg-white/80 hover:bg-white text-slate-700 p-2 rounded-full shadow-md cursor-pointer"
+-                >
+-                  <X className="w-5 h-5" />
++          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
++            <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
++              className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-[#F2E4DC] flex flex-col md:flex-row shadow-2xl">
++
++              {/* Image */}
++              <div className="md:w-1/2 relative bg-[#F8EDE8] min-h-[300px] md:rounded-r-3xl overflow-hidden">
++                <img src={selectedProduct.image} alt={selectedProduct.name} referrerPolicy="no-referrer"
++                  className="w-full h-full object-cover" />
++                <button onClick={() => setSelectedProduct(null)}
++                  className="absolute top-4 right-4 bg-white/90 hover:bg-white text-[#2C1810] p-2 rounded-full shadow-md cursor-pointer transition-all">
++                  <X className="w-4 h-4" />
++                </button>
++                <button onClick={e => toggleWishlist(selectedProduct.id, e)}
++                  className="absolute top-4 left-4 bg-white/90 hover:bg-white p-2 rounded-full shadow-md cursor-pointer transition-all">
++                  <Heart className={`w-4 h-4 ${wishlist.includes(selectedProduct.id) ? 'fill-[#9A2D55] text-[#9A2D55]' : 'text-[#8B7B78]'}`} />
+                 </button>
+               </div>
+ 
+-              {/* Product Configurations Block */}
++              {/* Details */}
+               <div className="p-6 md:p-8 flex-1 flex flex-col justify-between">
+-                
+                 <div>
+-                  <div className="flex items-center justify-between mb-2">
+-                    <span className="text-xs font-bold text-[#9A2D55] bg-rose-50 px-2 py-0.5 rounded-full">
++                  <div className="flex items-center justify-between mb-3">
++                    <span className="text-xs font-bold text-[#9A2D55] bg-[#F8EDE8] px-3 py-1 rounded-full">
+                       {categories.find(c => c.id === selectedProduct.category)?.name || 'مخور'}
+                     </span>
+-                    <button 
+-                      onClick={() => {
+-                        const guide = selectedProduct.category === 'kids' ? 'g-2' : 'g-1';
+-                        setShowSizeGuide(guide);
+-                      }}
+-                      className="text-xs text-[#9A2D55] underline hover:text-[#802446] font-bold"
+-                      id="guide-trigger"
+-                    >
+-                      📏 عرض دليل مقاسات المخاور المعتمدة
++                    <button onClick={() => { const g = selectedProduct.category === 'kids' ? 'g-2' : 'g-1'; setShowSizeGuide(g); }}
++                      className="text-xs text-[#9A2D55] underline font-bold hover:text-[#802446] transition-colors">
++                      📏 دليل المقاسات
+                     </button>
+                   </div>
+ 
+-                  <h2 className="text-xl font-bold text-slate-800 mb-2 leading-tight">{selectedProduct.name}</h2>
+-                  
+-                  <div className="flex items-baseline gap-2 my-3 font-sans">
+-                    <span className="text-2xl font-extrabold text-[#9A2D55]">{selectedProduct.price.toFixed(2)} د.ب</span>
++                  <h2 className="text-xl font-black text-[#2C1810] mb-3 leading-tight">{selectedProduct.name}</h2>
++
++                  <div className="flex items-baseline gap-2 mb-4">
++                    <span className="text-3xl font-black text-[#9A2D55]">{selectedProduct.price.toFixed(2)}</span>
++                    <span className="text-[#9A2D55] font-semibold">د.ب</span>
+                     {selectedProduct.originalPrice && (
+-                      <span className="text-sm text-slate-300 line-through">{selectedProduct.originalPrice.toFixed(2)} د.ب</span>
++                      <span className="text-sm text-[#8B7B78] line-through">{selectedProduct.originalPrice.toFixed(2)} د.ب</span>
+                     )}
+                   </div>
+ 
+-                  <p className="text-slate-500 text-xs leading-relaxed mb-6 font-semibold">{selectedProduct.description}</p>
++                  <p className="text-[#8B7B78] text-sm leading-relaxed mb-5 font-medium">{selectedProduct.description}</p>
+ 
+-                  {/* 1. SELECT SIZE */}
++                  {/* Size selector */}
+                   <div className="mb-4">
+-                    <span className="text-xs font-bold text-slate-400 block mb-2">اختر المقاس (أنش / Inches):</span>
++                    <span className="text-xs font-bold text-[#5C3830] block mb-2">المقاس:</span>
+                     <div className="flex flex-wrap gap-2">
+-                      {selectedProduct.sizes.map((size) => (
+-                        <button
+-                          key={size}
+-                          onClick={() => setChosenSize(size)}
+-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+-                            chosenSize === size 
+-                              ? 'bg-[#9A2D55] text-white border border-[#9A2D55]' 
+-                              : 'bg-slate-50 hover:bg-rose-50 text-slate-700 border border-rose-50'
+-                          }`}
+-                        >
+-                          {size}
+-                        </button>
++                      {selectedProduct.sizes.map(size => (
++                        <button key={size} onClick={() => setChosenSize(size)}
++                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
++                            chosenSize === size
++                              ? 'bg-[#9A2D55] text-white border-[#9A2D55] shadow-sm'
++                              : 'bg-white hover:bg-[#F8EDE8] text-[#5C3830] border-[#F2E4DC]'
++                          }`}>{size}</button>
+                       ))}
+                     </div>
+                   </div>
+ 
+-                  {/* 2. SELECT COLOR */}
+-                  <div className="mb-6">
+-                    <span className="text-xs font-bold text-slate-400 block mb-2">اللون المفضّل للتطريز ومطاطة القماش:</span>
++                  {/* Color selector */}
++                  <div className="mb-5">
++                    <span className="text-xs font-bold text-[#5C3830] block mb-2">اللون:</span>
+                     <div className="flex flex-wrap gap-2">
+-                      {selectedProduct.colors.map((color) => (
+-                        <button
+-                          key={color}
+-                          onClick={() => setChosenColor(color)}
+-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+-                            chosenColor === color 
+-                              ? 'bg-[#9A2D55]/10 text-[#9A2D55] border-2 border-[#9A2D55]' 
+-                              : 'bg-slate-50 hover:bg-rose-50 text-slate-700 border border-rose-50'
+-                          }`}
+-                        >
+-                          {color}
+-                        </button>
++                      {selectedProduct.colors.map(color => (
++                        <button key={color} onClick={() => setChosenColor(color)}
++                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
++                            chosenColor === color
++                              ? 'bg-[#F8EDE8] text-[#9A2D55] border-[#9A2D55] border-2'
++                              : 'bg-white hover:bg-[#F8EDE8] text-[#5C3830] border-[#F2E4DC]'
++                          }`}>{color}</button>
+                       ))}
+                     </div>
+                   </div>
+ 
+-                  {/* 3. PRODUCT PROPERTIES TABLE */}
+-                  <div className="bg-slate-50 rounded-2xl p-4 mb-6 border border-rose-50">
+-                    <span className="text-[11px] font-bold text-slate-400 block mb-2">تفاصيل القطعة واللمسات:</span>
+-                    <div className="grid grid-cols-2 gap-2 text-xs font-bold text-slate-600">
++                  {/* Properties */}
++                  <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
++                    <div className="grid grid-cols-2 gap-2 text-xs">
+                       {selectedProduct.properties.map((prop, idx) => (
+-                        <div key={idx} className="flex flex-col bg-white p-2 rounded-lg border border-rose-50/50">
+-                          <span className="text-[9px] text-slate-400 font-semibold">{prop.label}:</span>
+-                          <span className="text-slate-800 line-clamp-1">{prop.value}</span>
++                        <div key={idx} className="bg-white p-2.5 rounded-xl border border-[#F2E4DC]">
++                          <span className="text-[#8B7B78] font-semibold block text-[10px]">{prop.label}</span>
++                          <span className="text-[#2C1810] font-bold">{prop.value}</span>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 </div>
+ 
+-                {/* Adding controller */}
+-                <div className="pt-4 border-t border-rose-50 flex items-center justify-between gap-4">
+-                  <div className="flex items-center gap-2 bg-slate-100 rounded-xl px-3 py-1.5 border border-rose-50">
+-                    <button 
+-                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
+-                      className="p-1 text-slate-500 hover:text-slate-800 transition"
+-                    >
++                {/* Add to cart */}
++                <div className="pt-5 border-t border-[#F2E4DC] flex items-center gap-3 mt-4">
++                  <div className="flex items-center gap-2 bg-[#FDF8F5] rounded-xl px-3 py-2 border border-[#F2E4DC]">
++                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="text-[#8B7B78] hover:text-[#9A2D55] transition-colors">
+                       <Minus className="w-4 h-4" />
+                     </button>
+-                    <span className="w-6 text-center text-sm font-bold text-slate-800">{quantity}</span>
+-                    <button 
+-                      onClick={() => setQuantity(q => q + 1)}
+-                      className="p-1 text-slate-500 hover:text-[#9A2D55] transition"
+-                    >
++                    <span className="w-6 text-center text-sm font-black text-[#2C1810]">{quantity}</span>
++                    <button onClick={() => setQuantity(q => q + 1)} className="text-[#8B7B78] hover:text-[#9A2D55] transition-colors">
+                       <Plus className="w-4 h-4" />
+                     </button>
+                   </div>
+-
+-                  <button
+-                    onClick={handleAddToCart}
+-                    disabled={selectedProduct.stock === 0}
+-                    className="flex-1 bg-[#9A2D55] hover:bg-[#802446] disabled:bg-slate-300 text-white font-bold py-3 px-6 rounded-xl text-center shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+-                  >
+-                    <ShoppingBag className="w-5 h-5" />
+-                    <span>إضافة لسلة المشتريات الماسية</span>
++                  <button onClick={handleAddToCart} disabled={selectedProduct.stock === 0}
++                    className="flex-1 bg-[#9A2D55] hover:bg-[#802446] disabled:bg-[#F2E4DC] disabled:text-[#8B7B78] text-white font-black py-3 px-6 rounded-xl shadow-md transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer">
++                    <ShoppingBag className="w-4 h-4" />
++                    {selectedProduct.stock === 0 ? 'نفدت الكمية' : 'أضيفي للسلة'}
+                   </button>
+                 </div>
+-
+               </div>
+-
+             </motion.div>
+           </div>
+         )}
+       </AnimatePresence>
+ 
+-
+-      {/* MODAL 2: Interactive Shopping Cart Drawer & Checkout Steps */}
++      {/* ── MODAL: Cart Drawer ───────────────────────────────── */}
+       <AnimatePresence>
+         {isCartOpen && (
+-          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex justify-end" id="shopping-cart-drawer">
+-            <motion.div 
+-              initial={{ x: '100%' }}
+-              animate={{ x: 0 }}
+-              exit={{ x: '100%' }}
++          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
++            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+-              className="bg-white w-full max-w-md h-full flex flex-col justify-between shadow-2xl border-r border-rose-100"
+-            >
+-              
++              className="bg-white w-full max-w-md h-full flex flex-col shadow-2xl">
++
+               {/* Header */}
+-              <div className="p-4 border-b border-rose-50 flex items-center justify-between bg-rose-50/50">
++              <div className="p-4 border-b border-[#F2E4DC] flex items-center justify-between bg-[#FDF8F5]">
+                 <div className="flex items-center gap-2 text-[#9A2D55]">
+                   <ShoppingBag className="w-5 h-5" />
+-                  <span className="font-bold text-base">سلة المشتريات والطلب الإلكتروني</span>
++                  <span className="font-black text-base text-[#2C1810]">سلة المشتريات</span>
++                  {cart.length > 0 && (
++                    <span className="bg-[#9A2D55] text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">
++                      {cart.reduce((s, i) => s + i.quantity, 0)}
++                    </span>
++                  )}
+                 </div>
+-                <button onClick={() => setIsCartOpen(false)} className="p-1 bg-white hover:bg-slate-100 rounded-lg text-slate-500 border border-rose-100 cursor-pointer">
++                <button onClick={() => setIsCartOpen(false)} className="p-1.5 bg-white hover:bg-[#F8EDE8] rounded-lg text-[#8B7B78] border border-[#F2E4DC] cursor-pointer transition-all">
+                   <X className="w-4 h-4" />
+                 </button>
+               </div>
+ 
+-              {/* Multi-step Checkout Controller */}
+-              <div className="flex-1 overflow-y-auto p-4">
+-                
+-                {/* Process Stepper Visual */}
+-                <div className="flex items-center justify-around mb-6 text-[10px] font-bold border-b border-rose-50 pb-4 text-slate-400">
+-                  <span className={`${checkoutStep === 'cart' ? 'text-[#9A2D55] scale-105' : 'text-slate-400'}`}>1. السلة ({cart.length})</span>
+-                  <ChevronRight className="w-3 h-3 text-rose-300" />
+-                  <span className={`${checkoutStep === 'details' ? 'text-[#9A2D55] scale-105' : 'text-slate-400'}`}>2. بيانات الشحن</span>
+-                  <ChevronRight className="w-3 h-3 text-rose-300" />
+-                  <span className={`${checkoutStep === 'payment' ? 'text-[#9A2D55] scale-105' : 'text-slate-400'}`}>3. الدفع الإلكتروني</span>
++              {/* Stepper */}
++              {checkoutStep !== 'success' && (
++                <div className="flex items-center justify-around px-4 py-3 border-b border-[#F2E4DC] bg-white text-[10px] font-bold">
++                  {[['cart', 'السلة'], ['details', 'بيانات الشحن'], ['payment', 'الدفع']].map(([step, label], i) => (
++                    <React.Fragment key={step}>
++                      <span className={checkoutStep === step ? 'text-[#9A2D55] font-black' : 'text-[#8B7B78]'}>
++                        {i + 1}. {label}
++                      </span>
++                      {i < 2 && <ChevronRight className="w-3 h-3 text-[#F2E4DC]" />}
++                    </React.Fragment>
++                  ))}
+                 </div>
++              )}
++
++              <div className="flex-1 overflow-y-auto p-4">
+ 
+-                {/* STEP A: VIEW CART ITEMS */}
++                {/* CART STEP */}
+                 {checkoutStep === 'cart' && (
+                   <div>
+                     {cart.length === 0 ? (
+-                      <div className="text-center py-12 text-slate-400">
+-                        <ShoppingBag className="w-12 h-12 text-rose-100 mx-auto mb-3" />
+-                        <p className="text-sm font-bold">حقيبة تسوّقكِ فارغة تماماً.</p>
+-                        <button onClick={() => { setIsCartOpen(false); setActiveTab('shop'); }} className="mt-4 bg-[#9A2D55] text-white font-bold py-2 px-6 rounded-xl text-xs hover:bg-[#802446]">
+-                          تصفحي مخاوير العيد
++                      <div className="text-center py-14">
++                        <ShoppingBag className="w-12 h-12 text-[#F2E4DC] mx-auto mb-4" />
++                        <p className="text-sm font-bold text-[#2C1810] mb-2">حقيبتكِ فارغة</p>
++                        <button onClick={() => { setIsCartOpen(false); setActiveTab('shop'); }}
++                          className="mt-3 bg-[#9A2D55] text-white font-bold py-2.5 px-6 rounded-xl text-xs hover:bg-[#802446] transition-all">
++                          تصفحي المخاوير
+                         </button>
+                       </div>
+                     ) : (
+-                      <div className="space-y-4">
++                      <div className="space-y-3">
+                         {cart.map((item, index) => (
+-                          <div key={index} className="flex gap-3 bg-slate-50 p-3 rounded-2xl border border-rose-50/50">
+-                            <div className="w-16 h-16 rounded-xl bg-slate-200 overflow-hidden shrink-0">
++                          <div key={index} className="flex gap-3 bg-[#FDF8F5] p-3 rounded-2xl border border-[#F2E4DC]">
++                            <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#F8EDE8]">
+                               <img src={item.product.image} alt={item.product.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                             </div>
+-                            <div className="flex-1 flex flex-col justify-between">
+-                              <div>
+-                                <h4 className="text-xs font-bold text-slate-800 line-clamp-1">{item.product.name}</h4>
+-                                <span className="text-[10px] text-slate-400 font-bold block mt-0.5">
+-                                  مقاس: {item.selectedSize} | لون: {item.selectedColor}
+-                                </span>
+-                              </div>
++                            <div className="flex-1 min-w-0">
++                              <h4 className="text-xs font-black text-[#2C1810] line-clamp-1">{item.product.name}</h4>
++                              <span className="text-[10px] text-[#8B7B78] font-medium">{item.selectedSize} | {item.selectedColor}</span>
+                               <div className="flex items-center justify-between mt-2">
+-                                <div className="flex items-center gap-1.5 bg-white border border-rose-100 rounded-md py-0.5 px-2">
+-                                  <button onClick={() => updateCartQty(index, item.quantity - 1)} className="text-slate-400 hover:text-slate-800"><Minus className="w-3 h-3" /></button>
+-                                  <span className="text-xs font-bold text-slate-700 w-5 text-center">{item.quantity}</span>
+-                                  <button onClick={() => updateCartQty(index, item.quantity + 1)} className="text-slate-400 hover:text-[#9A2D55]"><Plus className="w-3 h-3" /></button>
++                                <div className="flex items-center gap-1 bg-white border border-[#F2E4DC] rounded-lg py-0.5 px-2">
++                                  <button onClick={() => updateCartQty(index, item.quantity - 1)} className="text-[#8B7B78] hover:text-[#9A2D55]"><Minus className="w-3 h-3" /></button>
++                                  <span className="text-xs font-black w-5 text-center text-[#2C1810]">{item.quantity}</span>
++                                  <button onClick={() => updateCartQty(index, item.quantity + 1)} className="text-[#8B7B78] hover:text-[#9A2D55]"><Plus className="w-3 h-3" /></button>
+                                 </div>
+-                                <span className="text-xs font-bold text-[#9A2D55] font-sans">{(item.product.price * item.quantity).toFixed(2)} د.ب</span>
++                                <span className="text-xs font-black text-[#9A2D55]">{(item.product.price * item.quantity).toFixed(2)} د.ب</span>
+                               </div>
+                             </div>
+-                            <button onClick={() => removeFromCart(index)} className="text-slate-300 hover:text-red-500 shrink-0 self-start p-1 cursor-pointer">
++                            <button onClick={() => removeFromCart(index)} className="text-[#F2E4DC] hover:text-red-400 shrink-0 p-1 cursor-pointer">
+                               <X className="w-4 h-4" />
+                             </button>
+                           </div>
+                         ))}
+ 
+-                        {/* Promo Coupon Form */}
+-                        <div className="bg-rose-50/30 border border-rose-100 rounded-2xl p-4 mt-6">
+-                          <label className="text-xs font-bold text-slate-500 block mb-2">هل لديكِ كوبون خصم ألماسة؟ 🎟️</label>
++                        {/* Coupon */}
++                        <div className="bg-[#F8EDE8] border border-[#F2E4DC] rounded-2xl p-4 mt-4">
++                          <label className="text-xs font-bold text-[#5C3830] block mb-2">كوبون الخصم 🎟️</label>
+                           <div className="flex gap-2">
+-                            <input 
+-                              type="text" 
+-                              placeholder="ALMAASA10 أو EID2026..."
+-                              value={couponCode}
+-                              onChange={(e) => setCouponCode(e.target.value)}
+-                              className="flex-1 max-w-[170px] bg-white border border-rose-100 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] uppercase"
++                            <input type="text" placeholder="ALMAASA10..."
++                              value={couponCode} onChange={e => setCouponCode(e.target.value)}
++                              className="flex-1 bg-white border border-[#F2E4DC] rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55] uppercase"
+                             />
+-                            <button 
+-                              onClick={applyCoupon}
+-                              className="bg-[#9A2D55] hover:bg-[#802446] text-white text-xs font-bold rounded-xl px-4 py-1.5 shrink-0"
+-                            >
+-                              تفعيل الخصم
++                            <button onClick={applyCoupon} className="bg-[#9A2D55] hover:bg-[#802446] text-white text-xs font-bold rounded-xl px-4 py-1.5 transition-all">
++                              تفعيل
+                             </button>
+                           </div>
+                           {activeCoupon && (
+-                            <p className="text-[10px] text-emerald-600 font-bold mt-2 flex items-center gap-1">
+-                              ✓ تم تطبيق كود {activeCoupon.code}: خصم {activeCoupon.type === 'percentage' ? `${activeCoupon.discount}%` : `${activeCoupon.discount.toFixed(2)} د.ب`} بنجاح!
+-                            </p>
+-                          )}
+-                          {couponError && (
+-                            <p className="text-[10px] text-red-500 font-bold mt-2">
+-                              {couponError}
++                            <p className="text-[10px] text-emerald-600 font-bold mt-1.5 flex items-center gap-1">
++                              <Check className="w-3 h-3" />
++                              خصم {activeCoupon.type === 'percentage' ? `${activeCoupon.discount}%` : `${activeCoupon.discount.toFixed(2)} د.ب`} مطبّق
+                             </p>
+                           )}
++                          {couponError && <p className="text-[10px] text-red-500 font-bold mt-1.5">{couponError}</p>}
+                         </div>
+                       </div>
+                     )}
+                   </div>
+                 )}
+ 
+-
+-                {/* STEP B: BUYER SHPPING ADDRESS DETAILS */}
++                {/* DETAILS STEP */}
+                 {checkoutStep === 'details' && (
+-                  <div className="space-y-4 font-semibold text-xs" id="buyer-details-form">
+-                    <h3 className="font-bold text-sm text-slate-700 mb-3 border-b border-rose-50 pb-2">بيانات مستلمة الشحنة 📦</h3>
+-                    
+-                    <div>
+-                      <label className="text-slate-500 block mb-1">اسم العميل الثلاثي للبوليسية *</label>
+-                      <input 
+-                        required
+-                        type="text" 
+-                        placeholder="فاطمة البوعينين"
+-                        value={customerName}
+-                        onChange={(e) => setCustomerName(e.target.value)}
+-                        className="w-full bg-slate-50 border border-rose-100 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
+-                      />
+-                    </div>
+-
+-                    <div>
+-                      <label className="text-slate-500 block mb-1">رقم الهاتف عبر الواتساب للتنسيق والدفع *</label>
+-                      <div className="relative">
+-                        <input 
+-                          required
+-                          type="tel" 
+-                          placeholder="97337037697"
+-                          value={customerPhone}
+-                          onChange={(e) => setCustomerPhone(e.target.value)}
+-                          className="w-full bg-slate-50 border border-rose-100 rounded-xl px-4 py-2.5 text-sm text-left dir-neutral focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
++                  <div className="space-y-3 font-medium text-xs">
++                    <h3 className="font-black text-sm text-[#2C1810] border-b border-[#F2E4DC] pb-2 mb-3">بيانات الشحن</h3>
++                    {[
++                      { label: 'الاسم الكامل *', type: 'text', val: customerName, set: setCustomerName, ph: 'فاطمة البوعينين' },
++                      { label: 'رقم الواتساب *', type: 'tel', val: customerPhone, set: setCustomerPhone, ph: '97337037697' },
++                      { label: 'البريد الإلكتروني', type: 'email', val: customerEmail, set: setCustomerEmail, ph: 'aisha@example.com' },
++                    ].map(f => (
++                      <div key={f.label}>
++                        <label className="text-[#8B7B78] block mb-1">{f.label}</label>
++                        <input type={f.type} placeholder={f.ph} value={f.val} onChange={e => f.set(e.target.value)}
++                          className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810]"
+                         />
+-                        <span className="absolute left-3.5 top-3.1 text-slate-400 text-[10px]">دولي</span>
+                       </div>
+-                    </div>
+-
+-                    <div>
+-                      <label className="text-slate-500 block mb-1">البريد الإلكتروني للإشعارات والرمز الرقمي</label>
+-                      <input 
+-                        type="email" 
+-                        placeholder="aisha@example.com"
+-                        value={customerEmail}
+-                        onChange={(e) => setCustomerEmail(e.target.value)}
+-                        className="w-full bg-slate-50 border border-rose-100 rounded-xl px-4 py-2.5 text-sm text-left dir-neutral focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
+-                      />
+-                    </div>
++                    ))}
+ 
+                     <div className="grid grid-cols-2 gap-2">
+                       <div>
+-                        <label className="text-slate-500 block mb-1">الدولة الخليجية *</label>
+-                        <select 
+-                          value={customerCountry}
+-                          onChange={(e) => setCustomerCountry(e.target.value)}
+-                          className="w-full bg-slate-50 border border-rose-100 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
+-                        >
+-                          <option value="البحرين">البحرين 🇧🇭</option>
+-                          <option value="السعودية">السعودية 🇸🇦</option>
+-                          <option value="الكويت">الكويت 🇰🇼</option>
+-                          <option value="الإمارات">الإمارات 🇦🇪</option>
+-                          <option value="قطر">قطر 🇶🇦</option>
+-                          <option value="عمان">عمان 🇴🇲</option>
++                        <label className="text-[#8B7B78] block mb-1">الدولة *</label>
++                        <select value={customerCountry} onChange={e => setCustomerCountry(e.target.value)}
++                          className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810] font-medium">
++                          {['البحرين 🇧🇭', 'السعودية 🇸🇦', 'الكويت 🇰🇼', 'الإمارات 🇦🇪', 'قطر 🇶🇦', 'عمان 🇴🇲'].map(c => (
++                            <option key={c} value={c.split(' ')[0]}>{c}</option>
++                          ))}
+                         </select>
+                       </div>
+                       <div>
+-                        <label className="text-slate-500 block mb-1">المدينة الحضرية *</label>
+-                        <input 
+-                          required
+-                          type="text" 
+-                          placeholder="الرفاع / الجسرة / المنامة"
+-                          value={customerCity}
+-                          onChange={(e) => setCustomerCity(e.target.value)}
+-                          className="w-full bg-slate-50 border border-rose-100 rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
++                        <label className="text-[#8B7B78] block mb-1">المدينة *</label>
++                        <input type="text" placeholder="المنامة" value={customerCity} onChange={e => setCustomerCity(e.target.value)}
++                          className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810] font-medium"
+                         />
+                       </div>
+                     </div>
+ 
+                     <div>
+-                      <label className="text-slate-500 block mb-1">عنوان التوصيل بالتفصيل (رقم المنزل والشارع والمجمع) *</label>
+-                      <textarea 
+-                        required
+-                        placeholder="طريق 1221، فيلا 93، مجمع البديع"
+-                        value={customerAddress}
+-                        onChange={(e) => setCustomerAddress(e.target.value)}
+-                        rows={2}
+-                        className="w-full bg-slate-50 border border-rose-100 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
++                      <label className="text-[#8B7B78] block mb-1">العنوان الكامل *</label>
++                      <textarea rows={2} placeholder="طريق 1221، فيلا 93، مجمع البديع" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)}
++                        className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810] font-medium resize-none"
+                       />
+                     </div>
+-
+                     <div>
+-                      <label className="text-slate-500 block mb-1">ملاحظات إضافية للمخيط والتغليف (اختياري)</label>
+-                      <textarea 
+-                        placeholder="تطريز أكمام واسعة، مع بطانة داخلية إضافية..."
+-                        value={customerNotes}
+-                        onChange={(e) => setCustomerNotes(e.target.value)}
+-                        rows={2}
+-                        className="w-full bg-slate-50 border border-rose-100 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
++                      <label className="text-[#8B7B78] block mb-1">ملاحظات للمخيط (اختياري)</label>
++                      <textarea rows={2} placeholder="تطريز خاص، مقاس مخصص..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)}
++                        className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810] font-medium resize-none"
+                       />
+                     </div>
+ 
+-                    {/* Dynamic Shipping Method Selector selection */}
+-                    <div className="pt-2" id="dynamic-shipping-methods-container">
+-                      <label className="text-slate-500 block mb-2 font-bold text-xs">خيارات وبوابات التوصيل المتاحة لبلدكِ *</label>
++                    {/* Shipping methods */}
++                    <div>
++                      <label className="text-[#8B7B78] block mb-2 font-bold">طريقة التوصيل</label>
+                       {availableShippingMethods.length === 0 ? (
+-                        <div className="bg-slate-50 border border-amber-150 text-amber-800 p-4 rounded-2xl text-[11px] font-semibold leading-normal">
+-                          ⚠️ لا تتوفر طرق توصيل معرفة لبلدكِ حالياً. سيقوم فريق الدعم بالتنسيق المباشر معكِ لتحديد سعر الشحن الملائم لطلبكِ.
++                        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-[11px] font-medium">
++                          ⚠️ سيقوم فريق الدعم بالتنسيق معكِ لتحديد سعر الشحن.
+                         </div>
+                       ) : (
+-                        <div className="grid grid-cols-1 gap-2">
++                        <div className="space-y-2">
+                           {availableShippingMethods.map((method: any) => (
+-                            <label 
+-                              key={method.id}
+-                              className={`flex items-center justify-between p-3.5 rounded-2xl border cursor-pointer transition-all ${
+-                                selectedShippingMethod?.id === method.id 
+-                                  ? 'bg-rose-50/50 border-[#9A2D55] text-[#9A2D55] ring-1 ring-[#9A2D55]/10' 
+-                                  : 'bg-white border-rose-100 text-slate-700 hover:bg-slate-50/10'
+-                              }`}
+-                            >
+-                              <div className="flex items-center gap-3">
+-                                <input 
+-                                  type="radio"
+-                                  name="shipping_method_radio"
+-                                  checked={selectedShippingMethod?.id === method.id}
+-                                  onChange={() => setSelectedShippingMethod(method)}
+-                                  className="w-4 h-4 text-[#9A2D55] focus:ring-[#9A2D55] accent-[#9A2D55]"
+-                                />
+-                                <div className="text-right">
+-                                  <span className="font-extrabold text-xs block text-slate-800">
+-                                    {method.name} 
+-                                    <span className="mr-1.5 bg-rose-50 text-[#9A2D55] px-1.5 py-0.2 rounded text-[8px] font-mono leading-none font-black inline-block">
+-                                      {method.provider}
+-                                    </span>
+-                                  </span>
+-                                  {method.description && (
+-                                    <span className="text-[10px] text-slate-400 block mt-0.5 font-semibold">
+-                                      {method.description}
+-                                    </span>
+-                                  )}
++                            <label key={method.id}
++                              className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
++                                selectedShippingMethod?.id === method.id
++                                  ? 'bg-[#F8EDE8] border-[#9A2D55] ring-1 ring-[#9A2D55]/20'
++                                  : 'bg-white border-[#F2E4DC] hover:bg-[#FDF8F5]'
++                              }`}>
++                              <div className="flex items-center gap-2">
++                                <input type="radio" name="shipping" checked={selectedShippingMethod?.id === method.id}
++                                  onChange={() => setSelectedShippingMethod(method)} className="accent-[#9A2D55]" />
++                                <div>
++                                  <span className="font-bold text-xs text-[#2C1810] block">{method.name}</span>
++                                  {method.description && <span className="text-[10px] text-[#8B7B78]">{method.description}</span>}
+                                 </div>
+                               </div>
+-                              <span className="text-xs font-black font-mono">
+-                                {method.priceType === 'free' ? 'مـجـانـاً' : `${parseFloat(method.price).toFixed(3)} د.ب`}
++                              <span className="text-xs font-black text-[#9A2D55]">
++                                {method.priceType === 'free' ? 'مجاني' : `${parseFloat(method.price).toFixed(3)} د.ب`}
+                               </span>
+                             </label>
+                           ))}
+@@ -1250,396 +1258,201 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab
+                   </div>
+                 )}
+ 
+-
+-                {/* STEP C: SIMULATED MIDDLE-EASTERN PAYMENT LOGIC WITH SPECIFIC APPS */}
++                {/* PAYMENT STEP */}
+                 {checkoutStep === 'payment' && (
+-                  <div className="space-y-4 font-semibold text-xs" id="secure-payment-ports">
+-                    <h3 className="font-bold text-sm text-slate-700 mb-2 flex items-center gap-1.5">
+-                      <ShieldCheck className="w-5 h-5 text-emerald-500" />
+-                      <span>قنوات التشفير السريعة والدفع الموحد</span>
++                  <div className="space-y-4 text-xs font-medium">
++                    <h3 className="font-black text-sm text-[#2C1810] flex items-center gap-2 border-b border-[#F2E4DC] pb-2">
++                      <ShieldCheck className="w-4 h-4 text-emerald-500" /> الدفع الآمن
+                     </h3>
+-
+-                    <p className="text-slate-400 text-[10px] leading-relaxed mb-4">
+-                      يرجى اختيار التطبيق أو القناة الملائمة لكِ للدفع المباشر، جاري تسجيل طلبيتك بأرقام الخادم لضمان أمان أموالك.
+-                    </p>
+-
+-                    {/* SELECT METHOD TOGGLES */}
+-                    <div className="grid grid-cols-2 gap-2" id="payment-method-selector-grid">
+-                      {/* BenefitPay - Bahrain */}
+-                      <button 
+-                        onClick={() => { setPaymentMethod('benefit'); setBenefitStep('input'); }}
+-                        className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+-                          paymentMethod === 'benefit' 
+-                            ? 'bg-rose-50/70 border-[#9A2D55] text-[#9A2D55]' 
+-                            : 'bg-white border-rose-100 text-slate-600 hover:bg-rose-50/20'
+-                        }`}
+-                      >
+-                        <span className="text-[10.5px] font-extrabold">بـنـفـت بـي (BenefitPay) 🇧🇭</span>
+-                        <span className="text-[8px] text-slate-400">تحويل سريع / رقم الهاتف</span>
+-                      </button>
+-
+-                      {/* KNet - Kuwait */}
+-                      <button 
+-                        onClick={() => setPaymentMethod('knet')}
+-                        className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+-                          paymentMethod === 'knet' 
+-                            ? 'bg-rose-50/70 border-[#9A2D55] text-[#9A2D55]' 
+-                            : 'bg-white border-rose-100 text-slate-600 hover:bg-rose-50/20'
+-                        }`}
+-                      >
+-                        <span className="text-[10.5px] font-extrabold">كي نــت (KNet) 🇰🇼</span>
+-                        <span className="text-[8px] text-slate-400">شبكة الاتصال والخصم للدولة</span>
+-                      </button>
+-
+-                      {/* Unified GCC Visa/Mastercard */}
+-                      <button 
+-                        onClick={() => setPaymentMethod('card')}
+-                        className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+-                          paymentMethod === 'card' 
+-                            ? 'bg-rose-50/70 border-[#9A2D55] text-[#9A2D55]' 
+-                            : 'bg-white border-rose-100 text-slate-600 hover:bg-rose-50/20'
+-                        }`}
+-                      >
+-                        <CreditCard className="w-5 h-5 text-slate-700" />
+-                        <span className="text-[10.5px] font-extrabold">بطاقة بنكية ومنافذ مدى</span>
+-                        <span className="text-[8px] text-slate-400">فيزا وسداد ماستركارد</span>
+-                      </button>
+-
+-                      {/* Apple Pay mock */}
+-                      <button 
+-                        onClick={() => setPaymentMethod('applepay')}
+-                        className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+-                          paymentMethod === 'applepay' 
+-                            ? 'bg-rose-50/70 border-[#9A2D55] text-[#9A2D55]' 
+-                            : 'bg-white border-rose-100 text-slate-600 hover:bg-rose-50/20'
+-                        }`}
+-                      >
+-                        <span className="text-base font-bold"> Pay</span>
+-                        <span className="text-[10.5px] font-extrabold">دفع سريع بلمسة واحدة</span>
+-                        <span className="text-[8px] text-slate-400">تطبيق محفظة آي أو إس</span>
+-                      </button>
++                    <div className="grid grid-cols-2 gap-2">
++                      {[
++                        { id: 'benefit', label: 'BenefitPay 🇧🇭', sub: 'البحرين' },
++                        { id: 'knet', label: 'KNet 🇰🇼', sub: 'الكويت' },
++                        { id: 'card', label: 'بطاقة بنكية', sub: 'Visa / Mastercard' },
++                        { id: 'applepay', label: ' Pay', sub: 'تطبيق المحفظة' },
++                      ].map(m => (
++                        <button key={m.id} onClick={() => { setPaymentMethod(m.id as any); setBenefitStep('input'); }}
++                          className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
++                            paymentMethod === m.id ? 'bg-[#F8EDE8] border-[#9A2D55] text-[#9A2D55]' : 'bg-white border-[#F2E4DC] text-[#5C3830] hover:bg-[#FDF8F5]'
++                          }`}>
++                          <span className="text-[11px] font-black block">{m.label}</span>
++                          <span className="text-[9px] text-[#8B7B78]">{m.sub}</span>
++                        </button>
++                      ))}
+                     </div>
+ 
+-                    {/* GATEWAY SUB-INTERACTION FOR DEMONSTRATIVE EFFECT */}
+-                    <div className="bg-[#FAF6F6] rounded-2xl p-4 border border-rose-100 mt-4 text-xs">
+-                      
+-                      {/* BenefitPay specific prompt */}
++                    <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
+                       {paymentMethod === 'benefit' && (
+                         <div className="space-y-3">
+-                          <p className="font-extrabold text-[#9A2D55]">بوابة بنفت بي المعتمدة (BHD Portal):</p>
+-                          <p className="text-slate-500 leading-relaxed text-[10px]">
+-                            أدخلي رقم الهاتف المفعل لدى تطبيق Benefit لخصم آمن وتلقائي بقيمة <strong className="text-slate-800">{totalCost.toFixed(2)} د.ب</strong>:
+-                          </p>
+-                          <div className="space-y-2">
+-                            <input 
+-                              type="tel" 
+-                              placeholder="37037697" 
+-                              value={benefitPhone} 
+-                              onChange={(e) => setBenefitPhone(e.target.value)}
+-                              className="w-full bg-white border border-rose-100 rounded-xl px-3 py-2 text-sm text-center font-bold"
+-                            />
+-                            <p className="text-[9px] text-[#9A2D55] text-center font-bold">
+-                              سيتم فتح طلب السداد بالبصمة داخل جهازك بعد النقر على الدفع
+-                            </p>
+-                          </div>
++                          <p className="font-bold text-[#9A2D55]">BenefitPay — أدخلي رقم الهاتف:</p>
++                          <input type="tel" placeholder="37037697" value={benefitPhone} onChange={e => setBenefitPhone(e.target.value)}
++                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-sm text-center font-black text-[#2C1810]" />
++                          <p className="text-[9px] text-[#9A2D55] text-center font-semibold">سيتم فتح طلب الدفع بالبصمة في جهازكِ</p>
+                         </div>
+                       )}
+-
+-                      {/* KNet custom Blue/Yellow layout prompt */}
+                       {paymentMethod === 'knet' && (
+-                        <div className="space-y-3">
+-                          <p className="font-extrabold text-blue-800">شبكة الكويت الوطنية لخدمات الدفع KNET:</p>
+-                          <div className="space-y-2">
+-                            <div className="grid grid-cols-3 gap-1">
+-                              <select className="col-span-1 bg-white border border-rose-100 rounded-lg p-1 text-[10px] font-bold">
+-                                <option>NBK (الوطني)</option>
+-                                <option>KFH (بيتك)</option>
+-                                <option>Gulf Bank (الخليج)</option>
+-                                <option>Boubyan (بوبيان)</option>
+-                              </select>
+-                              <input 
+-                                type="text" 
+-                                placeholder="الرقم التعريفي للكارت" 
+-                                value={knetCardNum}
+-                                onChange={(e) => setKnetCardNum(e.target.value)}
+-                                className="col-span-2 bg-white border border-rose-100 rounded-lg p-1 text-center font-semibold text-xs"
+-                              />
+-                            </div>
+-                            <input 
+-                              type="password" 
+-                              placeholder="الرقم السري للبطاقة (KNet PIN)" 
+-                              value={knetPin}
+-                              onChange={(e) => setKnetPin(e.target.value)}
+-                              maxLength={4}
+-                              className="w-full bg-white border border-rose-100 rounded-lg p-1 text-center font-semibold text-xs"
+-                            />
+-                          </div>
++                        <div className="space-y-2">
++                          <p className="font-bold text-blue-700">شبكة KNet الكويتية:</p>
++                          <input type="text" placeholder="رقم البطاقة" value={knetCardNum} onChange={e => setKnetCardNum(e.target.value)}
++                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs text-center font-medium text-[#2C1810]" />
++                          <input type="password" placeholder="الرقم السري (PIN)" value={knetPin} onChange={e => setKnetPin(e.target.value)} maxLength={4}
++                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs text-center font-medium text-[#2C1810]" />
+                         </div>
+                       )}
+-
+-                      {/* Credit Card mockup layout */}
+                       {paymentMethod === 'card' && (
+-                        <div className="space-y-2.5">
+-                          <div>
+-                            <label className="text-slate-500 text-[10px] block mb-0.5">الاسم على البطاقة</label>
+-                            <input 
+-                              type="text" 
+-                              placeholder="Fatima Al-Binali" 
+-                              value={cardName}
+-                              onChange={(e) => setCardName(e.target.value)}
+-                              className="w-full bg-white border border-rose-100 rounded-lg p-1 text-xs font-semibold"
+-                            />
+-                          </div>
+-                          <div>
+-                            <label className="text-slate-500 text-[10px] block mb-0.5">رقم البطاقة الائتمانية</label>
+-                            <input 
+-                              type="text" 
+-                              placeholder="4000 1234 5678 9010" 
+-                              value={cardNumber}
+-                              onChange={(e) => setCardNumber(e.target.value)}
+-                              className="w-full bg-white border border-rose-100 rounded-lg p-1 text-xs font-mono text-center"
+-                            />
+-                          </div>
++                        <div className="space-y-2">
++                          <input type="text" placeholder="الاسم على البطاقة" value={cardName} onChange={e => setCardName(e.target.value)}
++                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs font-medium text-[#2C1810]" />
++                          <input type="text" placeholder="رقم البطاقة" value={cardNumber} onChange={e => setCardNumber(e.target.value)}
++                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs font-mono text-center text-[#2C1810]" />
+                           <div className="grid grid-cols-2 gap-2">
+-                            <div>
+-                              <label className="text-slate-500 text-[10px] block mb-0.5">تاريخ الانتهاء</label>
+-                              <input 
+-                                type="text" 
+-                                placeholder="MM/YY" 
+-                                value={cardExpiry}
+-                                onChange={(e) => setCardExpiry(e.target.value)}
+-                                className="w-full bg-white border border-rose-100 rounded-lg p-1 text-xs text-center"
+-                              />
+-                            </div>
+-                            <div>
+-                              <label className="text-slate-500 text-[10px] block mb-0.5">الرقم السري CVV</label>
+-                              <input 
+-                                type="password" 
+-                                placeholder="123" 
+-                                value={cardCvv}
+-                                onChange={(e) => setCardCvv(e.target.value)}
+-                                maxLength={3}
+-                                className="w-full bg-white border border-rose-100 rounded-lg p-1 text-xs text-center"
+-                              />
+-                            </div>
++                            <input type="text" placeholder="MM/YY" value={cardExpiry} onChange={e => setCardExpiry(e.target.value)}
++                              className="bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs text-center text-[#2C1810]" />
++                            <input type="password" placeholder="CVV" value={cardCvv} onChange={e => setCardCvv(e.target.value)} maxLength={3}
++                              className="bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs text-center text-[#2C1810]" />
+                           </div>
+                         </div>
+                       )}
+-
+-                      {/* Apple Pay Specific visual mockup */}
+                       {paymentMethod === 'applepay' && (
+-                        <div className="text-center py-4 space-y-3">
+-                          <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-2 font-bold text-lg shadow-sm"></div>
+-                          <p className="text-[10px] text-slate-500 leading-normal font-bold">
+-                            جاري الاتصال بـ Touch ID / Face ID الخاص بكِ لتسديد قيمة المخاور الفوري..
+-                          </p>
+-                          <div className="w-24 h-1.5 bg-rose-100 rounded-full mx-auto overflow-hidden">
+-                            <div className="h-full bg-[#9A2D55] rounded-full animate-pulse" style={{ width: '60%' }} />
++                        <div className="text-center py-4">
++                          <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-lg shadow"></div>
++                          <p className="text-[10px] text-[#8B7B78] font-medium">جاري الاتصال بـ Face ID / Touch ID...</p>
++                          <div className="w-24 h-1.5 bg-[#F2E4DC] rounded-full mx-auto mt-3 overflow-hidden">
++                            <div className="h-full bg-[#9A2D55] rounded-full animate-pulse" style={{ width: '65%' }} />
+                           </div>
+                         </div>
+                       )}
+-
+                     </div>
+                   </div>
+                 )}
+ 
+-
+-                {/* STEP D: ORDER SUCCESS CELEBRATION SHEET */}
++                {/* SUCCESS STEP */}
+                 {checkoutStep === 'success' && newOrder && (
+-                  <div className="text-center py-8 space-y-4" id="order-success-card">
+-                    <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto border border-emerald-100 animate-pulse">
+-                      <CheckCircle className="w-10 h-10" />
++                  <div className="text-center py-8 space-y-5">
++                    <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-100">
++                      <CheckCircle className="w-10 h-10 text-emerald-500" />
+                     </div>
+-                    
+-                    <h3 className="font-extrabold text-xl text-slate-800 leading-tight">مبروك! تم تفعيل طلبكِ وتفصيل المخور ✨</h3>
+-                    <p className="text-slate-500 text-xs">
+-                      تم استلام الدفع الإلكتروني بنجاح وجاري إدخال البوليسية لخطوط الخياطة الفورية! ستحصلين على إشعارات دورية لمراحل العمل والتوصيل.
+-                    </p>
+-
+-                    <div className="bg-[#FAF6F6] rounded-2xl p-4 border border-rose-100 text-right space-y-2 text-xs">
+-                      <p className="text-center font-bold text-slate-700 bg-white border border-rose-50 py-1.5 rounded-lg">تفاصيل تتبع الطلبية</p>
++                    <div>
++                      <h3 className="font-black text-xl text-[#2C1810]">مبروك! تم الطلب بنجاح ✨</h3>
++                      <p className="text-[#8B7B78] text-xs mt-1">تم تسجيل طلبكِ وجاري التجهيز</p>
++                    </div>
++                    <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC] text-right space-y-2 text-xs">
+                       <div className="flex justify-between">
+-                        <span className="text-slate-400">كود التتبع للعميل:</span>
+-                        <strong className="text-[#9A2D55] font-mono select-all font-extrabold text-sm">{newOrder.trackingCode}</strong>
++                        <span className="text-[#8B7B78]">كود التتبع:</span>
++                        <strong className="text-[#9A2D55] font-mono font-black">{newOrder.trackingCode}</strong>
+                       </div>
+                       <div className="flex justify-between">
+-                        <span className="text-slate-400">مجموع المبالغ المسددة:</span>
+-                        <strong className="text-slate-800">{newOrder.total.toFixed(2)} د.ب</strong>
++                        <span className="text-[#8B7B78]">الإجمالي:</span>
++                        <strong className="text-[#2C1810]">{newOrder.total.toFixed(2)} د.ب</strong>
+                       </div>
+                       <div className="flex justify-between">
+-                        <span className="text-slate-400">وجهة الشحن الدولي:</span>
+-                        <strong className="text-slate-800">{newOrder.customer.city}، {newOrder.customer.country}</strong>
++                        <span className="text-[#8B7B78]">الوجهة:</span>
++                        <strong className="text-[#2C1810]">{newOrder.customer.city}، {newOrder.customer.country}</strong>
+                       </div>
+                     </div>
+-
+                     <div className="space-y-2">
+-                      <button 
+-                        onClick={() => {
+-                          setTrackSearchQuery(newOrder.trackingCode);
+-                          setTrackedOrder(newOrder);
+-                          setIsCartOpen(false);
+-                          setActiveTab('tracking');
+-                          setCheckoutStep('cart');
+-                        }}
+-                        className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-xs"
+-                      >
+-                        الانتقال إلى خريطة تتبع طلبي المباشر ✈️
++                      <button onClick={() => { setTrackSearchQuery(newOrder.trackingCode); setTrackedOrder(newOrder); setIsCartOpen(false); setActiveTab('tracking'); setCheckoutStep('cart'); }}
++                        className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white py-3 rounded-xl text-xs font-black transition-all">
++                        تتبع شحنتي ✈️
+                       </button>
+-                      <button 
+-                        onClick={() => {
+-                          setIsCartOpen(false);
+-                          setCheckoutStep('cart');
+-                          setNewOrder(null);
+-                        }}
+-                        className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold"
+-                      >
+-                        الرجوع لتصفّح المخاوير الأخرى
++                      <button onClick={() => { setIsCartOpen(false); setCheckoutStep('cart'); setNewOrder(null); }}
++                        className="w-full bg-[#F8EDE8] hover:bg-[#F2E4DC] text-[#5C3830] py-3 rounded-xl text-xs font-bold transition-all">
++                        متابعة التسوق
+                       </button>
+                     </div>
+                   </div>
+                 )}
+-
+               </div>
+ 
+-              {/* Dynamic Bottom Controls Bar */}
++              {/* Cart Footer */}
+               {checkoutStep !== 'success' && cart.length > 0 && (
+-                <div className="p-4 border-t border-rose-50 bg-[#FAF6F6]">
+-                  {/* Totals Summary */}
++                <div className="p-4 border-t border-[#F2E4DC] bg-[#FDF8F5]">
+                   <div className="space-y-1.5 text-xs mb-4">
+-                    <div className="flex justify-between">
+-                      <span className="text-slate-400 font-semibold">المجموع الفرعي:</span>
+-                      <strong className="text-slate-700 font-sans">{calculatedSubtotal.toFixed(2)} د.ب</strong>
++                    <div className="flex justify-between text-[#8B7B78]">
++                      <span>المجموع الفرعي</span>
++                      <span className="font-semibold text-[#2C1810]">{calculatedSubtotal.toFixed(2)} د.ب</span>
+                     </div>
+                     {calculatedDiscount > 0 && (
+-                      <div className="flex justify-between text-emerald-600 font-bold">
+-                        <span>قيمة التخفيض بالكوبون:</span>
+-                        <strong className="font-sans">-{calculatedDiscount.toFixed(2)} د.ب</strong>
++                      <div className="flex justify-between text-emerald-600 font-semibold">
++                        <span>الخصم</span><span>-{calculatedDiscount.toFixed(2)} د.ب</span>
+                       </div>
+                     )}
+-                    <div className="flex justify-between">
+-                      <span className="text-slate-400 font-semibold">شحن جمركي وتوصيل ممتاز:</span>
+-                      <strong className="text-slate-755 font-bold font-sans">
+-                        {shippingCharge === 0 ? 'شحن مجاااني ✓' : `${shippingCharge.toFixed(2)} د.ب`}
+-                      </strong>
++                    <div className="flex justify-between text-[#8B7B78]">
++                      <span>الشحن</span>
++                      <span className="font-semibold text-[#2C1810]">{shippingCharge === 0 ? 'مجاني ✓' : `${shippingCharge.toFixed(2)} د.ب`}</span>
+                     </div>
+-                    <div className="border-t border-rose-100 pt-2 flex justify-between text-sm">
+-                      <span className="font-extrabold text-[#9A2D55]">إجمالي قيمة الفاتورة:</span>
+-                      <strong className="font-extrabold text-[#9A2D55] font-sans text-lg">{totalCost.toFixed(2)} د.ب</strong>
++                    <div className="border-t border-[#F2E4DC] pt-2 flex justify-between">
++                      <span className="font-black text-[#9A2D55]">الإجمالي</span>
++                      <span className="font-black text-[#9A2D55] text-lg">{totalCost.toFixed(2)} د.ب</span>
+                     </div>
+                   </div>
+ 
+-                  {/* Progressive Actions switcher */}
+                   {checkoutStep === 'cart' && (
+-                    <button 
+-                      onClick={() => setCheckoutStep('details')}
+-                      className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white font-bold py-3 px-4 rounded-xl text-center shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+-                    >
+-                      <span>تعبئة بيانات الشحن والتوصيل</span>
+-                      <ArrowRight className="w-4 h-4 turn-on-rtl-flip" />
++                    <button onClick={() => setCheckoutStep('details')}
++                      className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white font-black py-3.5 px-4 rounded-xl shadow-md transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer">
++                      بيانات الشحن <ArrowRight className="w-4 h-4" />
+                     </button>
+                   )}
+-
+                   {checkoutStep === 'details' && (
+                     <div className="flex gap-2">
+-                      <button 
+-                        onClick={() => setCheckoutStep('cart')}
+-                        className="bg-slate-200 hover:bg-slate-350 text-slate-700 font-bold py-3 px-4 rounded-xl text-center transition cursor-pointer"
+-                      >
+-                        رجوع
+-                      </button>
+-                      <button 
+-                        onClick={() => {
+-                          if (!customerName || !customerPhone || !customerAddress) {
+-                            alert('الرجاء تعبئة الحقول الأساسية لضمان صحة التوصيل وتجهيز البوليسية.');
+-                            return;
+-                          }
+-                          setCheckoutStep('payment');
+-                        }}
+-                        className="flex-1 bg-[#9A2D55] hover:bg-[#802446] text-white font-bold py-3 px-4 rounded-xl text-center shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
+-                      >
+-                        <span>الانتقال لخطوة السداد الآمن</span>
+-                        <ArrowRight className="w-4 h-4 turn-on-rtl-flip" />
++                      <button onClick={() => setCheckoutStep('cart')} className="bg-[#F8EDE8] hover:bg-[#F2E4DC] text-[#5C3830] font-bold py-3 px-4 rounded-xl transition-all">رجوع</button>
++                      <button onClick={() => { if (!customerName || !customerPhone || !customerAddress) { addToast('يرجى تعبئة الحقول الأساسية', 'error'); return; } setCheckoutStep('payment'); }}
++                        className="flex-1 bg-[#9A2D55] hover:bg-[#802446] text-white font-black py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
++                        إلى الدفع <ArrowRight className="w-4 h-4" />
+                       </button>
+                     </div>
+                   )}
+-
+                   {checkoutStep === 'payment' && (
+                     <div className="flex gap-2">
+-                      <button 
+-                        onClick={() => setCheckoutStep('details')}
+-                        className="bg-slate-200 hover:bg-slate-350 text-slate-700 font-bold py-3 px-4 rounded-xl text-center transition cursor-pointer"
+-                      >
+-                        رجوع
+-                      </button>
+-                      <button 
+-                        onClick={triggerPayment}
+-                        disabled={isPaying}
+-                        className="flex-1 bg-[#9A2D55] hover:bg-[#802446] text-white font-bold py-3 px-4 rounded-xl text-center shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer disabled:bg-slate-300"
+-                        id="submit-payment-btn"
+-                      >
+-                        {isPaying ? (
+-                          <span>جاري ترخيص الدوافع والربط... 🔐</span>
+-                        ) : (
+-                          <>
+-                            <span>إقرار الدفع وتأكيد الطلب 🛍️</span>
+-                            <ArrowRight className="w-4 h-4 turn-on-rtl-flip" />
+-                          </>
+-                        )}
++                      <button onClick={() => setCheckoutStep('details')} className="bg-[#F8EDE8] hover:bg-[#F2E4DC] text-[#5C3830] font-bold py-3 px-4 rounded-xl transition-all">رجوع</button>
++                      <button onClick={triggerPayment} disabled={isPaying}
++                        className="flex-1 bg-[#9A2D55] hover:bg-[#802446] disabled:bg-[#F2E4DC] disabled:text-[#8B7B78] text-white font-black py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
++                        {isPaying ? <span className="flex items-center gap-2"><Zap className="w-4 h-4 animate-pulse" />جاري الدفع...</span> : <><span>تأكيد الطلب والدفع</span><ArrowRight className="w-4 h-4" /></>}
+                       </button>
+                     </div>
+                   )}
+                 </div>
+               )}
+-
+             </motion.div>
+           </div>
+         )}
+       </AnimatePresence>
+ 
+-
+-      {/* MODAL 3: Approved Reviews (رأي الزباااين Popup) */}
++      {/* ── MODAL: Reviews ──────────────────────────────────── */}
+       <AnimatePresence>
+         {showReviewsPopup && (
+-          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4" id="reviews-testimonials-dialog">
+-            <motion.div 
+-              initial={{ opacity: 0, y: 15 }}
+-              animate={{ opacity: 1, y: 0 }}
+-              exit={{ opacity: 0 }}
+-              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-rose-50 shadow-xl max-h-[80vh] overflow-y-auto"
+-            >
+-              <div className="flex justify-between items-center mb-6 border-b border-rose-50 pb-3 bg-rose-50/20 -mx-6 px-6 -mt-6 pt-4 rounded-t-3xl">
+-                <span className="font-bold text-[#9A2D55] text-base">رأي الزباين في مخاوير ألماسة ⭐</span>
+-                <button onClick={() => setShowReviewsPopup(false)} className="p-1 bg-white hover:bg-slate-150 rounded-lg text-slate-500 border cursor-pointer">
++          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
++            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
++              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
++              <div className="flex justify-between items-center mb-6 pb-3 border-b border-[#F2E4DC]">
++                <div className="flex items-center gap-2">
++                  <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
++                  <span className="font-black text-[#2C1810]">آراء زبائن ألماسة</span>
++                </div>
++                <button onClick={() => setShowReviewsPopup(false)} className="p-1.5 bg-[#FDF8F5] hover:bg-[#F8EDE8] rounded-lg text-[#8B7B78] border border-[#F2E4DC] cursor-pointer">
+                   <X className="w-4 h-4" />
+                 </button>
+               </div>
+-
+               <div className="space-y-4">
+-                {reviews.map((rev) => (
+-                  <div key={rev.id} className="bg-[#FAF6F6] rounded-2xl p-4 border border-rose-50">
+-                    <div className="flex justify-between items-start mb-2">
+-                      <strong className="text-slate-800 text-sm">{rev.customerName}</strong>
+-                      <div className="flex gap-0.5 text-amber-500">
++                {reviews.map(rev => (
++                  <div key={rev.id} className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
++                    <div className="flex justify-between mb-2">
++                      <strong className="text-[#2C1810] text-sm">{rev.customerName}</strong>
++                      <div className="flex gap-0.5">
+                         {Array.from({ length: rev.rating }).map((_, i) => (
+-                          <Star key={i} className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
++                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                         ))}
+                       </div>
+                     </div>
+-                    <span className="text-[10px] text-slate-400 font-bold block mb-1">السلعة: {rev.productName}</span>
+-                    <p className="text-slate-600 text-xs leading-relaxed font-semibold">{rev.comment}</p>
+-                    <span className="text-[9px] text-slate-400 font-mono block mt-2 text-left">{rev.date}</span>
++                    <span className="text-[10px] text-[#8B7B78] font-medium block mb-2">{rev.productName}</span>
++                    <p className="text-[#5C3830] text-xs leading-relaxed font-medium italic">"{rev.comment}"</p>
+                   </div>
+                 ))}
+               </div>
+-
+               <div className="mt-6 text-center">
+-                <a 
+-                  href="https://wa.me/97337037697" 
+-                  target="_blank"
+-                  referrerPolicy="no-referrer"
+-                  className="inline-block bg-[#9A2D55] text-white hover:bg-[#802446] font-bold text-xs py-2.5 px-6 rounded-xl shadow transition"
+-                >
+-                  صممي قطعة خاصة بكِ وشاركي رأيكِ معنا 🎙️
++                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
++                  className="inline-block bg-[#9A2D55] text-white font-bold text-xs py-3 px-6 rounded-xl shadow-md hover:bg-[#802446] transition-all">
++                  شاركينا رأيك على واتساب 🎙️
+                 </a>
+               </div>
+             </motion.div>
+@@ -1647,53 +1460,42 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab
+         )}
+       </AnimatePresence>
+ 
+-
+-      {/* MODAL 4: Interactive Size Guide Popover Screen */}
++      {/* ── MODAL: Size Guide ────────────────────────────────── */}
+       <AnimatePresence>
+         {showSizeGuide && (
+-          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4" id="size-guide-modal">
+-            <motion.div 
+-              initial={{ opacity: 0, scale: 0.95 }}
+-              animate={{ opacity: 1, scale: 1 }}
+-              exit={{ opacity: 0 }}
+-              className="bg-white rounded-3xl w-full max-w-xl p-6 border border-rose-50 shadow-xl"
+-            >
+-              <div className="flex justify-between items-center mb-4 border-b border-rose-50 pb-3 bg-rose-50/20 -mx-6 px-6 -mt-6 pt-4 rounded-t-3xl">
+-                <span className="font-bold text-[#9A2D55] text-sm">
+-                  {sizeGuides.find(g => g.id === showSizeGuide)?.name || 'أدلة مقاسات المخاوير المعتمدة'}
+-                </span>
+-                <button onClick={() => setShowSizeGuide(null)} className="p-1 bg-white hover:bg-slate-150 rounded-lg text-slate-500 border cursor-pointer">
++          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
++            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
++              className="bg-white rounded-3xl w-full max-w-xl p-6 border border-[#F2E4DC] shadow-2xl">
++              <div className="flex justify-between items-center mb-4 pb-3 border-b border-[#F2E4DC]">
++                <span className="font-black text-[#9A2D55]">{sizeGuides.find(g => g.id === showSizeGuide)?.name || 'دليل المقاسات'}</span>
++                <button onClick={() => setShowSizeGuide(null)} className="p-1.5 bg-[#FDF8F5] hover:bg-[#F8EDE8] rounded-lg text-[#8B7B78] border border-[#F2E4DC] cursor-pointer">
+                   <X className="w-4 h-4" />
+                 </button>
+               </div>
+-
+               <div className="overflow-x-auto">
+-                <table className="w-full text-xs text-right text-slate-650 font-bold border-collapse">
++                <table className="w-full text-xs text-right border-collapse">
+                   <thead>
+-                    <tr className="bg-rose-50 text-[#9A2D55]">
+-                      <th className="p-2 border border-rose-100">المقاس القياسي</th>
+-                      <th className="p-2 border border-rose-100">محيط الصدر</th>
+-                      <th className="p-2 border border-rose-100">كامل الطول</th>
+-                      <th className="p-2 border border-rose-100">محيط الخصر</th>
+-                      <th className="p-2 border border-rose-100">طول الكم</th>
++                    <tr className="bg-[#F8EDE8] text-[#9A2D55]">
++                      {['المقاس', 'الصدر', 'الطول', 'الخصر', 'الكم'].map(h => (
++                        <th key={h} className="p-2.5 border border-[#F2E4DC] font-black">{h}</th>
++                      ))}
+                     </tr>
+                   </thead>
+                   <tbody>
+                     {sizeGuides.find(g => g.id === showSizeGuide)?.sizes.map((row, idx) => (
+-                      <tr key={idx} className="hover:bg-rose-50/20 odd:bg-slate-50/50">
+-                        <td className="p-2 border border-rose-100 text-slate-900 font-extrabold">{row.label}</td>
+-                        <td className="p-2 border border-rose-100">{row.chest}</td>
+-                        <td className="p-2 border border-rose-100">{row.length}</td>
+-                        <td className="p-2 border border-rose-100">{row.waist}</td>
+-                        <td className="p-2 border border-rose-100">{row.sleeve}</td>
++                      <tr key={idx} className="odd:bg-[#FDF8F5] hover:bg-[#F8EDE8] transition-colors">
++                        <td className="p-2.5 border border-[#F2E4DC] font-black text-[#9A2D55]">{row.label}</td>
++                        <td className="p-2.5 border border-[#F2E4DC] font-medium text-[#5C3830]">{row.chest}</td>
++                        <td className="p-2.5 border border-[#F2E4DC] font-medium text-[#5C3830]">{row.length}</td>
++                        <td className="p-2.5 border border-[#F2E4DC] font-medium text-[#5C3830]">{row.waist}</td>
++                        <td className="p-2.5 border border-[#F2E4DC] font-medium text-[#5C3830]">{row.sleeve}</td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
+               </div>
+-
+-              <p className="text-[10px] text-slate-400 mt-4 leading-relaxed font-semibold">
+-                * ملاحظة هامة: قياساتنا الموثوقة تؤخذ بالبوصة (Inches) المعتمدة للخياط الخليجي. تناسب الأقمشة الخفيفة والمخملية والستان. في حال رغبتك بتفصيل قياسات خاصة بالملي الرجاء تزويد فريقنا بها عبر الواتساب.
++              <p className="text-[10px] text-[#8B7B78] mt-4 leading-relaxed font-medium">
++                * القياسات بالبوصة (Inches). للتفصيل بمقاسات خاصة راسليننا على واتساب.
+               </p>
+             </motion.div>
+           </div>
+diff --git a/src/index.css b/src/index.css
+index f1d8c73..beca80e 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -1 +1,82 @@
+ @import "tailwindcss";
++
++@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
++
++/* ─── ALMAASA DESIGN TOKENS ───────────────────────────────── */
++:root {
++  --color-primary:    #9A2D55;
++  --color-primary-hover: #802446;
++  --color-gold:       #C4956A;
++  --color-gold-light: #E8D5C4;
++  --color-cream:      #FDF8F5;
++  --color-cream-2:    #F8EDE8;
++  --color-cream-3:    #F2E4DC;
++  --color-muted:      #9B8178;
++  --color-dark:       #2C1810;
++}
++
++/* ─── BASE ────────────────────────────────────────────────── */
++html { scroll-behavior: smooth; }
++
++body {
++  font-family: 'Cairo', system-ui, sans-serif;
++  background-color: var(--color-cream);
++  color: var(--color-dark);
++  -webkit-font-smoothing: antialiased;
++}
++
++/* ─── SCROLLBAR ──────────────────────────────────────────── */
++::-webkit-scrollbar { width: 5px; height: 5px; }
++::-webkit-scrollbar-track { background: #f8ede8; }
++::-webkit-scrollbar-thumb { background: #d4a5a5; border-radius: 99px; }
++
++/* ─── SELECTION ──────────────────────────────────────────── */
++::selection { background: #9A2D55; color: white; }
++
++/* ─── LUXURY CARD HOVER ──────────────────────────────────── */
++.luxury-card {
++  transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.35s ease;
++}
++.luxury-card:hover {
++  transform: translateY(-6px);
++  box-shadow: 0 20px 40px -12px rgba(154,45,85,0.18);
++}
++
++/* ─── PRODUCT IMAGE ZOOM ─────────────────────────────────── */
++.product-img { transition: transform 0.6s cubic-bezier(.22,.68,0,1.2); }
++.luxury-card:hover .product-img { transform: scale(1.08); }
++
++/* ─── FADE IN ────────────────────────────────────────────── */
++@keyframes fadeUp {
++  from { opacity: 0; transform: translateY(20px); }
++  to   { opacity: 1; transform: translateY(0); }
++}
++.fade-up { animation: fadeUp 0.6s ease forwards; }
++
++/* ─── SHIMMER SKELETON ───────────────────────────────────── */
++@keyframes shimmer {
++  0%   { background-position: -1000px 0; }
++  100% { background-position: 1000px 0; }
++}
++.skeleton {
++  background: linear-gradient(90deg, #f0e6e0 25%, #f8ede8 50%, #f0e6e0 75%);
++  background-size: 1000px 100%;
++  animation: shimmer 1.5s infinite;
++  border-radius: 12px;
++}
++
++/* ─── TOAST ──────────────────────────────────────────────── */
++@keyframes toastIn {
++  from { transform: translateX(100%); opacity: 0; }
++  to   { transform: translateX(0); opacity: 1; }
++}
++.toast-enter { animation: toastIn 0.35s ease; }
++
++/* ─── HIDE SCROLLBAR (stories row) ──────────────────────── */
++.no-scrollbar::-webkit-scrollbar { display: none; }
++.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
++
++/* ─── BOTTOM NAV (mobile) ────────────────────────────────── */
++@media (max-width: 768px) {
++  .has-bottom-nav { padding-bottom: 72px; }
++}
+-- 
+2.43.0
+
