@@ -51,11 +51,15 @@ async function startServer() {
       const response = await fetch(url, {
         headers: { "Accept": "application/json", "User-Agent": "Mozilla/5.0" }
       });
-      const text = await response.text();
+      const data = await response.json();
+      const firstPost = data.posts?.[0] ?? data[0] ?? null;
       res.json({
         status: response.status,
-        contentType: response.headers.get("content-type"),
-        body: text.slice(0, 1000),
+        isArray: Array.isArray(data),
+        topLevelKeys: Object.keys(data),
+        postsCount: (data.posts ?? data).length,
+        firstPostKeys: firstPost ? Object.keys(firstPost) : null,
+        firstPost: firstPost,
       });
     } catch (err: any) {
       res.json({ fetchError: err.message });
