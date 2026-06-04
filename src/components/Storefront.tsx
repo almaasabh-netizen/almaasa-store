@@ -311,47 +311,47 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       </div>
 
       {/* ── 2. HEADER ────────────────────────────────────────────── */}
-      <header className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/97 backdrop-blur-md shadow-md border-b border-[#F2E4DC]' : 'bg-white border-b border-[#F2E4DC]'}`}>
+      <header className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/98 backdrop-blur-lg shadow-lg border-b border-[#F2E4DC]' : 'bg-white/95 backdrop-blur-sm border-b border-[#F2E4DC]'}`}>
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between h-16 md:h-18">
+          <div className="flex items-center justify-between h-[4.5rem]">
 
             {/* Mobile: hamburger */}
-            <button className="md:hidden p-2 text-[#9A2D55]" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="md:hidden p-2 text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               <Menu className="w-5 h-5" />
             </button>
 
             {/* Desktop nav - right */}
-            <nav className="hidden md:flex items-center gap-5 text-sm font-semibold text-[#5C3830]">
+            <nav className="hidden md:flex items-center gap-1 text-sm font-semibold text-[#5C3830]">
               <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}
-                className={`hover:text-[#9A2D55] transition-colors pb-0.5 ${activeTab === 'shop' && selectedCategory === 'all' ? 'text-[#9A2D55] border-b-2 border-[#9A2D55]' : ''}`}>
+                className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${activeTab === 'shop' && selectedCategory === 'all' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
                 الرئيسية
               </button>
               {categories.filter(c => c.id !== 'all').slice(0, 4).map(cat => (
                 <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); }}
-                  className={`hover:text-[#9A2D55] transition-colors pb-0.5 ${selectedCategory === cat.id ? 'text-[#9A2D55] border-b-2 border-[#9A2D55]' : ''}`}>
+                  className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${selectedCategory === cat.id && activeTab === 'shop' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
                   {cat.name}
                 </button>
               ))}
               <button onClick={() => setActiveTab('tracking')}
-                className={`hover:text-[#9A2D55] transition-colors pb-0.5 ${activeTab === 'tracking' ? 'text-[#9A2D55] border-b-2 border-[#9A2D55]' : ''}`}>
+                className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${activeTab === 'tracking' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
                 تتبع طلبي
               </button>
             </nav>
 
             {/* Logo - center */}
-            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex items-center group">
-              <img src="/logo.jpg" alt="ألماسة" className="h-14 w-auto object-contain" />
+            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="absolute left-1/2 -translate-x-1/2 flex items-center">
+              <img src="/logo.jpg" alt="ألماسة" className="h-12 w-auto object-contain" />
             </button>
 
             {/* Actions - left */}
-            <div className="flex items-center gap-1 md:gap-2">
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] transition-colors hidden md:flex" onClick={() => setSearchQuery('')}>
-                <Search className="w-5 h-5" />
+            <div className="flex items-center gap-0.5 md:gap-1">
+              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all hidden md:flex" onClick={() => setSearchQuery('')}>
+                <Search className="w-4.5 h-4.5" />
               </button>
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] transition-colors hidden md:flex relative" onClick={() => setShowReviewsPopup(true)}>
-                <Star className="w-5 h-5" />
+              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all hidden md:flex relative" onClick={() => setShowReviewsPopup(true)}>
+                <Star className="w-4.5 h-4.5" />
               </button>
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] transition-colors relative" onClick={() => setIsCartOpen(true)}>
+              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all relative" onClick={() => setIsCartOpen(true)}>
                 <ShoppingBag className="w-5 h-5" />
                 {cart.length > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-[#9A2D55] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
@@ -359,7 +359,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   </span>
                 )}
               </button>
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] transition-colors relative" onClick={() => {}}>
+              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all relative" onClick={() => {}}>
                 <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-[#9A2D55] text-[#9A2D55]' : ''}`} />
                 {wishlist.length > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-[#C4956A] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
@@ -416,16 +416,18 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <div className="flex-1 py-16 md:py-0 order-2 md:order-1 fade-up text-center md:text-right">
                   <div className="inline-flex items-center gap-2 bg-[#9A2D55]/10 border border-[#9A2D55]/20 text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-6">
                     <Sparkles className="w-3.5 h-3.5" />
-                    مخاوير ألماسة — كولكشن 2026
+                    ✦ كولكشن 2026 — وصل الجديد
                   </div>
 
-                  <h1 className="text-[2.6rem] md:text-5xl lg:text-6xl font-black text-[#2C1810] leading-[1.15] mb-5">
-                    فخامة التفاصيل<br />
-                    <span className="text-[#9A2D55]">في كل خيط</span>
+                  <h1 className="text-[2.8rem] md:text-5xl lg:text-[3.8rem] font-black text-[#2C1810] leading-[1.1] mb-5">
+                    مخاوير فاخرة<br />
+                    <span style={{ background: 'linear-gradient(90deg, #9A2D55, #C4956A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                      بتصاميم حصرية
+                    </span>
                   </h1>
 
                   <p className="text-[#8B7B78] text-sm md:text-base leading-relaxed mb-8 max-w-md mx-auto md:mx-0">
-                    تشكيلة راقية من المخاوير والأقمشة الفاخرة بتصاميم حصرية وجودة استثنائية بتصاميم عصرية وجودة استثنائية
+                    تشكيلة راقية من المخاوير والأقمشة الفاخرة — تصاميم عصرية وجودة استثنائية مع توصيل لجميع دول الخليج والعالم
                   </p>
 
                   <div className="flex flex-wrap gap-3 justify-center md:justify-start">
@@ -676,7 +678,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
                 {filteredProducts.map((product, idx) => (
-                  <div key={product.id} className="bg-white rounded-2xl border border-[#F2E4DC] overflow-hidden luxury-card group cursor-pointer flex flex-col"
+                  <div key={product.id} className="bg-white rounded-2xl border border-[#F2E4DC] overflow-hidden luxury-card group cursor-pointer flex flex-col shadow-sm hover:shadow-xl hover:shadow-[#9A2D55]/10 hover:border-[#E8D5C4] transition-all"
                     style={{ animationDelay: `${idx * 0.05}s` }}>
 
                     {/* Image */}
@@ -879,40 +881,50 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 9. NEWSLETTER SECTION ───────────────────────────── */}
-          <section className="py-14 px-4 bg-[#F8EDE8]">
-            <div className="max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                {/* Left: CTA */}
-                <div className="md:col-span-2 space-y-2">
-                  <div className="flex items-center gap-2 text-[#9A2D55] text-xs font-bold">
-                    <Gift className="w-4 h-4" />
-                    <span>انضمي لعائلة ألماسة</span>
+          {/* ── 9. WHATSAPP JOIN SECTION ────────────────────────── */}
+          <section className="py-14 px-4 bg-[#FDF8F5]">
+            <div className="max-w-4xl mx-auto">
+              {/* Main CTA card */}
+              <div className="relative rounded-3xl overflow-hidden p-8 md:p-12 text-center"
+                style={{ background: 'linear-gradient(135deg, #FDF0F5 0%, #F8E8EE 50%, #F5E0E8 100%)' }}>
+                {/* Decorative blobs */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-[#9A2D55]/8 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#C4956A]/10 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                  <div className="inline-flex items-center gap-2 bg-white border border-[#F2E4DC] shadow-sm text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-5">
+                    <Gift className="w-3.5 h-3.5" />
+                    انضمي لعائلة ألماسة
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-black text-[#2C1810]">اطلعي على جديدنا أولاً</h2>
-                  <p className="text-[#8B7B78] text-sm">عبر الجوال والبريد الإلكتروني — خصومات وعروض حصرية للأعضاء</p>
-                </div>
-                {/* Right: WhatsApp button */}
-                <div className="flex flex-col gap-3">
-                  <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                    className="flex items-center justify-center gap-2 bg-[#9A2D55] hover:bg-[#802446] text-white font-black px-6 py-3.5 rounded-2xl shadow-lg shadow-[#9A2D55]/20 transition-all hover:-translate-y-0.5 text-sm">
-                    <Phone className="w-4 h-4" />
-                    تواصلي على واتساب
-                  </a>
-                  <p className="text-[10px] text-center text-[#8B7B78] font-mono">+973 37037697 — نرد خلال دقائق 24/7</p>
+                  <h2 className="text-2xl md:text-4xl font-black text-[#2C1810] mb-3 leading-tight">
+                    اطلعي على جديدنا أولاً
+                  </h2>
+                  <p className="text-[#8B7B78] text-sm mb-8 max-w-md mx-auto">خصومات حصرية وتصاميم جديدة قبل الإعلان الرسمي — نرد خلال دقائق 24/7</p>
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#9A2D55] hover:bg-[#802446] text-white font-black px-8 py-4 rounded-full shadow-xl shadow-[#9A2D55]/25 transition-all hover:-translate-y-1 text-sm">
+                      <Phone className="w-4 h-4" />
+                      تواصلي على واتساب
+                    </a>
+                    <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer"
+                      className="inline-flex items-center gap-2 bg-white border border-[#F2E4DC] text-[#9A2D55] hover:border-[#9A2D55] font-bold px-8 py-4 rounded-full transition-all hover:-translate-y-1 text-sm shadow-sm">
+                      <Instagram className="w-4 h-4" />
+                      تابعينا على إنستقرام
+                    </a>
+                  </div>
+                  <p className="text-[11px] text-[#8B7B78] mt-4 font-mono">+973 37037697</p>
                 </div>
               </div>
 
               {/* 3 perks */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
                 {[
-                  { icon: Gift, title: 'خصومات حصرية', desc: 'عروض خاصة للأعضاء على المخاوير والأقمشة' },
-                  { icon: Sparkles, title: 'اطلعي على الجديد أولاً', desc: 'تصاميم جديدة قبل الإعلان الرسمي' },
-                  { icon: BadgeCheck, title: 'مزايا عضوية ألماسة', desc: 'نقاط مكافآت وهدايا مع كل طلب' },
-                ].map(({ icon: Icon, title, desc }) => (
-                  <div key={title} className="bg-white rounded-2xl p-5 border border-[#F2E4DC] flex gap-4 items-start">
-                    <div className="w-10 h-10 bg-[#F8EDE8] rounded-xl flex items-center justify-center shrink-0">
-                      <Icon className="w-5 h-5 text-[#9A2D55]" />
+                  { icon: Gift, title: 'خصومات حصرية', desc: 'عروض خاصة للأعضاء على المخاوير والأقمشة', color: 'bg-rose-50 text-rose-500' },
+                  { icon: Sparkles, title: 'الجديد أولاً', desc: 'تصاميم جديدة قبل الإعلان الرسمي', color: 'bg-amber-50 text-amber-500' },
+                  { icon: BadgeCheck, title: 'مزايا العضوية', desc: 'نقاط مكافآت وهدايا مع كل طلب', color: 'bg-emerald-50 text-emerald-500' },
+                ].map(({ icon: Icon, title, desc, color }) => (
+                  <div key={title} className="bg-white rounded-2xl p-5 border border-[#F2E4DC] flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow">
+                    <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shrink-0`}>
+                      <Icon className="w-5 h-5" />
                     </div>
                     <div>
                       <p className="font-black text-[#2C1810] text-sm">{title}</p>
@@ -924,29 +936,38 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 10. WHATSAPP CTA ───────────────────────────────── */}
-          <section className="py-14 px-4" style={{ background: 'linear-gradient(135deg, #9A2D55 0%, #6B1E3A 50%, #4A1228 100%)' }}>
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <Sparkles className="w-7 h-7 text-[#E8D5C4]" />
+          {/* ── 10. FINAL CTA ──────────────────────────────────── */}
+          <section className="py-16 px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #2C1810 0%, #4A1228 40%, #9A2D55 100%)' }}>
+            {/* Decorative diamonds */}
+            <div className="absolute inset-0 opacity-5">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="absolute border border-white rotate-45"
+                  style={{ width: `${40 + i*20}px`, height: `${40 + i*20}px`, top: `${Math.random()*80}%`, left: `${Math.random()*100}%` }} />
+              ))}
+            </div>
+            <div className="relative max-w-4xl mx-auto text-center">
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-[#E8D5C4] text-xs font-bold px-4 py-2 rounded-full mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                طلبات خاصة ومخصصة
               </div>
-              <h2 className="text-2xl md:text-4xl font-black text-white mb-3 leading-tight">
-                أناقة استثنائية<br />
-                <span className="text-[#E8D5C4]">تفاصيل تخطف الأنظار</span>
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">
+                أناقتك تبدأ من هنا
+                <br />
+                <span className="text-[#E8D5C4] text-2xl md:text-3xl font-bold">نصنع لكِ تفاصيل لا تُنسى</span>
               </h2>
-              <p className="text-white/70 text-sm mb-8 max-w-lg mx-auto leading-relaxed">
-                للطلبات الخاصة والتفصيل المخصص والاستفسارات، فريقنا جاهز للخدمة 24/7
+              <p className="text-white/60 text-sm mb-10 max-w-lg mx-auto leading-relaxed">
+                للطلبات الخاصة والتفصيل المخصص والاستفسارات — فريقنا جاهز للخدمة 24/7
               </p>
-              <div className="flex flex-wrap gap-3 justify-center">
+              <div className="flex flex-wrap gap-4 justify-center">
                 <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-2 bg-white text-[#9A2D55] font-black px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 text-sm">
+                  className="inline-flex items-center gap-2.5 bg-white text-[#9A2D55] font-black px-10 py-4 rounded-full shadow-2xl hover:shadow-white/20 transition-all hover:-translate-y-1.5 text-sm">
                   <Phone className="w-4 h-4" />
                   تواصلي على واتساب الآن
                 </a>
                 <button
                   onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold px-8 py-4 rounded-full hover:bg-white/20 transition-all text-sm">
-                  تصفح التشكيلة
+                  className="inline-flex items-center gap-2 border-2 border-white/30 text-white font-bold px-8 py-4 rounded-full hover:bg-white/10 transition-all text-sm">
+                  تصفحي التشكيلة
                   <ChevronLeft className="w-4 h-4" />
                 </button>
               </div>
