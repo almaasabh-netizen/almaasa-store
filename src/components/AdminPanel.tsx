@@ -2581,17 +2581,146 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
             })()}
 
             {/* =========================================
-                DEVELOPMENT PLACEHOLDER ACCORD FOR IMAGES EMPTY SUBMENUS
+                SECTION: SIZE GUIDES
                 ========================================= */}
-            {!['dashboard', 'orders', 'sales_log', 'customers', 'shipping_bills', 'categories', 'products', 'inventory', 'reviews', 'coupons', 'payment_gateways', 'shipping_zones', 'options'].includes(activeMenu) && (
-              <div className="bg-white border rounded-2xl p-8 text-center text-slate-400 font-semibold text-xs py-16">
-                <p className="text-lg font-bold text-[#9A2D55] mb-2 font-mono">⚜️ القسم: {activeMenu.toUpperCase()} قيد العمل ⚜️</p>
-                <p className="leading-relaxed text-slate-500">
-                  تم تهيئة هذا الإعداد المتوافق مع شاشات الإدارة بنجاح وفق رغبتكم. هذا الحقل يمنح الإدارة وصولاً كاملاً لتخزين التحديثات ومعايراتها.
-                </p>
-                <div className="w-16 h-1 bg-[#9A2D55] rounded mx-auto mt-4" />
-              </div>
-            )}
+            {activeMenu === 'size_guides' && (() => {
+              const [newGuideName, setNewGuideName] = React.useState('');
+              const [newGuideRows, setNewGuideRows] = React.useState(
+                'S,52,120,80,60\nM,54,124,84,62\nL,56,128,88,64\nXL,58,132,92,66'
+              );
+              const [showAddGuide, setShowAddGuide] = React.useState(false);
+              const [editingGuide, setEditingGuide] = React.useState<SizeGuide | null>(null);
+
+              const handleSaveGuide = () => {
+                const sizes = newGuideRows.split('\n').filter(r => r.trim()).map(r => {
+                  const [label, chest, length, waist, sleeve] = r.split(',').map(s => s.trim());
+                  return { label, chest: chest || '', length: length || '', waist: waist || '', sleeve: sleeve || '' };
+                });
+                const guide: SizeGuide = {
+                  id: editingGuide?.id || `sg_${Date.now()}`,
+                  name: newGuideName,
+                  sizes,
+                };
+                const data = getStoredData();
+                const updated = editingGuide
+                  ? data.sizeGuides.map((g: SizeGuide) => g.id === editingGuide.id ? guide : g)
+                  : [...(data.sizeGuides || []), guide];
+                saveStoredData({ sizeGuides: updated });
+                setSizeGuides(updated);
+                setShowAddGuide(false);
+                setEditingGuide(null);
+                setNewGuideName('');
+                setNewGuideRows('S,52,120,80\nM,54,124,84\nL,56,128,88\nXL,58,132,92');
+              };
+
+              const handleDeleteGuide = (id: string) => {
+                const data = getStoredData();
+                const updated = data.sizeGuides.filter((g: SizeGuide) => g.id !== id);
+                saveStoredData({ sizeGuides: updated });
+                setSizeGuides(updated);
+              };
+
+              const handleEdit = (g: SizeGuide) => {
+                setEditingGuide(g);
+                setNewGuideName(g.name);
+                setNewGuideRows(g.sizes.map((r) => `${r.label},${r.chest},${r.length},${r.waist},${r.sleeve}`).join('\n'));
+                setShowAddGuide(true);
+              };
+
+              return (
+                <div className="space-y-5">
+                  {/* Header */}
+                  <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center shrink-0">
+                        <Compass className="w-5 h-5 text-teal-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-black text-slate-800 text-sm">أدلة المقاسات</h3>
+                        <p className="text-slate-400 text-[11px] font-medium">إنشاء جداول مقاسات تظهر للعملاء عند اختيار المنتج</p>
+                      </div>
+                    </div>
+                    <button onClick={() => { setShowAddGuide(true); setEditingGuide(null); setNewGuideName(''); setNewGuideRows('S,52,80,64\nM,54,84,68\nL,56,88,72\nXL,58,92,76'); }}
+                      className="flex items-center gap-2 bg-[#9A2D55] text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm whitespace-nowrap">
+                      <Plus className="w-4 h-4" />
+                      دليل جديد
+                    </button>
+                  </div>
+
+                  {/* Add/Edit form */}
+                  {showAddGuide && (
+                    <div className="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm space-y-4">
+                      <h4 className="font-black text-slate-800 text-sm">{editingGuide ? 'تعديل الدليل' : 'دليل مقاسات جديد'}</h4>
+                      <input value={newGuideName} onChange={e => setNewGuideName(e.target.value)}
+                        placeholder="اسم الدليل (مثال: مقاسات المخاوير الشتوي)"
+                        className="w-full border rounded-xl px-3 py-2.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-bold mb-1.5">أدخل كل مقاس في سطر: المقاس, الصدر (سم), الطول (سم), الخصر (سم), الأكمام (سم)</p>
+                        <textarea value={newGuideRows} onChange={e => setNewGuideRows(e.target.value)} rows={5}
+                          className="w-full border rounded-xl px-3 py-2.5 text-sm font-mono text-right focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                      </div>
+                      {/* Preview table */}
+                      {newGuideRows.trim() && (
+                        <div className="bg-slate-50 rounded-xl overflow-hidden border">
+                          <table className="w-full text-center text-xs">
+                            <thead className="bg-[#9A2D55] text-white">
+                              <tr><th className="py-2 px-3">المقاس</th><th className="py-2 px-3">الصدر</th><th className="py-2 px-3">الطول</th><th className="py-2 px-3">الخصر</th><th className="py-2 px-3">الأكمام</th></tr>
+                            </thead>
+                            <tbody>
+                              {newGuideRows.split('\n').filter(r => r.trim()).map((row, i) => {
+                                const [s, c, l, w, sl] = row.split(',').map(x => x.trim());
+                                return <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}><td className="py-1.5 px-3 font-bold">{s}</td><td className="py-1.5 px-3">{c}</td><td className="py-1.5 px-3">{l}</td><td className="py-1.5 px-3">{w}</td><td className="py-1.5 px-3">{sl}</td></tr>;
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                      <div className="flex gap-2 justify-end">
+                        <button onClick={() => { setShowAddGuide(false); setEditingGuide(null); }} className="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl">إلغاء</button>
+                        <button onClick={handleSaveGuide} disabled={!newGuideName.trim()} className="px-5 py-2 bg-[#9A2D55] text-white font-bold text-xs rounded-xl disabled:opacity-50">حفظ الدليل</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Guides list */}
+                  {sizeGuides.length === 0 ? (
+                    <div className="bg-white border rounded-2xl p-12 text-center text-slate-400 text-sm font-semibold">
+                      لا توجد أدلة مقاسات بعد — أنشئي الأول الآن
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {sizeGuides.map(guide => (
+                        <div key={guide.id} className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+                            <h4 className="font-black text-slate-800 text-sm">{guide.name}</h4>
+                            <div className="flex gap-2">
+                              <button onClick={() => handleEdit(guide)} className="text-[11px] font-bold text-slate-500 hover:text-slate-800 border rounded-lg px-3 py-1.5">تعديل</button>
+                              <button onClick={() => handleDeleteGuide(guide.id)} className="text-[11px] font-bold text-rose-400 hover:text-rose-600 border border-rose-100 rounded-lg px-3 py-1.5">حذف</button>
+                            </div>
+                          </div>
+                          <table className="w-full text-center text-xs">
+                            <thead className="bg-[#9A2D55]/5 text-[#9A2D55] font-bold">
+                              <tr><th className="py-2 px-4">المقاس</th><th className="py-2 px-4">الصدر</th><th className="py-2 px-4">الطول</th><th className="py-2 px-4">الخصر</th><th className="py-2 px-4">الأكمام</th></tr>
+                            </thead>
+                            <tbody>
+                              {guide.sizes.map((row, i) => (
+                                <tr key={i} className={i % 2 === 0 ? '' : 'bg-slate-50'}>
+                                  <td className="py-2 px-4 font-black text-slate-800">{row.label}</td>
+                                  <td className="py-2 px-4 text-slate-600">{row.chest}</td>
+                                  <td className="py-2 px-4 text-slate-600">{row.length}</td>
+                                  <td className="py-2 px-4 text-slate-600">{row.waist}</td>
+                                  <td className="py-2 px-4 text-slate-600">{row.sleeve}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             </div>{/* end p-5 md:p-7 */}
           </main>
