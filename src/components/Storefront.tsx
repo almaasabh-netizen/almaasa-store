@@ -340,7 +340,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
             {/* Logo - center */}
             <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex items-center group">
-              <img src="/logo.svg" alt="ألماسة" className="h-12 w-auto" />
+              <img src="/logo.jpg" alt="ألماسة" className="h-14 w-auto object-contain" />
             </button>
 
             {/* Actions - left */}
