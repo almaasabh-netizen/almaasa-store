@@ -315,33 +315,35 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-[4.5rem]">
 
-            {/* Mobile: hamburger */}
-            <button className="md:hidden p-2 text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              <Menu className="w-5 h-5" />
-            </button>
-
-            {/* Desktop nav - right */}
-            <nav className="hidden md:flex items-center gap-1 text-sm font-semibold text-[#5C3830]">
-              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}
-                className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${activeTab === 'shop' && selectedCategory === 'all' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
-                الرئيسية
+            {/* Desktop: Logo first + Nav (RTL = right side) */}
+            <div className="hidden md:flex items-center gap-1">
+              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex items-center ml-2">
+                <img src="/logo.jpg" alt="ألماسة" className="h-11 w-auto object-contain" />
               </button>
-              {categories.filter(c => c.id !== 'all').slice(0, 4).map(cat => (
-                <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); }}
-                  className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${selectedCategory === cat.id && activeTab === 'shop' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
-                  {cat.name}
+              <div className="w-px h-6 bg-[#F2E4DC] mx-1" />
+              <nav className="flex items-center gap-1 text-sm font-semibold text-[#5C3830]">
+                {categories.filter(c => c.id !== 'all').slice(0, 4).map(cat => (
+                  <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); }}
+                    className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${selectedCategory === cat.id && activeTab === 'shop' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
+                    {cat.name}
+                  </button>
+                ))}
+                <button onClick={() => setActiveTab('tracking')}
+                  className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${activeTab === 'tracking' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
+                  تتبع طلبي
                 </button>
-              ))}
-              <button onClick={() => setActiveTab('tracking')}
-                className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${activeTab === 'tracking' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
-                تتبع طلبي
-              </button>
-            </nav>
+              </nav>
+            </div>
 
-            {/* Logo - center */}
-            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="absolute left-1/2 -translate-x-1/2 flex items-center">
-              <img src="/logo.jpg" alt="ألماسة" className="h-12 w-auto object-contain" />
-            </button>
+            {/* Mobile: logo + hamburger */}
+            <div className="flex md:hidden items-center gap-2">
+              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}>
+                <img src="/logo.jpg" alt="ألماسة" className="h-10 w-auto object-contain" />
+              </button>
+              <button className="p-2 text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
 
             {/* Actions - left */}
             <div className="flex items-center gap-0.5 md:gap-1">
