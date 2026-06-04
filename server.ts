@@ -44,6 +44,24 @@ async function startServer() {
     }
   });
 
+  // Debug endpoint - raw Behold response
+  app.get("/api/instagram-debug", async (req, res) => {
+    try {
+      const url = "https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm";
+      const response = await fetch(url, {
+        headers: { "Accept": "application/json", "User-Agent": "Mozilla/5.0" }
+      });
+      const text = await response.text();
+      res.json({
+        status: response.status,
+        contentType: response.headers.get("content-type"),
+        body: text.slice(0, 1000),
+      });
+    } catch (err: any) {
+      res.json({ fetchError: err.message });
+    }
+  });
+
   // Instagram Feed Proxy (Behold)
   app.get("/api/instagram-feed", async (req, res) => {
     try {
