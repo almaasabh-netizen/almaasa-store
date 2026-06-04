@@ -2452,9 +2452,138 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
 
             {/* =========================================
+                SECTION: PRODUCT OPTIONS (SIZES & COLORS)
+                ========================================= */}
+            {activeMenu === 'options' && (() => {
+              const data = getStoredData();
+              const allSizes: string[] = ([...new Set(data.products.flatMap((p: any) => p.sizes ?? []))] as string[]).sort();
+              const allColors: string[] = [...new Set(data.products.flatMap((p: any) => p.colors ?? []))] as string[];
+              const totalProducts = data.products.length;
+              const withSheilah = data.products.filter((p: any) => p.hasSheilah).length;
+              return (
+                <div className="space-y-5">
+                  {/* Header */}
+                  <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-center gap-4">
+                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center shrink-0">
+                      <Sliders className="w-5 h-5 text-slate-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-slate-800 text-sm">خيارات المنتجات</h3>
+                      <p className="text-slate-400 text-[11px] font-medium mt-0.5">نظرة شاملة على خيارات المقاسات والألوان المستخدمة عبر جميع المنتجات</p>
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { label: 'إجمالي المنتجات', value: totalProducts, color: 'bg-violet-50 text-violet-600' },
+                      { label: 'مقاسات مختلفة', value: allSizes.length, color: 'bg-rose-50 text-rose-600' },
+                      { label: 'ألوان مختلفة', value: allColors.length, color: 'bg-pink-50 text-pink-600' },
+                      { label: 'مع شيلة مطابقة', value: withSheilah, color: 'bg-emerald-50 text-emerald-600' },
+                    ].map(({ label, value, color }) => (
+                      <div key={label} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm text-center">
+                        <div className={`text-2xl font-black ${color.split(' ')[1]}`}>{value}</div>
+                        <div className="text-[10px] text-slate-400 font-bold mt-1">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Sizes */}
+                  <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+                    <h4 className="font-black text-slate-800 text-sm mb-4 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-rose-400 rounded-full" />
+                      المقاسات المستخدمة
+                    </h4>
+                    {allSizes.length === 0 ? (
+                      <p className="text-slate-400 text-xs">لا توجد مقاسات مسجّلة بعد</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {allSizes.map(size => {
+                          const count = data.products.filter((p: any) => p.sizes?.includes(size)).length;
+                          return (
+                            <div key={size} className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                              <span className="font-black text-slate-800 text-sm">{size}</span>
+                              <span className="text-[10px] text-slate-400 font-bold">{count} منتج</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Colors */}
+                  <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+                    <h4 className="font-black text-slate-800 text-sm mb-4 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-pink-400 rounded-full" />
+                      الألوان المستخدمة
+                    </h4>
+                    {allColors.length === 0 ? (
+                      <p className="text-slate-400 text-xs">لا توجد ألوان مسجّلة بعد</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {allColors.map(color => {
+                          const count = data.products.filter((p: any) => p.colors?.includes(color)).length;
+                          return (
+                            <div key={color} className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                              <span className="font-semibold text-slate-800 text-sm">{color}</span>
+                              <span className="text-[10px] text-slate-400 font-bold">{count} منتج</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Per-product options table */}
+                  <div className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="px-5 py-3.5 border-b border-slate-100">
+                      <h4 className="font-black text-slate-800 text-sm">خيارات كل منتج</h4>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-right text-[12px]">
+                        <thead className="bg-slate-50 text-slate-500 font-bold text-[10px]">
+                          <tr>
+                            <th className="px-4 py-3">المنتج</th>
+                            <th className="px-4 py-3">المقاسات</th>
+                            <th className="px-4 py-3">الألوان</th>
+                            <th className="px-4 py-3 text-center">شيلة</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                          {data.products.filter((p: any) => !p.isDraft).map((p: any) => (
+                            <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="px-4 py-3 font-semibold text-slate-800 max-w-[200px] truncate">{p.name}</td>
+                              <td className="px-4 py-3">
+                                <div className="flex flex-wrap gap-1">
+                                  {(p.sizes ?? []).map((s: string) => (
+                                    <span key={s} className="bg-rose-50 text-rose-600 font-bold text-[9px] px-1.5 py-0.5 rounded">{s}</span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex flex-wrap gap-1">
+                                  {(p.colors ?? []).map((c: string) => (
+                                    <span key={c} className="bg-slate-100 text-slate-600 font-bold text-[9px] px-1.5 py-0.5 rounded">{c}</span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                {p.hasSheilah ? <span className="text-emerald-500 font-black">✓</span> : <span className="text-slate-300">—</span>}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* =========================================
                 DEVELOPMENT PLACEHOLDER ACCORD FOR IMAGES EMPTY SUBMENUS
                 ========================================= */}
-            {!['dashboard', 'orders', 'sales_log', 'customers', 'shipping_bills', 'categories', 'products', 'inventory', 'reviews', 'coupons', 'payment_gateways', 'shipping_zones'].includes(activeMenu) && (
+            {!['dashboard', 'orders', 'sales_log', 'customers', 'shipping_bills', 'categories', 'products', 'inventory', 'reviews', 'coupons', 'payment_gateways', 'shipping_zones', 'options'].includes(activeMenu) && (
               <div className="bg-white border rounded-2xl p-8 text-center text-slate-400 font-semibold text-xs py-16">
                 <p className="text-lg font-bold text-[#9A2D55] mb-2 font-mono">⚜️ القسم: {activeMenu.toUpperCase()} قيد العمل ⚜️</p>
                 <p className="leading-relaxed text-slate-500">
