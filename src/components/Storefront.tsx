@@ -548,39 +548,34 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 4. CATEGORIES SECTION ───────────────────────────── */}
-          <section className="py-14 px-4 max-w-7xl mx-auto">
-            <div className="text-center mb-10">
-              <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-2">استكشفي</p>
-              <h2 className="text-2xl md:text-3xl font-black text-[#2C1810]">الأقسام الرئيسية</h2>
-            </div>
+          {/* ── 4. CATEGORIES CIRCLES ───────────────────────────── */}
+          <section className="py-6 px-4 max-w-7xl mx-auto">
+            <div className="flex items-center gap-5 overflow-x-auto no-scrollbar pb-2 justify-start md:justify-center">
 
-            {/* Story circles row */}
-            <div className="flex items-center gap-4 overflow-x-auto no-scrollbar pb-3 justify-start md:justify-center mb-8">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer"
-              >
-                <div className={`w-16 h-16 md:w-18 md:h-18 rounded-full p-0.5 transition-all ${selectedCategory === 'all' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
-                  <div className="w-full h-full rounded-full bg-[#FDF8F5] flex items-center justify-center">
+              {/* الكل */}
+              <button onClick={() => { setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer">
+                <div className={`w-16 h-16 rounded-full p-0.5 transition-all ${selectedCategory === 'all' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
+                  <div className={`w-full h-full rounded-full flex items-center justify-center ${selectedCategory === 'all' ? 'bg-[#FDF8F5]' : 'bg-white'}`}>
                     <BookOpen className={`w-6 h-6 ${selectedCategory === 'all' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`} />
                   </div>
                 </div>
                 <span className={`text-[11px] font-bold ${selectedCategory === 'all' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>الكل</span>
               </button>
 
+              {/* Category circles */}
               {categories.filter(c => c.id !== 'all').map(cat => (
-                <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
+                <button key={cat.id}
+                  onClick={() => { setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
                   className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer">
                   <div className={`w-16 h-16 rounded-full p-0.5 transition-all ${selectedCategory === cat.id ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
-                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-xs font-bold text-[#9A2D55]">
-                      ⚜️
-                    </div>
+                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-lg">⚜️</div>
                   </div>
-                  <span className={`text-[11px] font-bold text-center leading-tight ${selectedCategory === cat.id ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>{cat.name}</span>
+                  <span className={`text-[11px] font-bold text-center leading-tight max-w-[60px] ${selectedCategory === cat.id ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>{cat.name}</span>
                 </button>
               ))}
 
+              {/* التقييمات */}
               <button onClick={() => setShowReviewsPopup(true)} className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer">
                 <div className="w-16 h-16 rounded-full p-0.5 bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-amber-400 group-hover:to-orange-400 transition-all">
                   <div className="w-full h-full rounded-full bg-amber-50 flex items-center justify-center">
@@ -589,36 +584,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 </div>
                 <span className="text-[11px] font-bold text-[#8B7B78]">التقييمات</span>
               </button>
-            </div>
 
-            {/* Category Cards Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {categories.filter(c => c.id !== 'all').slice(0, 4).map((cat, i) => {
-                const catProducts = products.filter(p => p.category === cat.id);
-                const img = catProducts[0]?.image;
-                return (
-                  <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
-                    className="relative rounded-2xl overflow-hidden aspect-[3/4] group cursor-pointer luxury-card shadow-sm">
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/85 via-[#2C1810]/20 to-transparent z-10 group-hover:from-[#9A2D55]/80 transition-all duration-500" />
-                    {img ? (
-                      <img src={img} alt={cat.name} referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover product-img" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center"
-                        style={{ background: `linear-gradient(145deg, hsl(${i*40+340},60%,88%) 0%, hsl(${i*40+360},50%,78%) 100%)` }}>
-                        <span className="text-4xl opacity-50">⚜️</span>
-                      </div>
-                    )}
-                    <div className="absolute bottom-0 right-0 left-0 p-4 z-20">
-                      <p className="text-white font-black text-sm md:text-base">{cat.name}</p>
-                      <p className="text-[#E8D5C4]/80 text-xs font-medium mt-0.5 group-hover:text-white transition-colors">
-                        {catProducts.length} منتج — تسوّقي الآن ›
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
             </div>
           </section>
 
