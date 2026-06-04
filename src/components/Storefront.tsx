@@ -826,7 +826,27 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 9. WHATSAPP JOIN SECTION ────────────────────────── */}
+          {/* ── 9. INSTAGRAM FEED ───────────────────────────────── */}
+          <section className="py-14 px-4 bg-white">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 text-[#9A2D55] text-xs font-bold mb-2">
+                  <Instagram className="w-4 h-4" />
+                  <span>تابعينا على إنستقرام</span>
+                </div>
+                <h2 className="text-2xl font-black text-[#2C1810]">@almaasa.bh</h2>
+                <p className="text-[#8B7B78] text-sm mt-1">أحدث تصاميمنا وكولكشناتنا الجديدة</p>
+              </div>
+              <behold-widget feed-id="HbcZC4oN0hh4xfAHUvTm"></behold-widget>
+              <script
+                dangerouslySetInnerHTML={{
+                  __html: `(() => { const d=document,s=d.createElement("script");s.type="module";s.src="https://w.behold.so/widget.js";d.head.append(s); })();`
+                }}
+              />
+            </div>
+          </section>
+
+          {/* ── 10. WHATSAPP JOIN SECTION ───────────────────────── */}
           <section className="py-14 px-4 bg-[#FDF8F5]">
             <div className="max-w-4xl mx-auto">
               {/* Main CTA card */}
