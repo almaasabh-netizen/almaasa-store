@@ -44,6 +44,18 @@ async function startServer() {
     }
   });
 
+  // Instagram Feed Proxy (Behold)
+  app.get("/api/instagram-feed", async (req, res) => {
+    try {
+      const response = await fetch("https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm");
+      if (!response.ok) throw new Error("Behold fetch failed");
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: "تعذّر جلب بيانات إنستقرام" });
+    }
+  });
+
   // AI Description Generator Endpoint
   app.post("/api/generate-description", async (req, res) => {
     try {

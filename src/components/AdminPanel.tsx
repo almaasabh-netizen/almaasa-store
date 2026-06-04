@@ -603,7 +603,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
   const handleImportFromInstagram = async () => {
     setIsImportingFromIG(true);
     try {
-      const res = await fetch('https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm');
+      const res = await fetch('/api/instagram-feed');
       const posts = await res.json();
       const data = getStoredData();
       const existingIds = new Set(data.products.map((p: any) => p.id));
