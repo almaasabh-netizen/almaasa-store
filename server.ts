@@ -47,15 +47,19 @@ async function startServer() {
   // Instagram Feed Proxy (Behold)
   app.get("/api/instagram-feed", async (req, res) => {
     try {
-      const response = await fetch("https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm", {
+      const feedId = "HbcZC4oN0hh4xfAHUvTm";
+      const url = `https://feeds.behold.so/${feedId}`;
+      console.log("Fetching Behold feed:", url);
+      const response = await fetch(url, {
         headers: {
           "Accept": "application/json",
-          "User-Agent": "Mozilla/5.0 (compatible; AlmaasaStore/1.0)"
+          "User-Agent": "Mozilla/5.0 (compatible; AlmaasaStore/1.0)",
+          "Origin": "https://almaasa-store.onrender.com",
         }
       });
       const text = await response.text();
-      console.log("Behold status:", response.status, "body:", text.slice(0, 200));
-      if (!response.ok) throw new Error(`Behold ${response.status}: ${text.slice(0,100)}`);
+      console.log("Behold status:", response.status, "Content-Type:", response.headers.get("content-type"), "body[:300]:", text.slice(0, 300));
+      if (!response.ok) throw new Error(`Behold ${response.status}: ${text.slice(0,200)}`);
       const data = JSON.parse(text);
       res.json(data);
     } catch (err: any) {

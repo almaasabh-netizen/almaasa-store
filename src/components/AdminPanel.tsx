@@ -614,24 +614,35 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     setIsImportingFromIG(true);
     try {
       const res = await fetch('/api/instagram-feed');
-      const posts = await res.json();
+      const body = await res.json();
+      if (!res.ok) {
+        alert(`⚠️ خطأ من الخادم: ${body.error || res.status}`);
+        return;
+      }
+      // Behold returns array directly or { posts: [...] }
+      const posts: any[] = Array.isArray(body) ? body : (body.posts ?? []);
+      if (posts.length === 0) {
+        alert('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد');
+        return;
+      }
       const data = getStoredData();
       const existingIds = new Set(data.products.map((p: any) => p.id));
       let added = 0;
       const newProducts = [...data.products];
       for (const post of posts) {
-        if (!post.mediaUrl || post.mediaType === 'VIDEO') continue;
+        const imgUrl = post.mediaUrl || post.media_url || post.thumbnailUrl || post.thumbnail_url;
+        if (!imgUrl || post.mediaType === 'VIDEO' || post.media_type === 'VIDEO') continue;
         const igId = `ig_${post.id}`;
         if (existingIds.has(igId)) continue;
         const caption = post.caption || '';
-        const name = caption.split('\n')[0].slice(0, 60) || 'منتج من إنستقرام';
+        const name = caption.split('\n')[0].replace(/#\S+/g, '').trim().slice(0, 60) || 'منتج من إنستقرام';
         newProducts.push({
           id: igId,
           name,
           description: caption.slice(0, 200),
           price: 0,
           originalPrice: undefined,
-          image: post.mediaUrl,
+          image: imgUrl,
           category: 'available',
           stock: 10,
           sizes: ['S', 'M', 'L', 'XL'],
@@ -645,9 +656,13 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       }
       saveStoredData({ products: newProducts });
       setProducts(newProducts);
-      alert(`✅ تم استيراد ${added} منتج جديد من إنستقرام كمسودة — عدّليهم وأضيفي السعر قبل النشر`);
-    } catch {
-      alert('⚠️ تعذّر الاتصال بإنستقرام، تأكدي من اتصال الإنترنت');
+      if (added > 0) {
+        alert(`✅ تم استيراد ${added} منتج جديد من إنستقرام كمسودة — عدّليهم وأضيفي السعر قبل النشر`);
+      } else {
+        alert('ℹ️ كل الصور موجودة مسبقاً في المنتجات');
+      }
+    } catch (err: any) {
+      alert(`⚠️ تعذّر الاتصال بإنستقرام: ${err.message}`);
     } finally {
       setIsImportingFromIG(false);
     }
