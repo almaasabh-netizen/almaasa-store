@@ -2662,23 +2662,66 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                   <button onClick={() => setEditingProduct(null)} className="text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
                 </div>
                 <div className="space-y-3 text-sm">
-                  {/* Image preview */}
-                  <img src={editingProduct.image} alt="" className="w-full h-40 object-cover rounded-xl" referrerPolicy="no-referrer" />
+
+                  {/* Image upload */}
                   <div>
-                    <label className="text-xs font-bold text-slate-600 mb-1 block">رابط الصورة</label>
-                    <input value={editingProduct.image} onChange={e => setEditingProduct({...editingProduct, image: e.target.value})}
-                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                    <label className="text-xs font-bold text-slate-600 mb-2 block">صورة المنتج</label>
+                    <div className="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-100 border-2 border-dashed border-slate-200 cursor-pointer group"
+                      onClick={() => document.getElementById('edit-img-upload')?.click()}>
+                      {editingProduct.image
+                        ? <img src={editingProduct.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        : <div className="flex flex-col items-center justify-center h-full text-slate-400"><Layers className="w-8 h-8 mb-2" /><span className="text-xs">اضغط لرفع صورة</span></div>
+                      }
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">تغيير الصورة</span>
+                      </div>
+                    </div>
+                    <input id="edit-img-upload" type="file" accept="image/*" className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 8 * 1024 * 1024) { alert('الصورة أكبر من 8MB'); return; }
+                        const reader = new FileReader();
+                        reader.onload = ev => setEditingProduct({...editingProduct, image: ev.target?.result as string});
+                        reader.readAsDataURL(file);
+                      }} />
                   </div>
+
+                  {/* Name */}
                   <div>
                     <label className="text-xs font-bold text-slate-600 mb-1 block">اسم المنتج</label>
                     <input value={editingProduct.name} onChange={e => setEditingProduct({...editingProduct, name: e.target.value})}
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
                   </div>
+
+                  {/* Description + AI */}
                   <div>
-                    <label className="text-xs font-bold text-slate-600 mb-1 block">الوصف</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-slate-600">الوصف</label>
+                      <button
+                        onClick={async () => {
+                          if (!editingProduct.name.trim()) { alert('اكتبي اسم المنتج أولاً'); return; }
+                          const cat = categories.find(c => c.id === editingProduct.category);
+                          setEditingProduct({...editingProduct, description: '⏳ جاري التوليد...'});
+                          try {
+                            const r = await fetch('/api/generate-description', {
+                              method: 'POST', headers: {'Content-Type':'application/json'},
+                              body: JSON.stringify({ productName: editingProduct.name, categoryName: cat?.name || '', imageBase64: editingProduct.image?.startsWith('data:') ? editingProduct.image : undefined })
+                            });
+                            const d = await r.json();
+                            setEditingProduct((prev: any) => ({...prev, description: d.description || prev.description}));
+                          } catch { setEditingProduct((prev: any) => ({...prev, description: ''})); }
+                        }}
+                        className="flex items-center gap-1 bg-gradient-to-r from-violet-500 to-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-full hover:opacity-90 transition-opacity"
+                      >
+                        <Sparkles className="w-3 h-3" /> توليد بالذكاء الاصطناعي
+                      </button>
+                    </div>
                     <textarea value={editingProduct.description} onChange={e => setEditingProduct({...editingProduct, description: e.target.value})}
                       rows={3} className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] resize-none" />
                   </div>
+
+                  {/* Price + Stock */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-xs font-bold text-slate-600 mb-1 block">السعر (د.ب)</label>
@@ -2691,6 +2734,8 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                         className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
                     </div>
                   </div>
+
+                  {/* Category */}
                   <div>
                     <label className="text-xs font-bold text-slate-600 mb-1 block">القسم</label>
                     <select value={editingProduct.category} onChange={e => setEditingProduct({...editingProduct, category: e.target.value})}
@@ -2698,6 +2743,8 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
+
+                  {/* Sizes */}
                   <div>
                     <label className="text-xs font-bold text-slate-600 mb-1 block">المقاسات (مفصولة بفاصلة)</label>
                     <input value={Array.isArray(editingProduct.sizes) ? editingProduct.sizes.join(', ') : editingProduct.sizes}
@@ -2705,6 +2752,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
                   </div>
                 </div>
+
                 <div className="flex gap-2 mt-5">
                   <button onClick={handleSaveEdit} className="flex-1 bg-[#9A2D55] hover:bg-[#802446] text-white font-black py-3 rounded-xl text-sm">حفظ التعديلات</button>
                   <button onClick={() => setEditingProduct(null)} className="px-5 border border-slate-200 rounded-xl text-slate-600 font-bold text-sm">إلغاء</button>
