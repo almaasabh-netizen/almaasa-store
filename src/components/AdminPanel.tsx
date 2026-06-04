@@ -5,7 +5,7 @@ import {
   Trash2, Plus, CheckCircle, Clock, Undo2, LogIn, Lock, 
   Tag, Compass, HelpCircle, Wallet, FileText, LayoutGrid, 
   RefreshCw, Check, AlertTriangle, Eye, Printer, Percent, BadgeAlert,
-  Globe
+  Globe, Instagram
 } from 'lucide-react';
 import { Product, Order, OperationLog, Category, Coupon, SizeGuide, Review, StoreSettings } from '../types';
 import { getStoredData, saveStoredData, addOperationLog } from '../data';
@@ -47,6 +47,7 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
   // Form states for Add Product
   const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [isImportingFromIG, setIsImportingFromIG] = useState(false);
   const [pName, setPName] = useState('');
   const [pDesc, setPDesc] = useState('');
   const [pPrice, setPPrice] = useState(30);
@@ -595,6 +596,50 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
         'warning'
       );
       loadData();
+    }
+  };
+
+  // Import products from Instagram via Behold JSON feed
+  const handleImportFromInstagram = async () => {
+    setIsImportingFromIG(true);
+    try {
+      const res = await fetch('https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm');
+      const posts = await res.json();
+      const data = getStoredData();
+      const existingIds = new Set(data.products.map((p: any) => p.id));
+      let added = 0;
+      const newProducts = [...data.products];
+      for (const post of posts) {
+        if (!post.mediaUrl || post.mediaType === 'VIDEO') continue;
+        const igId = `ig_${post.id}`;
+        if (existingIds.has(igId)) continue;
+        const caption = post.caption || '';
+        const name = caption.split('\n')[0].slice(0, 60) || 'منتج من إنستقرام';
+        newProducts.push({
+          id: igId,
+          name,
+          description: caption.slice(0, 200),
+          price: 0,
+          originalPrice: undefined,
+          image: post.mediaUrl,
+          category: 'available',
+          stock: 10,
+          sizes: ['S', 'M', 'L', 'XL'],
+          colors: [],
+          rating: 5,
+          reviewCount: 0,
+          hasSheilah: false,
+          isDraft: true,
+        });
+        added++;
+      }
+      saveStoredData({ products: newProducts });
+      setProducts(newProducts);
+      alert(`✅ تم استيراد ${added} منتج جديد من إنستقرام كمسودة — عدّليهم وأضيفي السعر قبل النشر`);
+    } catch {
+      alert('⚠️ تعذّر الاتصال بإنستقرام، تأكدي من اتصال الإنترنت');
+    } finally {
+      setIsImportingFromIG(false);
     }
   };
 
@@ -1379,13 +1424,23 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     />
                   </div>
 
-                  <button 
-                    onClick={() => setShowAddProductModal(true)}
-                    className="w-full sm:w-auto bg-[#9A2D55] hover:bg-[#802446] text-white font-extrabold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>إضافة منتج مخور جديد لمخزن العيد</span>
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setShowAddProductModal(true)}
+                      className="w-full sm:w-auto bg-[#9A2D55] hover:bg-[#802446] text-white font-extrabold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>إضافة منتج جديد</span>
+                    </button>
+                    <button
+                      onClick={handleImportFromInstagram}
+                      disabled={isImportingFromIG}
+                      className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-60 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Instagram className="w-4 h-4" />
+                      <span>{isImportingFromIG ? 'جاري الاستيراد...' : 'استيراد من إنستقرام'}</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Catalog Grid */}
