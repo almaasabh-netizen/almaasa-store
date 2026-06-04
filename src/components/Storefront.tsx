@@ -564,45 +564,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 4. CATEGORIES CIRCLES ───────────────────────────── */}
-          <section className="py-6 px-4 max-w-7xl mx-auto">
-            <div className="flex items-center gap-5 overflow-x-auto no-scrollbar pb-2 justify-start md:justify-center">
-
-              {/* الكل */}
-              <button onClick={() => { setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer">
-                <div className={`w-16 h-16 rounded-full p-0.5 transition-all ${selectedCategory === 'all' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
-                  <div className={`w-full h-full rounded-full flex items-center justify-center ${selectedCategory === 'all' ? 'bg-[#FDF8F5]' : 'bg-white'}`}>
-                    <BookOpen className={`w-6 h-6 ${selectedCategory === 'all' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`} />
-                  </div>
-                </div>
-                <span className={`text-[11px] font-bold ${selectedCategory === 'all' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>الكل</span>
-              </button>
-
-              {/* Category circles */}
-              {categories.filter(c => c.id !== 'all').map(cat => (
-                <button key={cat.id}
-                  onClick={() => { setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer">
-                  <div className={`w-16 h-16 rounded-full p-0.5 transition-all ${selectedCategory === cat.id ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
-                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-lg">⚜️</div>
-                  </div>
-                  <span className={`text-[11px] font-bold text-center leading-tight max-w-[60px] ${selectedCategory === cat.id ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>{cat.name}</span>
-                </button>
-              ))}
-
-              {/* التقييمات */}
-              <button onClick={() => setShowReviewsPopup(true)} className="flex flex-col items-center gap-2 shrink-0 group cursor-pointer">
-                <div className="w-16 h-16 rounded-full p-0.5 bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-amber-400 group-hover:to-orange-400 transition-all">
-                  <div className="w-full h-full rounded-full bg-amber-50 flex items-center justify-center">
-                    <Star className="w-6 h-6 fill-amber-400 text-amber-400" />
-                  </div>
-                </div>
-                <span className="text-[11px] font-bold text-[#8B7B78]">التقييمات</span>
-              </button>
-
-            </div>
-          </section>
 
           {/* ── 5. SEARCH + FILTER BAR ──────────────────────────── */}
           <div className="max-w-7xl mx-auto px-4 pb-6">
