@@ -320,17 +320,33 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex items-center ml-2">
                 <img src="/logo.jpg" alt="ألماسة" className="h-11 w-auto object-contain" />
               </button>
-              <div className="w-px h-6 bg-[#F2E4DC] mx-1" />
-              <nav className="flex items-center gap-1 text-sm font-semibold text-[#5C3830]">
-                {categories.filter(c => c.id !== 'all').slice(0, 4).map(cat => (
-                  <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); }}
-                    className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${selectedCategory === cat.id && activeTab === 'shop' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
-                    {cat.name}
+              <div className="w-px h-6 bg-[#F2E4DC] mx-2" />
+              <nav className="flex items-center gap-3">
+                {/* الكل */}
+                <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className="flex flex-col items-center gap-1 group">
+                  <div className={`w-10 h-10 rounded-full p-0.5 transition-all ${selectedCategory === 'all' && activeTab === 'shop' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
+                    <div className={`w-full h-full rounded-full flex items-center justify-center text-[10px] font-black ${selectedCategory === 'all' && activeTab === 'shop' ? 'bg-[#FDF8F5] text-[#9A2D55]' : 'bg-white text-[#8B7B78]'}`}>الكل</div>
+                  </div>
+                </button>
+                {/* Categories */}
+                {categories.filter(c => c.id !== 'all').slice(0, 5).map(cat => (
+                  <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                    className="flex flex-col items-center gap-1 group">
+                    <div className={`w-10 h-10 rounded-full p-0.5 transition-all ${selectedCategory === cat.id && activeTab === 'shop' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
+                      <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-sm">⚜️</div>
+                    </div>
+                    <span className={`text-[9px] font-bold text-center leading-tight max-w-[44px] line-clamp-1 ${selectedCategory === cat.id && activeTab === 'shop' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>{cat.name}</span>
                   </button>
                 ))}
-                <button onClick={() => setActiveTab('tracking')}
-                  className={`px-3 py-2 rounded-xl hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-all ${activeTab === 'tracking' ? 'text-[#9A2D55] bg-[#F8EDE8]' : ''}`}>
-                  تتبع طلبي
+                {/* تتبع طلبي */}
+                <button onClick={() => setActiveTab('tracking')} className="flex flex-col items-center gap-1 group">
+                  <div className={`w-10 h-10 rounded-full p-0.5 transition-all ${activeTab === 'tracking' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
+                    <div className={`w-full h-full rounded-full flex items-center justify-center ${activeTab === 'tracking' ? 'bg-[#FDF8F5]' : 'bg-white'}`}>
+                      <Truck className={`w-4 h-4 ${activeTab === 'tracking' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`} />
+                    </div>
+                  </div>
+                  <span className={`text-[9px] font-bold ${activeTab === 'tracking' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>تتبع</span>
                 </button>
               </nav>
             </div>
