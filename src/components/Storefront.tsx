@@ -339,11 +339,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </nav>
 
             {/* Logo - center */}
-            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex flex-col items-center group">
-              <span className="text-2xl font-black tracking-tight text-[#9A2D55] leading-none" style={{ fontFamily: "'Cairo', serif" }}>
-                ألماسة
-              </span>
-              <span className="text-[9px] tracking-[0.25em] text-[#C4956A] font-bold uppercase">ALMAASA</span>
+            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex items-center group">
+              <img src="/logo.svg" alt="ألماسة" className="h-12 w-auto" />
             </button>
 
             {/* Actions - left */}

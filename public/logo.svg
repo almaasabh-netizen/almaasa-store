@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <!-- Diamond icon -->
+  <g transform="translate(155, 30)">
+    <!-- Diamond shape -->
+    <polygon points="45,0 80,20 80,55 45,80 10,55 10,20" fill="none" stroke="#8B3A5A" stroke-width="2"/>
+    <polygon points="45,0 80,20 45,80 10,20" fill="none" stroke="#8B3A5A" stroke-width="1.5"/>
+    <line x1="10" y1="20" x2="80" y2="20" stroke="#8B3A5A" stroke-width="1.5"/>
+    <!-- Sparkles -->
+    <text x="85" y="15" font-size="16" fill="#8B3A5A">✦</text>
+    <text x="-5" y="10" font-size="10" fill="#8B3A5A">✦</text>
+    <text x="90" y="40" font-size="8" fill="#8B3A5A">·</text>
+  </g>
+  <!-- Arabic text ألماسة -->
+  <text x="200" y="145"
+        font-family="'Cairo', 'Traditional Arabic', serif"
+        font-size="58"
+        font-weight="700"
+        fill="#8B3A5A"
+        text-anchor="middle"
+        letter-spacing="2">ألماسة</text>
+  <!-- ALMAASA subtitle -->
+  <text x="200" y="172"
+        font-family="'Playfair Display', Georgia, serif"
+        font-size="14"
+        fill="#8B3A5A"
+        text-anchor="middle"
+        letter-spacing="6">ALMAASA</text>
+</svg>
