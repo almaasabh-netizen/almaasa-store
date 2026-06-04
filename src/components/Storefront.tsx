@@ -403,7 +403,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         <main>
 
           {/* ── 3. HERO SECTION ─────────────────────────────────── */}
-          <section className="relative overflow-hidden bg-[#F5EBE6]" style={{ minHeight: '82vh' }}>
+          <section className="relative overflow-hidden bg-[#F5EBE6]">
             {/* Soft warm gradient bg */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#F5EBE6] via-[#F0E0D6] to-[#EDD5CA]" />
 
@@ -412,10 +412,10 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C4956A]/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-              <div className="flex flex-col md:flex-row items-center" style={{ minHeight: '82vh' }}>
+              <div className="flex flex-col md:flex-row items-center py-10 md:py-16 gap-8">
 
                 {/* Text content - right side (RTL) */}
-                <div className="flex-1 py-16 md:py-0 order-2 md:order-1 fade-up text-center md:text-right">
+                <div className="flex-1 order-2 md:order-1 fade-up text-center md:text-right">
                   <div className="inline-flex items-center gap-2 bg-[#9A2D55]/10 border border-[#9A2D55]/20 text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-6">
                     <Sparkles className="w-3.5 h-3.5" />
                     ✦ كولكشن 2026 — وصل الجديد
@@ -464,7 +464,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 </div>
 
                 {/* Hero image - left side */}
-                <div className="flex-1 order-1 md:order-2 relative flex justify-center items-end" style={{ minHeight: '60vw', maxHeight: '75vh' }}>
+                <div className="flex-1 order-1 md:order-2 relative flex justify-center items-center">
                   {products.length > 0 && (
                     <>
                       {/* Main image card */}
