@@ -5,7 +5,7 @@ import {
   Trash2, Plus, CheckCircle, Clock, Undo2, LogIn, Lock, 
   Tag, Compass, HelpCircle, Wallet, FileText, LayoutGrid, 
   RefreshCw, Check, AlertTriangle, Eye, Printer, Percent, BadgeAlert,
-  Globe, Instagram
+  Globe, Instagram, X
 } from 'lucide-react';
 import { Product, Order, OperationLog, Category, Coupon, SizeGuide, Review, StoreSettings } from '../types';
 import { getStoredData, saveStoredData, addOperationLog } from '../data';
@@ -48,6 +48,7 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   // Form states for Add Product
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [isImportingFromIG, setIsImportingFromIG] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [pName, setPName] = useState('');
   const [pDesc, setPDesc] = useState('');
   const [pPrice, setPPrice] = useState(30);
@@ -597,6 +598,15 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       );
       loadData();
     }
+  };
+
+  // Save edited product
+  const handleSaveEdit = () => {
+    if (!editingProduct) return;
+    const updated = products.map(p => p.id === editingProduct.id ? editingProduct : p);
+    setProducts(updated);
+    saveStoredData({ products: updated });
+    setEditingProduct(null);
   };
 
   // Import products from Instagram via Behold JSON feed
@@ -1466,13 +1476,20 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
                           <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                             <strong className="text-[#9A2D55] text-sm font-sans font-black">{prod.price.toFixed(2)} د.ب</strong>
-                            
-                            <button 
-                              onClick={() => handleDeleteProduct(prod.id, prod.name)}
-                              className="text-red-500 hover:text-red-700 font-bold flex items-center gap-1 cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" /> حذف السلعة
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => setEditingProduct({ ...prod })}
+                                className="text-[#9A2D55] hover:text-[#802446] font-bold flex items-center gap-1 cursor-pointer"
+                              >
+                                <Check className="w-3.5 h-3.5" /> تعديل
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProduct(prod.id, prod.name)}
+                                className="text-red-500 hover:text-red-700 font-bold flex items-center gap-1 cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> حذف
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -2635,6 +2652,66 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
             </div>
           )}
 
+
+          {/* PRODUCT EDIT MODAL */}
+          {editingProduct && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+              <div className="bg-white rounded-3xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="font-black text-slate-800 text-base">تعديل المنتج</h3>
+                  <button onClick={() => setEditingProduct(null)} className="text-slate-400 hover:text-slate-700"><X className="w-5 h-5" /></button>
+                </div>
+                <div className="space-y-3 text-sm">
+                  {/* Image preview */}
+                  <img src={editingProduct.image} alt="" className="w-full h-40 object-cover rounded-xl" referrerPolicy="no-referrer" />
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 mb-1 block">رابط الصورة</label>
+                    <input value={editingProduct.image} onChange={e => setEditingProduct({...editingProduct, image: e.target.value})}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 mb-1 block">اسم المنتج</label>
+                    <input value={editingProduct.name} onChange={e => setEditingProduct({...editingProduct, name: e.target.value})}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 mb-1 block">الوصف</label>
+                    <textarea value={editingProduct.description} onChange={e => setEditingProduct({...editingProduct, description: e.target.value})}
+                      rows={3} className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] resize-none" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-bold text-slate-600 mb-1 block">السعر (د.ب)</label>
+                      <input type="number" value={editingProduct.price} onChange={e => setEditingProduct({...editingProduct, price: parseFloat(e.target.value)||0})}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-600 mb-1 block">الكمية</label>
+                      <input type="number" value={editingProduct.stock} onChange={e => setEditingProduct({...editingProduct, stock: parseInt(e.target.value)||0})}
+                        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 mb-1 block">القسم</label>
+                    <select value={editingProduct.category} onChange={e => setEditingProduct({...editingProduct, category: e.target.value})}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]">
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 mb-1 block">المقاسات (مفصولة بفاصلة)</label>
+                    <input value={Array.isArray(editingProduct.sizes) ? editingProduct.sizes.join(', ') : editingProduct.sizes}
+                      onChange={e => setEditingProduct({...editingProduct, sizes: e.target.value.split(',').map((s:string)=>s.trim())})}
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-5">
+                  <button onClick={handleSaveEdit} className="flex-1 bg-[#9A2D55] hover:bg-[#802446] text-white font-black py-3 rounded-xl text-sm">حفظ التعديلات</button>
+                  <button onClick={() => setEditingProduct(null)} className="px-5 border border-slate-200 rounded-xl text-slate-600 font-bold text-sm">إلغاء</button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* PRODUCT ADD MODAL */}
           {showAddProductModal && (
