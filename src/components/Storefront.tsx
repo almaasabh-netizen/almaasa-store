@@ -298,20 +298,20 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       </div>
 
       {/* ── 1. ANNOUNCEMENT BAR ──────────────────────────────────── */}
-      <div className="bg-[#2C1810] text-[#E8D5C4] py-2 px-4 overflow-hidden">
-        <div className="flex items-center justify-center gap-8 text-[11px] font-semibold tracking-wide whitespace-nowrap animate-marquee-pause">
-          <span className="flex items-center gap-2">✨ مخاوير العيد وصلت! تسوّقي الآن</span>
-          <span className="text-[#C4956A]">◆</span>
-          <span>توصيل دولي سريع لجميع دول الخليج والعالم</span>
-          <span className="text-[#C4956A]">◆</span>
-          <span>شحن مجاني للطلبات فوق 50 د.ب 🎁</span>
-          <span className="text-[#C4956A]">◆</span>
-          <button onClick={onNavigateToAdmin} className="opacity-30 hover:opacity-70 text-[10px] transition-opacity">إدارة المتجر</button>
+      <div style={{ background: 'linear-gradient(90deg, #9A2D55 0%, #6B1E3A 50%, #9A2D55 100%)' }} className="text-white py-2 px-4 overflow-hidden">
+        <div className="flex items-center justify-center gap-6 text-[11px] font-bold tracking-wide whitespace-nowrap">
+          <span className="flex items-center gap-1.5">✨ مخاوير العيد وصلت! تسوّقي الآن</span>
+          <span className="text-[#E8D5C4] text-[8px]">◆</span>
+          <span className="flex items-center gap-1.5">🌍 توصيل دولي سريع لجميع دول الخليج والعالم</span>
+          <span className="text-[#E8D5C4] text-[8px]">◆</span>
+          <span className="flex items-center gap-1.5">🎁 شحن مجاني للطلبات فوق 50 د.ب</span>
+          <span className="text-[#E8D5C4] text-[8px] hidden md:inline">◆</span>
+          <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-60 text-[10px] transition-opacity hidden md:inline">إدارة المتجر</button>
         </div>
       </div>
 
       {/* ── 2. HEADER ────────────────────────────────────────────── */}
-      <header className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-[#F2E4DC]' : 'bg-white border-b border-[#F2E4DC]'}`}>
+      <header className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/97 backdrop-blur-md shadow-md border-b border-[#F2E4DC]' : 'bg-white border-b border-[#F2E4DC]'}`}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-18">
 
@@ -485,8 +485,32 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     </>
                   )}
                   {products.length === 0 && (
-                    <div className="w-full h-full bg-gradient-to-br from-[#F2E4DC] to-[#E8D5C4] rounded-[2.5rem] flex items-center justify-center">
-                      <Sparkles className="w-16 h-16 text-[#C4956A]/40" />
+                    <div className="relative w-[75%] md:w-[85%] aspect-[3/4] max-h-[72vh]">
+                      <div className="w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#9A2D55]/15"
+                        style={{ background: 'linear-gradient(145deg, #F2E4DC 0%, #E8D0C4 40%, #D4A5A0 100%)' }}>
+                        {/* Decorative abaya silhouette */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-20">
+                          <svg viewBox="0 0 200 300" className="w-3/4 h-3/4 fill-[#9A2D55]">
+                            <ellipse cx="100" cy="40" rx="30" ry="35" />
+                            <path d="M50 80 Q30 100 20 200 Q15 260 100 270 Q185 260 180 200 Q170 100 150 80 Q130 70 100 75 Q70 70 50 80Z" />
+                            <path d="M50 80 Q20 90 5 150 Q0 180 15 185 Q30 150 55 120Z" />
+                            <path d="M150 80 Q180 90 195 150 Q200 180 185 185 Q170 150 145 120Z" />
+                          </svg>
+                        </div>
+                        {/* Logo overlay */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
+                          <img src="/logo.jpg" alt="ألماسة" className="w-40 h-auto object-contain drop-shadow-lg" />
+                          <div className="flex gap-1.5 mt-4">
+                            {[0,1,2,3,4].map(i => <Star key={i} className="w-4 h-4 fill-[#9A2D55] text-[#9A2D55]" />)}
+                          </div>
+                          <p className="text-[#6B3040] font-bold text-sm text-center">أرقى تصاميم المخاوير</p>
+                        </div>
+                      </div>
+                      {/* Floating badge */}
+                      <div className="absolute bottom-5 right-5 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-lg">
+                        <p className="text-[10px] text-[#8B7B78] font-medium">كولكشن 2026</p>
+                        <p className="text-[#9A2D55] font-black text-base">جديد ✨</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -577,7 +601,10 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                       <img src={img} alt={cat.name} referrerPolicy="no-referrer"
                         className="w-full h-full object-cover product-img" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#F8EDE8] to-[#E8D5C4]" />
+                      <div className="w-full h-full flex items-center justify-center"
+                        style={{ background: `linear-gradient(145deg, hsl(${i*40+340},60%,88%) 0%, hsl(${i*40+360},50%,78%) 100%)` }}>
+                        <span className="text-4xl opacity-50">⚜️</span>
+                      </div>
                     )}
                     <div className="absolute bottom-0 right-0 left-0 p-4 z-20">
                       <p className="text-white font-black text-sm md:text-base">{cat.name}</p>
@@ -1028,8 +1055,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             {/* Brand */}
             <div className="sm:col-span-2 md:col-span-1">
               <div className="mb-4">
-                <p className="text-3xl font-black text-white" style={{ fontFamily: "'Cairo', serif" }}>ألماسة</p>
-                <p className="text-[9px] tracking-[0.3em] text-[#C4956A] font-bold uppercase mt-0.5">ALMAASA BOUTIQUE</p>
+                <img src="/logo.jpg" alt="ألماسة" className="h-16 w-auto object-contain brightness-[1.1] contrast-[0.9] opacity-90" />
               </div>
               <p className="text-[13px] leading-relaxed text-[#8B7B78] font-medium">
                 متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.
