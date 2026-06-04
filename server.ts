@@ -47,12 +47,20 @@ async function startServer() {
   // Instagram Feed Proxy (Behold)
   app.get("/api/instagram-feed", async (req, res) => {
     try {
-      const response = await fetch("https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm");
-      if (!response.ok) throw new Error("Behold fetch failed");
-      const data = await response.json();
+      const response = await fetch("https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm", {
+        headers: {
+          "Accept": "application/json",
+          "User-Agent": "Mozilla/5.0 (compatible; AlmaasaStore/1.0)"
+        }
+      });
+      const text = await response.text();
+      console.log("Behold status:", response.status, "body:", text.slice(0, 200));
+      if (!response.ok) throw new Error(`Behold ${response.status}: ${text.slice(0,100)}`);
+      const data = JSON.parse(text);
       res.json(data);
-    } catch (err) {
-      res.status(500).json({ error: "تعذّر جلب بيانات إنستقرام" });
+    } catch (err: any) {
+      console.error("Instagram feed error:", err.message);
+      res.status(500).json({ error: err.message });
     }
   });
 
