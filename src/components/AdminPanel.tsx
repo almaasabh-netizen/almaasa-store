@@ -630,8 +630,16 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       let added = 0;
       const newProducts = [...data.products];
       for (const post of posts) {
-        const imgUrl = post.mediaUrl || post.media_url || post.thumbnailUrl || post.thumbnail_url;
-        if (!imgUrl || post.mediaType === 'VIDEO' || post.media_type === 'VIDEO') continue;
+        if (post.mediaType === 'VIDEO' || post.media_type === 'VIDEO') continue;
+        // Prefer Behold-hosted CDN images (don't expire), fallback to direct Instagram URL
+        const imgUrl =
+          post.sizes?.medium?.mediaUrl ||
+          post.sizes?.small?.mediaUrl ||
+          post.sizes?.large?.mediaUrl ||
+          post.mediaUrl ||
+          post.media_url ||
+          post.thumbnailUrl;
+        if (!imgUrl) continue;
         const igId = `ig_${post.id}`;
         if (existingIds.has(igId)) continue;
         const caption = post.caption || '';
