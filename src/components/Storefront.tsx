@@ -38,6 +38,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const [showWishlist, setShowWishlist] = useState(false);
+  const [showReturnPolicy, setShowReturnPolicy] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(0);
@@ -272,6 +274,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
   /* ── FILTER ──────────────────────────────────────────────────── */
   const filteredProducts = products.filter(p => {
+    if (p.isDraft) return false; // لا تعرض المسودات للعملاء
     const cat = selectedCategory === 'all' || p.category === selectedCategory;
     const q = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.description.toLowerCase().includes(searchQuery.toLowerCase());
     return cat && q;
@@ -377,7 +380,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   </span>
                 )}
               </button>
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all relative" onClick={() => {}}>
+              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all relative" onClick={() => setShowWishlist(true)}>
                 <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-[#9A2D55] text-[#9A2D55]' : ''}`} />
                 {wishlist.length > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-[#C4956A] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
@@ -1087,7 +1090,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   { label: 'تتبع طلبي ✈️', action: () => setActiveTab('tracking') },
                   { label: 'آراء الزبائن ⭐', action: () => setShowReviewsPopup(true) },
                   { label: 'تواصلي معنا', action: () => window.open('https://wa.me/97337037697','_blank') },
-                  { label: 'سياسة الإرجاع', action: () => {} },
+                  { label: 'سياسة الإرجاع', action: () => setShowReturnPolicy(true) },
                 ].map(item => (
                   <li key={item.label}>
                     <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium">
@@ -1142,7 +1145,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             { icon: Home,        label: 'الرئيسية',   action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
             { icon: Grid3X3,     label: 'الأقسام',    action: () => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }) },
             { icon: ShoppingBag, label: 'السلة',      action: () => setIsCartOpen(true), badge: cart.reduce((s, i) => s + i.quantity, 0) },
-            { icon: Heart,       label: 'المفضلة',   action: () => {}, badge: wishlist.length },
+            { icon: Heart,       label: 'المفضلة',   action: () => setShowWishlist(true), badge: wishlist.length },
             { icon: Truck,       label: 'تتبع طلبي', action: () => setActiveTab('tracking') },
           ].map(({ icon: Icon, label, action, badge }) => (
             <button key={label} onClick={action}
@@ -1702,6 +1705,109 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <p className="text-[10px] text-[#8B7B78] mt-4 leading-relaxed font-medium">
                 * القياسات بالبوصة (Inches). للتفصيل بمقاسات خاصة راسليننا على واتساب.
               </p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL: Return Policy ────────────────────────────── */}
+      <AnimatePresence>
+        {showReturnPolicy && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#F2E4DC]">
+                <h3 className="font-black text-[#2C1810] text-lg">سياسة الإرجاع والاستبدال</h3>
+                <button onClick={() => setShowReturnPolicy(false)} className="p-1.5 hover:bg-slate-100 rounded-lg">
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
+              <div className="space-y-4 text-[13px] text-[#5C3830] leading-relaxed font-medium">
+                <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
+                  <p className="font-black text-[#9A2D55] mb-2">✅ شروط الإرجاع</p>
+                  <ul className="space-y-1.5 list-disc list-inside">
+                    <li>يُقبل الإرجاع خلال <strong>7 أيام</strong> من تاريخ الاستلام</li>
+                    <li>يجب أن يكون المنتج بحالته الأصلية غير مُستخدَم</li>
+                    <li>يجب الاحتفاظ بالوسم الأصلي والتغليف</li>
+                    <li>لا يُقبل إرجاع المنتجات المُقصَّة أو المُعدَّلة</li>
+                  </ul>
+                </div>
+                <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
+                  <p className="font-black text-[#9A2D55] mb-2">🔄 الاستبدال</p>
+                  <ul className="space-y-1.5 list-disc list-inside">
+                    <li>الاستبدال مجاني في حال وجود عيب مصنعي</li>
+                    <li>في حال الرغبة في الاستبدال بمقاس مختلف تتحمل العميلة رسوم الشحن</li>
+                  </ul>
+                </div>
+                <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
+                  <p className="font-black text-[#9A2D55] mb-2">💬 للتواصل</p>
+                  <p>للإرجاع أو الاستبدال تواصلي معنا على واتساب:</p>
+                  <button onClick={() => window.open('https://wa.me/97337037697','_blank')}
+                    className="mt-2 bg-green-500 text-white font-bold text-xs px-4 py-2 rounded-xl">
+                    واتساب: 97337037697+
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── DRAWER: Wishlist ────────────────────────────────── */}
+      <AnimatePresence>
+        {showWishlist && (
+          <div className="fixed inset-0 z-50 flex" dir="rtl">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowWishlist(false)} />
+            <motion.div initial={{ x: -320 }} animate={{ x: 0 }} exit={{ x: -320 }} transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="relative mr-auto w-full max-w-sm bg-white h-full flex flex-col shadow-2xl">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#F2E4DC]">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-5 h-5 fill-[#9A2D55] text-[#9A2D55]" />
+                  <h2 className="font-black text-[#2C1810] text-base">المفضلة</h2>
+                  <span className="bg-[#F8EDE8] text-[#9A2D55] text-[10px] font-black px-2 py-0.5 rounded-full">{wishlist.length}</span>
+                </div>
+                <button onClick={() => setShowWishlist(false)} className="p-1.5 hover:bg-slate-100 rounded-lg">
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                {wishlist.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
+                    <Heart className="w-14 h-14 text-[#F2E4DC]" />
+                    <p className="text-[#8B7B78] font-semibold text-sm">قائمة المفضلة فارغة</p>
+                    <p className="text-[#8B7B78] text-xs">اضغطي على قلب المنتج لإضافته للمفضلة</p>
+                    <button onClick={() => setShowWishlist(false)} className="bg-[#9A2D55] text-white font-bold text-sm px-6 py-2.5 rounded-xl">
+                      تصفحي المنتجات
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {products.filter(p => wishlist.includes(p.id)).map(p => (
+                      <div key={p.id} className="flex gap-3 bg-[#FDF8F5] rounded-2xl p-3 border border-[#F2E4DC]">
+                        <img src={p.image} alt={p.name} className="w-16 h-16 rounded-xl object-cover shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-sm text-[#2C1810] truncate">{p.name}</p>
+                          <p className="text-[#9A2D55] font-black text-sm mt-0.5">{p.price} د.ب</p>
+                          <button onClick={() => {
+                            setSelectedProduct(p);
+                            setShowWishlist(false);
+                          }} className="mt-1.5 text-[10px] font-bold text-[#9A2D55] hover:underline">
+                            عرض المنتج ←
+                          </button>
+                        </div>
+                        <button onClick={() => {
+                          const next = wishlist.filter(id => id !== p.id);
+                          setWishlist(next);
+                          localStorage.setItem('ama_wishlist', JSON.stringify(next));
+                        }} className="p-1 text-slate-400 hover:text-rose-500 shrink-0">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </motion.div>
           </div>
         )}

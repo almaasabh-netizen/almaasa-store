@@ -1456,6 +1456,11 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                           <span className="absolute top-2 right-2 bg-slate-900 text-white font-bold text-[9px] px-2 py-0.5 rounded-full">
                             متبقي {prod.stock} قطع
                           </span>
+                          {prod.isDraft && (
+                            <span className="absolute top-2 left-2 bg-amber-400 text-white font-black text-[9px] px-2 py-0.5 rounded-full">
+                              مسودة
+                            </span>
+                          )}
                         </div>
 
                         {/* Config */}
@@ -1466,8 +1471,26 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                           </div>
 
                           <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                            <strong className="text-[#9A2D55] text-sm font-sans font-black">{prod.price.toFixed(2)} د.ب</strong>
+                            <div className="flex items-center gap-1.5">
+                              <strong className="text-[#9A2D55] text-sm font-sans font-black">{prod.price.toFixed(2)} د.ب</strong>
+                              {prod.isDraft && prod.price === 0 && (
+                                <span className="text-[9px] text-amber-600 font-bold">أضيفي سعراً</span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-2">
+                              {prod.isDraft && (
+                                <button
+                                  onClick={() => {
+                                    const updated = products.map(p => p.id === prod.id ? { ...p, isDraft: false } : p);
+                                    setProducts(updated);
+                                    saveStoredData({ products: updated });
+                                    addOperationLog('نشر منتج', `تم نشر "${prod.name}" في المتجر`, 'المشرف', 'product', 'info');
+                                  }}
+                                  className="text-emerald-600 hover:text-emerald-700 font-bold flex items-center gap-1 cursor-pointer text-[10px] border border-emerald-200 bg-emerald-50 rounded-lg px-2 py-1"
+                                >
+                                  <CheckCircle className="w-3 h-3" /> نشر
+                                </button>
+                              )}
                               <button
                                 onClick={() => setEditingProduct({ ...prod })}
                                 className="text-[#9A2D55] hover:text-[#802446] font-bold flex items-center gap-1 cursor-pointer"

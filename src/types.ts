@@ -18,6 +18,7 @@ export interface Product {
   sizes: string[];
   colors: string[];
   hasSheilah: boolean; // مخاوير مع شيلة
+  isDraft?: boolean; // مستورد من إنستقرام - لم ينشر بعد
   properties: {
     label: string;
     value: string;
