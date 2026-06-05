@@ -459,66 +459,151 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       {activeTab === 'shop' && (
         <main>
 
-          {/* ── 3. HERO BANNER (compact) ─────────────────────── */}
-          <div className="mx-4 mt-3 mb-1 rounded-2xl overflow-hidden" dir="rtl"
-            style={{ background: 'linear-gradient(110deg,#6B1E3A 0%,#9A2D55 60%,#B5426A 100%)', minHeight: 110 }}>
-            <div className="flex items-center justify-between px-5 py-4 gap-4">
-              {/* Text */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <Sparkles className="w-3 h-3 text-[#E8C4A0] shrink-0" />
-                  <span className="text-[#E8C4A0] text-[10px] font-bold">كولكشن 2026 — وصل الجديد</span>
+          {/* ── 3. HERO BANNER ───────────────────────────────── */}
+          {(() => {
+            const heroProduct = products.filter(p => !p.isDraft)[0];
+            return (
+              <div className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #FDF0F3 0%, #FFF5F8 60%, #FFFFFF 100%)', minHeight: 400 }} dir="rtl">
+                <div className="max-w-7xl mx-auto px-4 py-10 md:py-16">
+                  <div className="flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
+                    {/* RIGHT side (RTL start): Text content */}
+                    <div className="flex-1 text-right md:pr-4">
+                      <div className="flex items-center justify-end gap-2 mb-3">
+                        <span className="text-[#C4698B] text-sm font-bold tracking-wide">أناقة تنبض بالأنوثة</span>
+                        <Sparkles className="w-4 h-4 text-[#C4698B]" />
+                      </div>
+                      <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#2C1810] leading-tight mb-4">
+                        مخاوير راقية
+                        <br />
+                        <span className="text-[#C4698B]">لتألقي في كل مناسبة</span>
+                      </h1>
+                      <p className="text-[#5C3830] text-sm md:text-base leading-relaxed mb-8 max-w-md mr-auto ml-0">
+                        اكتشفي أرقى تشكيلات المخاوير الفاخرة المصممة خصيصاً لتعكس أناقتك وتميزك في كل لحظة
+                      </p>
+                      <div className="flex items-center justify-end gap-3 flex-wrap">
+                        <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                          className="inline-flex items-center gap-2 text-white font-black text-sm px-7 py-3.5 rounded-full shadow-lg hover:shadow-xl hover:opacity-90 active:scale-95 transition-all"
+                          style={{ background: 'linear-gradient(135deg, #C4698B 0%, #9A2D55 100%)' }}>
+                          تسوّقي الآن
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                          className="inline-flex items-center gap-2 text-[#9A2D55] font-bold text-sm px-7 py-3.5 rounded-full border-2 border-[#C4698B]/40 hover:bg-[#FDF0F3] transition-all">
+                          استعرضي التشكيلة
+                        </button>
+                      </div>
+                      {/* Navigation dots */}
+                      <div className="flex items-center justify-end gap-2 mt-8">
+                        {[0,1,2].map(i => (
+                          <div key={i} className={`rounded-full transition-all ${i === 0 ? 'w-6 h-2 bg-[#C4698B]' : 'w-2 h-2 bg-[#C4698B]/30'}`} />
+                        ))}
+                      </div>
+                    </div>
+                    {/* LEFT side: Product image */}
+                    <div className="relative shrink-0 w-full md:w-80 lg:w-96">
+                      {heroProduct ? (
+                        <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-[#C4698B]/20 cursor-pointer"
+                          style={{ aspectRatio: '3/4', maxHeight: 420 }}
+                          onClick={() => handleProductClick(heroProduct)}>
+                          <img src={heroProduct.image} alt={heroProduct.name} loading="lazy" referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover object-top" />
+                          {/* Soft gradient overlay bottom */}
+                          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(44,24,16,0.4) 0%, transparent 60%)' }} />
+                          {heroProduct.originalPrice && (
+                            <div className="absolute top-4 right-4 bg-[#C4698B] text-white text-xs font-black px-3 py-1.5 rounded-full shadow-md">
+                              -{Math.round(((heroProduct.originalPrice - heroProduct.price) / heroProduct.originalPrice) * 100)}% خصم
+                            </div>
+                          )}
+                          <div className="absolute bottom-4 right-4 left-4">
+                            <p className="text-white font-black text-sm drop-shadow-md line-clamp-1">{heroProduct.name}</p>
+                            <p className="text-white/80 text-xs font-bold mt-0.5">{heroProduct.price.toFixed(2)} د.ب</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="rounded-3xl shadow-2xl shadow-[#C4698B]/20"
+                          style={{ aspectRatio: '3/4', maxHeight: 420, background: 'linear-gradient(135deg, #F8D7E3 0%, #E8B4C8 50%, #C4698B 100%)' }} />
+                      )}
+                      {/* Decorative circle */}
+                      <div className="absolute -top-6 -left-6 w-24 h-24 rounded-full opacity-30 blur-2xl" style={{ background: '#C4698B' }} />
+                      <div className="absolute -bottom-4 -right-4 w-16 h-16 rounded-full opacity-20 blur-xl" style={{ background: '#9A2D55' }} />
+                    </div>
+                  </div>
                 </div>
-                <h1 className="text-white font-black text-lg md:text-2xl leading-tight mb-2">
-                  مخاوير فاخرة بتصاميم حصرية ✦
-                </h1>
-                <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="inline-flex items-center gap-1.5 text-[#2C1810] font-black text-xs px-4 py-2 rounded-full transition-all hover:opacity-90 active:scale-95"
-                  style={{ background: 'linear-gradient(135deg,#E8C4A0,#C4956A)' }}>
-                  تسوّقي الآن
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
               </div>
-              {/* Mini product thumbnails */}
-              {products.filter(p=>!p.isDraft).length > 0 && (
-                <div className="flex gap-1.5 shrink-0">
-                  {products.filter(p=>!p.isDraft).slice(0,3).map((p,i) => (
-                    <button key={p.id} onClick={() => setSelectedProduct(p)}
-                      className={`rounded-xl overflow-hidden border-2 border-white/30 hover:border-white/70 transition-all hover:scale-105 ${i === 1 ? 'w-16 h-20 md:w-20 md:h-24' : 'w-12 h-16 md:w-16 md:h-20 opacity-80'}`}>
-                      <img src={p.image} alt={p.name} loading="lazy" referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-top" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+            );
+          })()}
 
           {/* ── 4. TRUST BADGES ─────────────────────────────────── */}
-          <div className="border-b border-[#F2E4DC] bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-3">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="border-y border-[#F2DCE4] bg-white">
+            <div className="max-w-7xl mx-auto px-4 py-5">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { icon: Globe2, label: 'شحن لجميع الدول', sub: 'دول الخليج والعالم' },
-                  { icon: BadgeCheck, label: 'جودة فاخرة', sub: 'أقمشة مختارة بعناية' },
-                  { icon: ShieldCheck, label: 'دفع آمن 100%', sub: 'مشفر ومحمي' },
-                  { icon: Gift, label: 'تغليف هدايا', sub: 'مجاني مع كل طلب' },
+                  { icon: BadgeCheck, label: 'جودة عالية', sub: 'أقمشة فاخرة مختارة بعناية' },
+                  { icon: Truck,      label: 'شحن سريع',  sub: 'لجميع دول الخليج والعالم' },
+                  { icon: ShieldCheck,label: 'دفع آمن',   sub: 'بيانات مشفرة ومحمية 100%' },
+                  { icon: Phone,      label: 'دعم عملاء', sub: 'نرد خلال دقائق 24/7' },
                 ].map(({ icon: Icon, label, sub }) => (
-                  <div key={label} className="flex items-center gap-2.5 justify-center md:justify-start">
-                    <div className="w-8 h-8 bg-[#F8EDE8] rounded-xl flex items-center justify-center shrink-0">
-                      <Icon className="w-4 h-4 text-[#9A2D55]" />
+                  <div key={label} className="flex flex-col items-center text-center gap-2 p-4 rounded-2xl bg-[#FDF0F3] border border-[#F2DCE4] hover:border-[#C4698B]/30 hover:shadow-sm transition-all">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-[#F2DCE4]">
+                      <Icon className="w-5 h-5 text-[#C4698B]" />
                     </div>
-                    <div className="text-right hidden sm:block">
-                      <p className="text-xs font-bold text-[#2C1810]">{label}</p>
-                      <p className="text-[10px] text-[#8B7B78]">{sub}</p>
+                    <div>
+                      <p className="text-sm font-black text-[#2C1810]">{label}</p>
+                      <p className="text-[10px] text-[#8B7B78] mt-0.5 hidden sm:block">{sub}</p>
                     </div>
-                    <span className="sm:hidden text-xs font-bold text-[#2C1810]">{label}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
+
+          {/* ── 4b. CATEGORY CARDS SECTION ──────────────────────── */}
+          {categories.filter(c => c.id !== 'all').length > 0 && (
+            <section className="py-10 px-4 bg-[#FAFAFA]">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <p className="text-[#C4698B] text-xs font-bold tracking-widest uppercase mb-1">التصنيفات</p>
+                    <h2 className="text-xl md:text-2xl font-black text-[#2C1810]">تسوّقي حسب التصنيف</h2>
+                  </div>
+                </div>
+                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                  {categories.filter(c => c.id !== 'all').map(cat => {
+                    const catProduct = products.filter(p => !p.isDraft && p.category === cat.id)[0];
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => { setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                        className="shrink-0 relative rounded-2xl overflow-hidden group cursor-pointer hover:scale-105 transition-all shadow-md"
+                        style={{ width: 160, height: 200 }}
+                      >
+                        {catProduct ? (
+                          <img src={catProduct.image} alt={cat.name} loading="lazy" referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500" />
+                        ) : (
+                          <div className="w-full h-full" style={{ background: 'linear-gradient(135deg, #F8D7E3 0%, #C4698B 100%)' }} />
+                        )}
+                        {/* Dark gradient overlay */}
+                        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(44,24,16,0.75) 0%, rgba(44,24,16,0.1) 60%, transparent 100%)' }} />
+                        <div className="absolute bottom-0 inset-x-0 p-3 text-right">
+                          <p className="text-white font-black text-sm drop-shadow-md">{cat.name}</p>
+                          <p className="text-white/70 text-[10px] font-medium mt-0.5">
+                            {products.filter(p => !p.isDraft && p.category === cat.id).length} منتج
+                          </p>
+                        </div>
+                        {selectedCategory === cat.id && (
+                          <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#C4698B] flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* ── 5. SEARCH + FILTER BAR ──────────────────────────── */}
           <div className="max-w-7xl mx-auto px-4 pb-6">
@@ -555,9 +640,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           <section id="products-section" className="max-w-7xl mx-auto px-4 pb-16">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-1">كولكشن 2026</p>
+                <p className="text-[#C4698B] text-xs font-bold tracking-widest uppercase mb-1">كولكشن 2026</p>
                 <h2 className="text-2xl font-black text-[#2C1810]">
-                  {selectedCategory === 'all' ? 'الأكثر مبيعاً' : categories.find(c => c.id === selectedCategory)?.name}
+                  {selectedCategory === 'all' ? 'وصل حديثاً' : categories.find(c => c.id === selectedCategory)?.name}
                 </h2>
               </div>
               <span className="text-xs text-[#8B7B78] font-medium bg-[#F8EDE8] px-3 py-1.5 rounded-xl">
