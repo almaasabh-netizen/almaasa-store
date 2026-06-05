@@ -422,124 +422,120 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         <main>
 
           {/* ── 3. HERO SECTION ─────────────────────────────────── */}
-          <section className="relative overflow-hidden bg-[#F5EBE6]">
-            {/* Soft warm gradient bg */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#F5EBE6] via-[#F0E0D6] to-[#EDD5CA]" />
+          <section className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #FDF6F0 0%, #F5E6DC 50%, #EDD5C8 100%)' }}>
 
-            {/* Decorative elements */}
-            <div className="absolute top-0 left-0 w-72 h-72 bg-[#9A2D55]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C4956A]/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+            <div className="max-w-7xl mx-auto px-4 md:px-10">
+              <div className="flex flex-col md:flex-row items-stretch min-h-[480px] md:min-h-[520px]">
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-              <div className="flex flex-col md:flex-row items-center py-10 md:py-16 gap-8">
+                {/* ── TEXT SIDE (right in RTL) ── */}
+                <div className="flex-1 flex flex-col justify-center py-12 md:py-16 text-right order-2 md:order-1 md:pl-10">
 
-                {/* Text content - right side (RTL) */}
-                <div className="flex-1 order-2 md:order-1 fade-up text-center md:text-right">
-                  <div className="inline-flex items-center gap-2 bg-[#9A2D55]/10 border border-[#9A2D55]/20 text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-6">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    ✦ كولكشن 2026 — وصل الجديد
+                  {/* Badge */}
+                  <div className="inline-flex items-center gap-2 self-start mb-5"
+                    style={{ background: 'rgba(154,45,85,0.08)', border: '1px solid rgba(154,45,85,0.18)', borderRadius: 999, padding: '6px 16px' }}>
+                    <Sparkles className="w-3.5 h-3.5 text-[#9A2D55]" />
+                    <span className="text-[#9A2D55] text-xs font-bold tracking-wide">كولكشن 2026 — وصل الجديد</span>
                   </div>
 
-                  <h1 className="text-[2.8rem] md:text-5xl lg:text-[3.8rem] font-black text-[#2C1810] leading-[1.1] mb-5">
-                    مخاوير فاخرة<br />
-                    <span style={{ background: 'linear-gradient(90deg, #9A2D55, #C4956A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  {/* Headline */}
+                  <h1 className="text-4xl md:text-5xl lg:text-[3.6rem] font-black text-[#1E0F0A] leading-[1.15] mb-4">
+                    مخاوير فاخرة
+                    <br />
+                    <span style={{ background: 'linear-gradient(90deg,#9A2D55 0%,#C4956A 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                       بتصاميم حصرية
                     </span>
                   </h1>
 
-                  <p className="text-[#8B7B78] text-sm md:text-base leading-relaxed mb-8 max-w-md mx-auto md:mx-0">
-                    تشكيلة راقية من المخاوير والأقمشة الفاخرة — تصاميم عصرية وجودة استثنائية مع توصيل لجميع دول الخليج والعالم
+                  <p className="text-[#7A6560] text-sm md:text-[15px] leading-relaxed mb-8 max-w-sm">
+                    تشكيلة راقية من المخاوير والأقمشة الفاخرة — جودة استثنائية مع توصيل لجميع دول الخليج والعالم
                   </p>
 
-                  <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                  {/* CTA buttons */}
+                  <div className="flex flex-wrap gap-3">
                     <button
                       onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                      className="bg-[#9A2D55] hover:bg-[#802446] text-white font-bold px-8 py-3.5 rounded-full shadow-lg shadow-[#9A2D55]/20 transition-all hover:-translate-y-0.5 flex items-center gap-2 text-sm"
+                      className="flex items-center gap-2 text-white font-bold text-sm px-7 py-3 rounded-full transition-all hover:-translate-y-0.5"
+                      style={{ background: 'linear-gradient(135deg,#9A2D55,#7A1E40)', boxShadow: '0 8px 24px rgba(154,45,85,0.3)' }}
                     >
                       تسوّقي الآن
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => { setActiveTab('shop'); setSelectedCategory(categories.filter(c=>c.id!=='all')[0]?.id || 'all'); }}
-                      className="bg-white border border-[#E8D5C4] text-[#2C1810] font-semibold px-6 py-3.5 rounded-full hover:border-[#9A2D55] hover:text-[#9A2D55] transition-all text-sm"
+                      onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="flex items-center gap-2 text-[#2C1810] font-semibold text-sm px-7 py-3 rounded-full bg-white border border-[#DFC8B8] hover:border-[#9A2D55] hover:text-[#9A2D55] transition-all"
                     >
                       تصفح المخاوير
                     </button>
                   </div>
 
-                  {/* Stats row */}
-                  <div className="flex gap-6 mt-10 justify-center md:justify-start">
+                  {/* Stats */}
+                  <div className="flex gap-7 mt-10">
                     {[
-                      { num: `${products.length}+`, label: 'منتج فاخر' },
-                      { num: '500+', label: 'عميلة سعيدة' },
-                      { num: '4.9', label: 'تقييم متوسط ⭐' },
-                    ].map(({ num, label }) => (
-                      <div key={label} className="text-center md:text-right">
-                        <p className="text-xl font-black text-[#9A2D55]">{num}</p>
-                        <p className="text-[11px] text-[#8B7B78] font-medium">{label}</p>
+                      { num: `${products.filter(p=>!p.isDraft).length > 0 ? products.filter(p=>!p.isDraft).length : ''}+`, label: 'منتج فاخر' },
+                      { num: '+500', label: 'عميلة سعيدة' },
+                      { num: '4.9', label: 'تقييم متوسط', icon: '⭐' },
+                    ].map(({ num, label, icon }) => (
+                      <div key={label} className="text-right">
+                        <p className="text-2xl font-black text-[#9A2D55] leading-none">{num}</p>
+                        <p className="text-[11px] text-[#9A8580] font-medium mt-0.5">{icon} {label}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Hero image - left side */}
-                <div className="flex-1 order-1 md:order-2 relative flex justify-center items-center">
-                  {products.length > 0 && (
-                    <>
-                      {/* Main image card */}
-                      <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#9A2D55]/15 w-[75%] md:w-[85%] aspect-[3/4] max-h-[72vh]">
-                        <img src={products[0].image} alt="hero product"
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover object-top"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/40 via-transparent to-transparent" />
-                        {/* Price badge */}
-                        <div className="absolute bottom-5 right-5 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-lg">
-                          <p className="text-[10px] text-[#8B7B78] font-medium">{products[0].name.slice(0,18)}...</p>
-                          <p className="text-[#9A2D55] font-black text-base">{products[0].price.toFixed(2)} د.ب</p>
-                        </div>
-                      </div>
-                      {/* Floating second image */}
-                      {products[1] && (
-                        <div className="absolute left-0 bottom-10 w-[38%] aspect-[3/4] rounded-2xl overflow-hidden shadow-xl border-4 border-white hidden md:block">
-                          <img src={products[1].image} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                {/* ── IMAGE SIDE (left in RTL) ── */}
+                <div className="flex-none order-1 md:order-2 flex items-end justify-center md:justify-start pt-8 md:pt-0 md:w-[52%] relative">
+
+                  {/* Decorative circle bg */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full opacity-30 hidden md:block"
+                    style={{ background: 'radial-gradient(circle,#E8C4B0 0%,transparent 70%)' }} />
+
+                  {products.filter(p=>!p.isDraft).length > 0 ? (
+                    <div className="relative flex items-end gap-3 pb-6 md:pb-10 z-10">
+
+                      {/* Secondary image (floats behind, slightly shorter) */}
+                      {products.filter(p=>!p.isDraft)[1] && (
+                        <div className="hidden md:block relative w-[180px] h-[300px] rounded-3xl overflow-hidden shadow-xl flex-shrink-0 mb-6"
+                          style={{ border: '3px solid white' }}>
+                          <img src={products.filter(p=>!p.isDraft)[1].image} alt=""
+                            referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
+                          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(44,24,16,0.3) 0%,transparent 50%)' }} />
                         </div>
                       )}
-                    </>
-                  )}
-                  {products.length === 0 && (
-                    <div className="relative w-[75%] md:w-[85%] aspect-[3/4] max-h-[72vh]">
-                      <div className="w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#9A2D55]/15"
-                        style={{ background: 'linear-gradient(145deg, #F2E4DC 0%, #E8D0C4 40%, #D4A5A0 100%)' }}>
-                        {/* Decorative abaya silhouette */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                          <svg viewBox="0 0 200 300" className="w-3/4 h-3/4 fill-[#9A2D55]">
-                            <ellipse cx="100" cy="40" rx="30" ry="35" />
-                            <path d="M50 80 Q30 100 20 200 Q15 260 100 270 Q185 260 180 200 Q170 100 150 80 Q130 70 100 75 Q70 70 50 80Z" />
-                            <path d="M50 80 Q20 90 5 150 Q0 180 15 185 Q30 150 55 120Z" />
-                            <path d="M150 80 Q180 90 195 150 Q200 180 185 185 Q170 150 145 120Z" />
-                          </svg>
-                        </div>
-                        {/* Logo overlay */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
-                          <img src="/logo.jpg" alt="ألماسة" className="w-40 h-auto object-contain drop-shadow-lg" />
-                          <div className="flex gap-1.5 mt-4">
-                            {[0,1,2,3,4].map(i => <Star key={i} className="w-4 h-4 fill-[#9A2D55] text-[#9A2D55]" />)}
-                          </div>
-                          <p className="text-[#6B3040] font-bold text-sm text-center">أرقى تصاميم المخاوير</p>
+
+                      {/* Main image */}
+                      <div className="relative w-[240px] md:w-[280px] h-[360px] md:h-[420px] rounded-[2rem] overflow-hidden shadow-2xl flex-shrink-0"
+                        style={{ boxShadow: '0 20px 60px rgba(154,45,85,0.2)', border: '3px solid white' }}>
+                        <img src={products.filter(p=>!p.isDraft)[0].image} alt="منتج مميز"
+                          referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
+                        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(44,24,16,0.5) 0%,transparent 55%)' }} />
+                        {/* Price badge on image */}
+                        <div className="absolute bottom-4 right-4 left-4 bg-white/95 backdrop-blur-sm rounded-2xl px-3 py-2 shadow-lg">
+                          <p className="text-[10px] text-[#8B7B78] font-medium truncate">{products.filter(p=>!p.isDraft)[0].name.slice(0,22)}...</p>
+                          <p className="text-[#9A2D55] font-black text-sm">{products.filter(p=>!p.isDraft)[0].price.toFixed(2)} د.ب</p>
                         </div>
                       </div>
-                      {/* Floating badge */}
-                      <div className="absolute bottom-5 right-5 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-lg">
-                        <p className="text-[10px] text-[#8B7B78] font-medium">كولكشن 2026</p>
-                        <p className="text-[#9A2D55] font-black text-base">جديد ✨</p>
+
+                    </div>
+                  ) : (
+                    /* Placeholder when no products */
+                    <div className="relative w-[260px] h-[380px] rounded-[2rem] overflow-hidden shadow-2xl z-10 mb-8"
+                      style={{ background: 'linear-gradient(145deg,#F2E4DC,#D4A5A0)', border: '3px solid white' }}>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                        <img src="/logo.jpg" alt="ألماسة" className="w-36 h-auto object-contain drop-shadow-md" />
+                        <div className="flex gap-1">{[0,1,2,3,4].map(i=><Star key={i} className="w-4 h-4 fill-[#9A2D55] text-[#9A2D55]"/>)}</div>
+                        <p className="text-[#6B3040] font-bold text-sm">أرقى تصاميم المخاوير</p>
                       </div>
                     </div>
                   )}
-                </div>
 
+                </div>
               </div>
             </div>
+
+            {/* Bottom fade */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+              style={{ background: 'linear-gradient(to bottom,transparent,rgba(253,248,245,0.6))' }} />
 
             {/* Trust badges bar */}
             <div className="relative z-10 border-t border-[#E8D5C4] bg-white/60 backdrop-blur-sm">
