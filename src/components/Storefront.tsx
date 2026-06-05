@@ -40,6 +40,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [showWishlist, setShowWishlist] = useState(false);
   const [showReturnPolicy, setShowReturnPolicy] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(0);
@@ -590,6 +593,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     {/* Image */}
                     <div className="relative overflow-hidden bg-[#F8EDE8]" style={{ aspectRatio: '3/4' }}>
                       <img src={product.image} alt={product.name} referrerPolicy="no-referrer"
+                        loading="lazy"
                         onClick={() => handleProductClick(product)}
                         className="w-full h-full object-cover product-img"
                       />
@@ -862,6 +866,52 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
+          {/* ── FAQ SECTION ─────────────────────────────────────── */}
+          {(() => {
+            const faqs = [
+              { q: 'كيف يمكنني تتبع طلبي؟', a: 'بعد إتمام الطلب ستصلك رسالة برقم التتبع. يمكنك أيضاً تتبع طلبك من قسم "تتبع طلبي" في الموقع.' },
+              { q: 'ما هي مناطق الشحن المتاحة؟', a: 'نشحن لجميع دول الخليج العربي (البحرين، السعودية، الكويت، الإمارات، قطر، عُمان) وكثير من دول العالم.' },
+              { q: 'كم يستغرق الشحن؟', a: 'داخل البحرين: 1-2 يوم عمل. دول الخليج: 3-5 أيام. الدول الأخرى: 7-14 يوم عمل.' },
+              { q: 'هل يمكنني إرجاع المنتج؟', a: 'نعم، نقبل الإرجاع خلال 7 أيام من تاريخ الاستلام شريطة أن يكون المنتج بحالته الأصلية غير مستخدم.' },
+              { q: 'ما هي طرق الدفع المتاحة؟', a: 'نقبل Benefit Pay, كي نت, البطاقات الائتمانية (Visa/Mastercard), Apple Pay, والدفع عند الاستلام.' },
+              { q: 'هل يمكن الطلب بمقاسات خاصة؟', a: 'نعم! تواصلي معنا على واتساب للطلبات المخصصة والتفصيل على المقاس.' },
+            ];
+            const [openFaq, setOpenFaq] = React.useState<number | null>(null);
+            return (
+              <section className="py-14 px-4 bg-white" dir="rtl">
+                <div className="max-w-3xl mx-auto">
+                  <div className="text-center mb-10">
+                    <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-2">الأسئلة الشائعة</p>
+                    <h2 className="text-2xl md:text-3xl font-black text-[#2C1810]">كل ما تريدين معرفته</h2>
+                  </div>
+                  <div className="space-y-3">
+                    {faqs.map((faq, i) => (
+                      <div key={i} className="border border-[#F2E4DC] rounded-2xl overflow-hidden">
+                        <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                          className="w-full flex items-center justify-between px-5 py-4 text-right font-bold text-sm text-[#2C1810] hover:bg-[#FDF8F5] transition-colors">
+                          <span>{faq.q}</span>
+                          <span className={`text-[#9A2D55] text-lg font-black transition-transform ${openFaq === i ? 'rotate-45' : ''}`}>+</span>
+                        </button>
+                        {openFaq === i && (
+                          <div className="px-5 pb-4 text-sm text-[#8B7B78] leading-relaxed border-t border-[#F8EDE8] pt-3 bg-[#FDF8F5]">
+                            {faq.a}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-center mt-8">
+                    <p className="text-[#8B7B78] text-sm mb-3">لم تجدي إجابتك؟</p>
+                    <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#9A2D55] text-white font-bold px-6 py-2.5 rounded-full text-sm hover:bg-[#802446] transition-all">
+                      تواصلي معنا على واتساب
+                    </a>
+                  </div>
+                </div>
+              </section>
+            );
+          })()}
+
           {/* ── 10. FINAL CTA ──────────────────────────────────── */}
           <section className="py-16 px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #2C1810 0%, #4A1228 40%, #9A2D55 100%)' }}>
             {/* Decorative diamonds */}
@@ -1086,8 +1136,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[#8B7B78]/60 font-medium">
             <p>© 2026 مخاوير ألماسة — almaasa.bh — جميع الحقوق محفوظة</p>
             <div className="flex items-center gap-4">
-              <button className="hover:text-[#8B7B78] transition-colors">سياسة الخصوصية</button>
-              <button className="hover:text-[#8B7B78] transition-colors">الشروط والأحكام</button>
+              <button onClick={() => setShowAbout(true)} className="hover:text-[#8B7B78] transition-colors">من نحن</button>
+              <button onClick={() => setShowPrivacy(true)} className="hover:text-[#8B7B78] transition-colors">سياسة الخصوصية</button>
+              <button onClick={() => setShowTerms(true)} className="hover:text-[#8B7B78] transition-colors">الشروط والأحكام</button>
               <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-60 transition-opacity">
                 إدارة المتجر
               </button>
@@ -1663,6 +1714,99 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <p className="text-[10px] text-[#8B7B78] mt-4 leading-relaxed font-medium">
                 * القياسات بالبوصة (Inches). للتفصيل بمقاسات خاصة راسليننا على واتساب.
               </p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL: About ────────────────────────────────────── */}
+      <AnimatePresence>
+        {showAbout && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#F2E4DC]">
+                <h3 className="font-black text-[#2C1810] text-lg">من نحن</h3>
+                <button onClick={() => setShowAbout(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-500" /></button>
+              </div>
+              <div className="space-y-4 text-[13px] text-[#5C3830] leading-relaxed font-medium">
+                <div className="flex justify-center mb-4"><img src="/logo.jpg" alt="ألماسة" className="h-16 w-auto object-contain" /></div>
+                <p><strong className="text-[#9A2D55]">بوتيك ألماسة</strong> — وجهتك الأولى لأرقى تصاميم المخاوير والجلابيات الخليجية الفاخرة في مملكة البحرين.</p>
+                <p>نؤمن بأن كل امرأة تستحق أن تبدو استثنائية في كل مناسبة. لذلك نختار بعناية فائقة أجود الأقمشة وأرقى التطريزات لنقدم لك تشكيلة لا مثيل لها من المخاوير التقليدية المعاصرة.</p>
+                <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
+                  <p className="font-black text-[#9A2D55] mb-2">قيمنا</p>
+                  <ul className="space-y-1.5 list-disc list-inside">
+                    <li>الجودة الاستثنائية في كل قطعة</li>
+                    <li>التصاميم الحصرية المصنوعة بحب</li>
+                    <li>خدمة عملاء متميزة ومتاحة دائماً</li>
+                    <li>توصيل سريع وآمن لجميع أنحاء العالم</li>
+                  </ul>
+                </div>
+                <div className="text-center pt-2">
+                  <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#9A2D55] text-white font-bold px-5 py-2.5 rounded-xl text-sm">
+                    تواصلي معنا
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL: Privacy Policy ────────────────────────────── */}
+      <AnimatePresence>
+        {showPrivacy && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#F2E4DC]">
+                <h3 className="font-black text-[#2C1810] text-lg">سياسة الخصوصية</h3>
+                <button onClick={() => setShowPrivacy(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-500" /></button>
+              </div>
+              <div className="space-y-4 text-[13px] text-[#5C3830] leading-relaxed font-medium">
+                {[
+                  { title: 'جمع المعلومات', body: 'نجمع المعلومات التي تزودينا بها عند إتمام طلبك مثل الاسم والعنوان ورقم الهاتف والبريد الإلكتروني.' },
+                  { title: 'استخدام المعلومات', body: 'تُستخدم بياناتك حصراً لمعالجة طلباتك، التواصل معك بشأن طلبك، وتحسين تجربتك في المتجر.' },
+                  { title: 'حماية البيانات', body: 'جميع المعلومات الشخصية محفوظة بأمان ولا تُشارك مع أطراف ثالثة إلا عند الضرورة لإتمام التوصيل.' },
+                  { title: 'ملفات الكوكيز', body: 'نستخدم ملفات الكوكيز لتحسين تجربة التصفح وتذكر تفضيلاتك. يمكنك تعطيلها من إعدادات المتصفح.' },
+                  { title: 'التواصل', body: 'لأي استفسار عن سياسة الخصوصية، تواصلي معنا على واتساب أو البريد الإلكتروني.' },
+                ].map(s => (
+                  <div key={s.title} className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
+                    <p className="font-black text-[#9A2D55] mb-1">{s.title}</p>
+                    <p>{s.body}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL: Terms ────────────────────────────────────── */}
+      <AnimatePresence>
+        {showTerms && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#F2E4DC]">
+                <h3 className="font-black text-[#2C1810] text-lg">الشروط والأحكام</h3>
+                <button onClick={() => setShowTerms(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-500" /></button>
+              </div>
+              <div className="space-y-4 text-[13px] text-[#5C3830] leading-relaxed font-medium">
+                {[
+                  { title: 'قبول الشروط', body: 'باستخدامك هذا الموقع فأنتِ توافقين على الشروط والأحكام الواردة هنا.' },
+                  { title: 'الطلبات والدفع', body: 'يُعتبر الطلب مؤكداً بعد إتمام عملية الدفع. نحتفظ بحق رفض أي طلب في حالات استثنائية مع إعادة المبلغ كاملاً.' },
+                  { title: 'الأسعار', body: 'الأسعار بالدينار البحريني وتشمل ضريبة القيمة المضافة حيثما ينطبق. قد تتغير الأسعار دون إشعار مسبق.' },
+                  { title: 'الشحن والتوصيل', body: 'مواعيد التوصيل تقريبية وقد تتأثر بظروف خارجة عن إرادتنا. نحن غير مسؤولين عن تأخيرات شركات الشحن.' },
+                  { title: 'الملكية الفكرية', body: 'جميع المحتويات (صور، نصوص، تصاميم) ملك حصري لبوتيك ألماسة ومحمية بقوانين حقوق النشر.' },
+                ].map(s => (
+                  <div key={s.title} className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
+                    <p className="font-black text-[#9A2D55] mb-1">{s.title}</p>
+                    <p>{s.body}</p>
+                  </div>
+                ))}
+              </div>
             </motion.div>
           </div>
         )}
