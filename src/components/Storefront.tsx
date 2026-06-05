@@ -422,146 +422,108 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         <main>
 
           {/* ── 3. HERO SECTION ─────────────────────────────────── */}
-          <section className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #FDF6F0 0%, #F5E6DC 50%, #EDD5C8 100%)' }}>
+          <section className="relative overflow-hidden" dir="rtl"
+            style={{ background: 'linear-gradient(160deg,#3B0D20 0%,#6B1E3A 45%,#9A2D55 100%)' }}>
 
-            <div className="max-w-7xl mx-auto px-4 md:px-10">
-              <div className="flex flex-col md:flex-row items-stretch min-h-[480px] md:min-h-[520px]">
+            {/* Subtle pattern overlay */}
+            <div className="absolute inset-0 opacity-10"
+              style={{ backgroundImage: 'radial-gradient(circle at 20% 80%,#C4956A 0%,transparent 50%), radial-gradient(circle at 80% 20%,#F2E4DC 0%,transparent 50%)' }} />
 
-                {/* ── TEXT SIDE (right in RTL) ── */}
-                <div className="flex-1 flex flex-col justify-center py-12 md:py-16 text-right order-2 md:order-1 md:pl-10">
+            <div className="relative z-10 max-w-6xl mx-auto px-5 md:px-10 py-12 md:py-16">
 
-                  {/* Badge */}
-                  <div className="inline-flex items-center gap-2 self-start mb-5"
-                    style={{ background: 'rgba(154,45,85,0.08)', border: '1px solid rgba(154,45,85,0.18)', borderRadius: 999, padding: '6px 16px' }}>
-                    <Sparkles className="w-3.5 h-3.5 text-[#9A2D55]" />
-                    <span className="text-[#9A2D55] text-xs font-bold tracking-wide">كولكشن 2026 — وصل الجديد</span>
-                  </div>
-
-                  {/* Headline */}
-                  <h1 className="text-4xl md:text-5xl lg:text-[3.6rem] font-black text-[#1E0F0A] leading-[1.15] mb-4">
-                    مخاوير فاخرة
-                    <br />
-                    <span style={{ background: 'linear-gradient(90deg,#9A2D55 0%,#C4956A 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                      بتصاميم حصرية
-                    </span>
-                  </h1>
-
-                  <p className="text-[#7A6560] text-sm md:text-[15px] leading-relaxed mb-8 max-w-sm">
-                    تشكيلة راقية من المخاوير والأقمشة الفاخرة — جودة استثنائية مع توصيل لجميع دول الخليج والعالم
-                  </p>
-
-                  {/* CTA buttons */}
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                      className="flex items-center gap-2 text-white font-bold text-sm px-7 py-3 rounded-full transition-all hover:-translate-y-0.5"
-                      style={{ background: 'linear-gradient(135deg,#9A2D55,#7A1E40)', boxShadow: '0 8px 24px rgba(154,45,85,0.3)' }}
-                    >
-                      تسوّقي الآن
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                      className="flex items-center gap-2 text-[#2C1810] font-semibold text-sm px-7 py-3 rounded-full bg-white border border-[#DFC8B8] hover:border-[#9A2D55] hover:text-[#9A2D55] transition-all"
-                    >
-                      تصفح المخاوير
-                    </button>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex gap-7 mt-10">
-                    {[
-                      { num: `${products.filter(p=>!p.isDraft).length > 0 ? products.filter(p=>!p.isDraft).length : ''}+`, label: 'منتج فاخر' },
-                      { num: '+500', label: 'عميلة سعيدة' },
-                      { num: '4.9', label: 'تقييم متوسط', icon: '⭐' },
-                    ].map(({ num, label, icon }) => (
-                      <div key={label} className="text-right">
-                        <p className="text-2xl font-black text-[#9A2D55] leading-none">{num}</p>
-                        <p className="text-[11px] text-[#9A8580] font-medium mt-0.5">{icon} {label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* ── IMAGE SIDE (left in RTL) ── */}
-                <div className="flex-none order-1 md:order-2 flex items-end justify-center md:justify-start pt-8 md:pt-0 md:w-[52%] relative">
-
-                  {/* Decorative circle bg */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full opacity-30 hidden md:block"
-                    style={{ background: 'radial-gradient(circle,#E8C4B0 0%,transparent 70%)' }} />
-
-                  {products.filter(p=>!p.isDraft).length > 0 ? (
-                    <div className="relative flex items-end gap-3 pb-6 md:pb-10 z-10">
-
-                      {/* Secondary image (floats behind, slightly shorter) */}
-                      {products.filter(p=>!p.isDraft)[1] && (
-                        <div className="hidden md:block relative w-[180px] h-[300px] rounded-3xl overflow-hidden shadow-xl flex-shrink-0 mb-6"
-                          style={{ border: '3px solid white' }}>
-                          <img src={products.filter(p=>!p.isDraft)[1].image} alt=""
-                            referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
-                          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(44,24,16,0.3) 0%,transparent 50%)' }} />
-                        </div>
-                      )}
-
-                      {/* Main image */}
-                      <div className="relative w-[240px] md:w-[280px] h-[360px] md:h-[420px] rounded-[2rem] overflow-hidden shadow-2xl flex-shrink-0"
-                        style={{ boxShadow: '0 20px 60px rgba(154,45,85,0.2)', border: '3px solid white' }}>
-                        <img src={products.filter(p=>!p.isDraft)[0].image} alt="منتج مميز"
-                          referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
-                        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(44,24,16,0.5) 0%,transparent 55%)' }} />
-                        {/* Price badge on image */}
-                        <div className="absolute bottom-4 right-4 left-4 bg-white/95 backdrop-blur-sm rounded-2xl px-3 py-2 shadow-lg">
-                          <p className="text-[10px] text-[#8B7B78] font-medium truncate">{products.filter(p=>!p.isDraft)[0].name.slice(0,22)}...</p>
-                          <p className="text-[#9A2D55] font-black text-sm">{products.filter(p=>!p.isDraft)[0].price.toFixed(2)} د.ب</p>
-                        </div>
-                      </div>
-
-                    </div>
-                  ) : (
-                    /* Placeholder when no products */
-                    <div className="relative w-[260px] h-[380px] rounded-[2rem] overflow-hidden shadow-2xl z-10 mb-8"
-                      style={{ background: 'linear-gradient(145deg,#F2E4DC,#D4A5A0)', border: '3px solid white' }}>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                        <img src="/logo.jpg" alt="ألماسة" className="w-36 h-auto object-contain drop-shadow-md" />
-                        <div className="flex gap-1">{[0,1,2,3,4].map(i=><Star key={i} className="w-4 h-4 fill-[#9A2D55] text-[#9A2D55]"/>)}</div>
-                        <p className="text-[#6B3040] font-bold text-sm">أرقى تصاميم المخاوير</p>
-                      </div>
-                    </div>
-                  )}
-
+              {/* ── WELCOME badge ── */}
+              <div className="flex justify-center mb-6">
+                <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/90 text-[11px] font-bold px-4 py-2 rounded-full backdrop-blur-sm">
+                  <Sparkles className="w-3 h-3 text-[#C4956A]" />
+                  أهلاً وسهلاً في بوتيك ألماسة ✦
                 </div>
               </div>
-            </div>
 
-            {/* Bottom fade */}
-            <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
-              style={{ background: 'linear-gradient(to bottom,transparent,rgba(253,248,245,0.6))' }} />
+              {/* ── MAIN TEXT centered ── */}
+              <div className="text-center mb-8">
+                <h1 className="text-4xl md:text-[3.4rem] lg:text-6xl font-black text-white leading-[1.15] mb-4" style={{ fontFamily: "'Cairo', serif" }}>
+                  ذوقك الرفيع
+                  <br />
+                  <span style={{ color: '#E8C4A0' }}>يستحق الأفضل</span>
+                </h1>
+                <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-lg mx-auto font-medium">
+                  اكتشفي أرقى تشكيلات المخاوير والجلابيات الفاخرة — مصمّمة بعناية لتُبهر في كل مناسبة
+                </p>
+              </div>
 
-            {/* Trust badges bar */}
-            <div className="relative z-10 border-t border-[#E8D5C4] bg-white/60 backdrop-blur-sm">
-              <div className="max-w-7xl mx-auto px-4 py-3">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  {[
-                    { icon: Globe2, label: 'شحن لجميع الدول', sub: 'دول الخليج والعالم' },
-                    { icon: BadgeCheck, label: 'جودة فاخرة', sub: 'أقمشة مختارة بعناية' },
-                    { icon: ShieldCheck, label: 'دفع آمن 100%', sub: 'مشفر ومحمي' },
-                    { icon: Gift, label: 'تغليف هدايا', sub: 'مجاني مع كل طلب' },
-                  ].map(({ icon: Icon, label, sub }) => (
-                    <div key={label} className="flex items-center gap-2.5 justify-center md:justify-start">
-                      <div className="w-8 h-8 bg-[#F8EDE8] rounded-xl flex items-center justify-center shrink-0">
-                        <Icon className="w-4 h-4 text-[#9A2D55]" />
-                      </div>
-                      <div className="text-right hidden sm:block">
-                        <p className="text-xs font-bold text-[#2C1810]">{label}</p>
-                        <p className="text-[10px] text-[#8B7B78]">{sub}</p>
-                      </div>
-                      <span className="sm:hidden text-xs font-bold text-[#2C1810]">{label}</span>
-                    </div>
+              {/* ── CTA BUTTONS centered ── */}
+              <div className="flex flex-wrap gap-3 justify-center mb-10">
+                <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="flex items-center gap-2 font-bold text-sm px-8 py-3.5 rounded-full transition-all hover:scale-105 active:scale-95"
+                  style={{ background: 'linear-gradient(135deg,#C4956A,#A07040)', color: 'white', boxShadow: '0 8px 28px rgba(196,149,106,0.45)' }}>
+                  تسوّقي الآن
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="flex items-center gap-2 text-white font-semibold text-sm px-8 py-3.5 rounded-full border border-white/30 hover:bg-white/10 backdrop-blur-sm transition-all">
+                  عرض التشكيلة
+                </button>
+              </div>
+
+              {/* ── PRODUCT IMAGES strip ── */}
+              {products.filter(p=>!p.isDraft).length > 0 && (
+                <div className="flex gap-3 justify-center items-end overflow-hidden">
+                  {products.filter(p=>!p.isDraft).slice(0,4).map((p, i) => (
+                    <button key={p.id} onClick={() => setSelectedProduct(p)}
+                      className={`relative rounded-2xl overflow-hidden flex-shrink-0 transition-all hover:scale-105 cursor-pointer shadow-2xl ${
+                        i === 1 || i === 2 ? 'w-[22vw] max-w-[130px] h-[28vw] max-h-[168px]' : 'w-[18vw] max-w-[108px] h-[23vw] max-h-[138px] opacity-80'
+                      }`}
+                      style={{ border: '2px solid rgba(255,255,255,0.25)' }}>
+                      <img src={p.image} alt={p.name} referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover object-top" />
+                      <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(30,10,5,0.6) 0%,transparent 55%)' }} />
+                      <p className="absolute bottom-1.5 right-2 left-2 text-white text-[9px] font-bold truncate text-right">{p.price.toFixed(2)} د.ب</p>
+                    </button>
                   ))}
                 </div>
+              )}
+
+              {/* ── STATS strip ── */}
+              <div className="flex justify-center gap-8 mt-8 pt-6 border-t border-white/10">
+                {[
+                  { num: '500+', label: 'عميلة راضية' },
+                  { num: '4.9 ⭐', label: 'تقييم متوسط' },
+                  { num: '🚚', label: 'توصيل للخليج والعالم' },
+                ].map(({ num, label }) => (
+                  <div key={label} className="text-center">
+                    <p className="text-white font-black text-lg leading-none">{num}</p>
+                    <p className="text-white/50 text-[10px] font-medium mt-0.5">{label}</p>
+                  </div>
+                ))}
               </div>
+
             </div>
           </section>
+
+          {/* ── 4. TRUST BADGES ─────────────────────────────────── */}
+          <div className="border-b border-[#F2E4DC] bg-white">
+            <div className="max-w-7xl mx-auto px-4 py-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                {[
+                  { icon: Globe2, label: 'شحن لجميع الدول', sub: 'دول الخليج والعالم' },
+                  { icon: BadgeCheck, label: 'جودة فاخرة', sub: 'أقمشة مختارة بعناية' },
+                  { icon: ShieldCheck, label: 'دفع آمن 100%', sub: 'مشفر ومحمي' },
+                  { icon: Gift, label: 'تغليف هدايا', sub: 'مجاني مع كل طلب' },
+                ].map(({ icon: Icon, label, sub }) => (
+                  <div key={label} className="flex items-center gap-2.5 justify-center md:justify-start">
+                    <div className="w-8 h-8 bg-[#F8EDE8] rounded-xl flex items-center justify-center shrink-0">
+                      <Icon className="w-4 h-4 text-[#9A2D55]" />
+                    </div>
+                    <div className="text-right hidden sm:block">
+                      <p className="text-xs font-bold text-[#2C1810]">{label}</p>
+                      <p className="text-[10px] text-[#8B7B78]">{sub}</p>
+                    </div>
+                    <span className="sm:hidden text-xs font-bold text-[#2C1810]">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
 
           {/* ── 5. SEARCH + FILTER BAR ──────────────────────────── */}
