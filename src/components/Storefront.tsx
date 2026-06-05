@@ -304,92 +304,121 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       </div>
 
       {/* ── 1. ANNOUNCEMENT BAR ──────────────────────────────────── */}
-      <div style={{ background: 'linear-gradient(90deg, #9A2D55 0%, #6B1E3A 50%, #9A2D55 100%)' }} className="text-white py-2 px-4 overflow-hidden">
-        <div className="flex items-center justify-center gap-6 text-[11px] font-bold tracking-wide whitespace-nowrap">
-          <span className="flex items-center gap-1.5">✨ مخاوير العيد وصلت! تسوّقي الآن</span>
-          <span className="text-[#E8D5C4] text-[8px]">◆</span>
-          <span className="flex items-center gap-1.5">🌍 توصيل دولي سريع لجميع دول الخليج والعالم</span>
-          <span className="text-[#E8D5C4] text-[8px]">◆</span>
-          <span className="flex items-center gap-1.5">🎁 شحن مجاني للطلبات فوق 50 د.ب</span>
-          <span className="text-[#E8D5C4] text-[8px] hidden md:inline">◆</span>
-          <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-60 text-[10px] transition-opacity hidden md:inline">إدارة المتجر</button>
+      <div style={{ background: 'linear-gradient(90deg, #C4698B 0%, #9A2D55 50%, #C4698B 100%)' }} className="text-white py-2 px-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          {/* Social icons - right side (RTL = visually right) */}
+          <div className="flex items-center gap-3">
+            <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-white/90 hover:text-white transition-colors">
+              <Instagram className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-bold hidden sm:inline">إنستقرام</span>
+            </a>
+            {/* Snapchat icon */}
+            <a href="#" className="flex items-center gap-1 text-white/90 hover:text-white transition-colors">
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12.206 1c-.576 0-3.545.163-5.122 3.151-.512.973-.39 2.669-.334 3.63l-.006.001c-.03.176-.153.33-.328.33a.61.61 0 0 1-.14-.019 2.36 2.36 0 0 0-.544-.067c-.666 0-1.368.335-1.368.906 0 .52.505.87 1.315 1.085.057.015.112.03.165.047.424.122.775.412.668.88-.3 1.298-2.175 3.573-2.175 3.573l-.002.003c-.283.355-.33.823-.12 1.23.27.52.849.79 1.52.726.136-.013.268-.025.395-.025.406 0 .755.08 1.043.237.592.328.977.945 1.176 1.483.127.344.33.524.62.522.084 0 .178-.017.277-.05.3-.095.627-.148.97-.148.26 0 .51.028.747.083.474.11.819.21 1.14.21.271 0 .516-.069.776-.21.237-.13.49-.253.849-.329.213-.045.448-.069.696-.069.269 0 .549.029.835.087.117.024.228.036.332.036.312-.002.534-.17.665-.528.198-.539.58-1.152 1.17-1.479.286-.157.633-.237 1.041-.237.128 0 .26.012.395.025.672.064 1.25-.207 1.52-.726.21-.406.163-.875-.12-1.23l-.002-.003S17.36 12.4 17.06 11.102c-.107-.468.244-.758.668-.88.053-.017.108-.032.165-.047.81-.214 1.315-.564 1.315-1.085 0-.571-.702-.906-1.368-.906-.19 0-.374.025-.544.067a.61.61 0 0 1-.14.019c-.175 0-.299-.154-.328-.33l-.006-.001c.055-.961.178-2.657-.334-3.63C15.711 1.163 12.782 1 12.206 1z"/></svg>
+              <span className="text-[10px] font-bold hidden sm:inline">سناب</span>
+            </a>
+            {/* TikTok icon */}
+            <a href="#" className="flex items-center gap-1 text-white/90 hover:text-white transition-colors">
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.93a8.18 8.18 0 0 0 4.78 1.52V7.01a4.85 4.85 0 0 1-1.01-.32z"/></svg>
+              <span className="text-[10px] font-bold hidden sm:inline">تيك توك</span>
+            </a>
+          </div>
+
+          {/* Marquee text center */}
+          <div className="flex-1 overflow-hidden">
+            <div className="flex items-center justify-center gap-6 text-[10px] font-bold tracking-wide whitespace-nowrap animate-none">
+              <span>✨ مخاوير العيد وصلت! تسوّقي الآن</span>
+              <span className="text-white/50 text-[8px]">◆</span>
+              <span>🌍 توصيل سريع لجميع دول الخليج</span>
+              <span className="text-white/50 text-[8px]">◆</span>
+              <span>🎁 شحن مجاني فوق 50 د.ب</span>
+            </div>
+          </div>
+
+          {/* Links - left side (RTL = visually left) */}
+          <div className="flex items-center gap-3">
+            <button onClick={() => setActiveTab('tracking')} className="text-[10px] font-bold text-white/90 hover:text-white transition-colors whitespace-nowrap">
+              تتبع طلبك
+            </button>
+            <span className="text-white/30 text-[8px]">|</span>
+            <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer" className="text-[10px] font-bold text-white/90 hover:text-white transition-colors whitespace-nowrap">
+              تواصل معنا
+            </a>
+            <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-60 text-[10px] transition-opacity hidden md:inline">•</button>
+          </div>
         </div>
       </div>
 
       {/* ── 2. HEADER ────────────────────────────────────────────── */}
       <header className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/98 backdrop-blur-lg shadow-lg border-b border-[#F2E4DC]' : 'bg-white/95 backdrop-blur-sm border-b border-[#F2E4DC]'}`}>
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between h-[4.5rem]">
+          <div className="flex items-center justify-between h-[4.5rem] gap-4">
 
-            {/* Desktop: Logo first + Nav (RTL = right side) */}
-            <div className="hidden md:flex items-center gap-1">
-              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex items-center ml-2">
-                <img src="/logo.jpg" alt="ألماسة" className="h-11 w-auto object-contain" />
+            {/* Desktop: Nav links (RTL = right side) */}
+            <nav className="hidden md:flex items-center gap-1">
+              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}
+                className={`px-3 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === 'shop' && selectedCategory === 'all' ? 'text-[#C4698B] bg-[#FDF0F3]' : 'text-[#2C1810] hover:text-[#C4698B] hover:bg-[#FDF0F3]'}`}>
+                الرئيسية
               </button>
-              <div className="w-px h-6 bg-[#F2E4DC] mx-2" />
-              <nav className="flex items-center gap-3">
-                {/* الكل */}
-                <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="flex flex-col items-center gap-1 group">
-                  <div className={`w-10 h-10 rounded-full p-0.5 transition-all ${selectedCategory === 'all' && activeTab === 'shop' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
-                    <div className={`w-full h-full rounded-full flex items-center justify-center text-[10px] font-black ${selectedCategory === 'all' && activeTab === 'shop' ? 'bg-[#FDF8F5] text-[#9A2D55]' : 'bg-white text-[#8B7B78]'}`}>الكل</div>
-                  </div>
+              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="px-3 py-2 rounded-xl text-sm font-bold text-[#2C1810] hover:text-[#C4698B] hover:bg-[#FDF0F3] transition-all">
+                المخاوير
+              </button>
+              {categories.filter(c => c.id !== 'all').slice(0, 3).map(cat => (
+                <button key={cat.id}
+                  onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className={`px-3 py-2 rounded-xl text-sm font-bold transition-all ${selectedCategory === cat.id && activeTab === 'shop' ? 'text-[#C4698B] bg-[#FDF0F3]' : 'text-[#2C1810] hover:text-[#C4698B] hover:bg-[#FDF0F3]'}`}>
+                  {cat.name}
                 </button>
-                {/* Categories */}
-                {categories.filter(c => c.id !== 'all').slice(0, 5).map(cat => (
-                  <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                    className="flex flex-col items-center gap-1 group">
-                    <div className={`w-10 h-10 rounded-full p-0.5 transition-all ${selectedCategory === cat.id && activeTab === 'shop' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
-                      <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-sm">⚜️</div>
-                    </div>
-                    <span className={`text-[9px] font-bold text-center leading-tight max-w-[44px] line-clamp-1 ${selectedCategory === cat.id && activeTab === 'shop' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>{cat.name}</span>
-                  </button>
-                ))}
-                {/* تتبع طلبي */}
-                <button onClick={() => setActiveTab('tracking')} className="flex flex-col items-center gap-1 group">
-                  <div className={`w-10 h-10 rounded-full p-0.5 transition-all ${activeTab === 'tracking' ? 'bg-gradient-to-tr from-[#9A2D55] to-[#C4956A]' : 'bg-[#F2E4DC] group-hover:bg-gradient-to-tr group-hover:from-[#9A2D55] group-hover:to-[#C4956A]'}`}>
-                    <div className={`w-full h-full rounded-full flex items-center justify-center ${activeTab === 'tracking' ? 'bg-[#FDF8F5]' : 'bg-white'}`}>
-                      <Truck className={`w-4 h-4 ${activeTab === 'tracking' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`} />
-                    </div>
-                  </div>
-                  <span className={`text-[9px] font-bold ${activeTab === 'tracking' ? 'text-[#9A2D55]' : 'text-[#8B7B78]'}`}>تتبع</span>
-                </button>
-              </nav>
-            </div>
+              ))}
+              <button onClick={() => setShowAbout(true)}
+                className="px-3 py-2 rounded-xl text-sm font-bold text-[#2C1810] hover:text-[#C4698B] hover:bg-[#FDF0F3] transition-all">
+                عن المتجر
+              </button>
+            </nav>
 
-            {/* Mobile: logo + hamburger */}
-            <div className="flex md:hidden items-center gap-2">
-              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}>
-                <img src="/logo.jpg" alt="ألماسة" className="h-10 w-auto object-contain" />
-              </button>
-              <button className="p-2 text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                <Menu className="w-5 h-5" />
-              </button>
-            </div>
+            {/* Logo - center */}
+            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="flex items-center gap-2 shrink-0">
+              <img src="/logo.jpg" alt="ألماسة" className="h-11 w-auto object-contain" />
+            </button>
 
             {/* Actions - left */}
             <div className="flex items-center gap-0.5 md:gap-1">
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all hidden md:flex" onClick={() => setSearchQuery('')}>
-                <Search className="w-4.5 h-4.5" />
-              </button>
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all hidden md:flex relative" onClick={() => setShowReviewsPopup(true)}>
-                <Star className="w-4.5 h-4.5" />
-              </button>
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all relative" onClick={() => setIsCartOpen(true)}>
+              {/* Search bar on desktop */}
+              <div className="hidden md:flex items-center bg-[#FDF0F3] border border-[#F2DCE4] rounded-xl px-3 py-1.5 gap-2 mr-1">
+                <Search className="w-3.5 h-3.5 text-[#C4698B] shrink-0" />
+                <input
+                  type="text"
+                  placeholder="ابحثي..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="bg-transparent text-[#2C1810] text-xs w-28 focus:outline-none font-medium placeholder-[#C4698B]/50"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="text-[#8B7B78] hover:text-[#9A2D55]">
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              <button className="p-2 text-[#5C3830] hover:text-[#C4698B] hover:bg-[#FDF0F3] rounded-xl transition-all relative" onClick={() => setIsCartOpen(true)}>
                 <ShoppingBag className="w-5 h-5" />
                 {cart.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-[#9A2D55] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#C4698B] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                     {cart.reduce((s, i) => s + i.quantity, 0)}
                   </span>
                 )}
               </button>
-              <button className="p-2 text-[#5C3830] hover:text-[#9A2D55] hover:bg-[#F8EDE8] rounded-xl transition-all relative" onClick={() => setShowWishlist(true)}>
-                <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-[#9A2D55] text-[#9A2D55]' : ''}`} />
+              <button className="p-2 text-[#5C3830] hover:text-[#C4698B] hover:bg-[#FDF0F3] rounded-xl transition-all relative" onClick={() => setShowWishlist(true)}>
+                <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-[#C4698B] text-[#C4698B]' : ''}`} />
                 {wishlist.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-[#C4956A] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#9A2D55] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                     {wishlist.length}
                   </span>
                 )}
+              </button>
+              {/* Mobile hamburger */}
+              <button className="p-2 text-[#9A2D55] hover:bg-[#FDF0F3] rounded-xl transition-colors md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                <Menu className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -400,6 +429,12 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                 className="md:hidden border-t border-[#F2E4DC] overflow-hidden bg-white">
                 <div className="py-4 space-y-2 px-2">
+                  {/* Mobile search */}
+                  <div className="flex items-center bg-[#FDF0F3] border border-[#F2DCE4] rounded-xl px-3 py-2 gap-2 mb-3 mx-2">
+                    <Search className="w-3.5 h-3.5 text-[#C4698B] shrink-0" />
+                    <input type="text" placeholder="ابحثي..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                      className="bg-transparent text-[#2C1810] text-sm flex-1 focus:outline-none font-medium placeholder-[#C4698B]/50" />
+                  </div>
                   {[
                     { label: 'الرئيسية', action: () => { setActiveTab('shop'); setSelectedCategory('all'); setMobileMenuOpen(false); } },
                     ...categories.filter(c => c.id !== 'all').map(cat => ({
@@ -409,7 +444,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     { label: 'تتبع الطلب ✈️', action: () => { setActiveTab('tracking'); setMobileMenuOpen(false); } },
                     { label: 'آراء الزبائن ⭐', action: () => { setShowReviewsPopup(true); setMobileMenuOpen(false); } },
                   ].map((item, i) => (
-                    <button key={i} onClick={item.action} className="w-full text-right py-2.5 px-4 rounded-xl text-sm font-semibold text-[#5C3830] hover:bg-[#F8EDE8] hover:text-[#9A2D55] transition-colors">
+                    <button key={i} onClick={item.action} className="w-full text-right py-2.5 px-4 rounded-xl text-sm font-semibold text-[#5C3830] hover:bg-[#FDF0F3] hover:text-[#C4698B] transition-colors">
                       {item.label}
                     </button>
                   ))}
