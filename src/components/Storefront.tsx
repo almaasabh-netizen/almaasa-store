@@ -424,84 +424,40 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       {activeTab === 'shop' && (
         <main>
 
-          {/* ── 3. HERO SECTION ─────────────────────────────────── */}
-          <section className="relative overflow-hidden" dir="rtl"
-            style={{ background: 'linear-gradient(160deg,#3B0D20 0%,#6B1E3A 45%,#9A2D55 100%)' }}>
-
-            {/* Subtle pattern overlay */}
-            <div className="absolute inset-0 opacity-10"
-              style={{ backgroundImage: 'radial-gradient(circle at 20% 80%,#C4956A 0%,transparent 50%), radial-gradient(circle at 80% 20%,#F2E4DC 0%,transparent 50%)' }} />
-
-            <div className="relative z-10 max-w-6xl mx-auto px-5 md:px-10 py-12 md:py-16">
-
-              {/* ── WELCOME badge ── */}
-              <div className="flex justify-center mb-6">
-                <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/90 text-[11px] font-bold px-4 py-2 rounded-full backdrop-blur-sm">
-                  <Sparkles className="w-3 h-3 text-[#C4956A]" />
-                  أهلاً وسهلاً في بوتيك ألماسة ✦
+          {/* ── 3. HERO BANNER (compact) ─────────────────────── */}
+          <div className="mx-4 mt-3 mb-1 rounded-2xl overflow-hidden" dir="rtl"
+            style={{ background: 'linear-gradient(110deg,#6B1E3A 0%,#9A2D55 60%,#B5426A 100%)', minHeight: 110 }}>
+            <div className="flex items-center justify-between px-5 py-4 gap-4">
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Sparkles className="w-3 h-3 text-[#E8C4A0] shrink-0" />
+                  <span className="text-[#E8C4A0] text-[10px] font-bold">كولكشن 2026 — وصل الجديد</span>
                 </div>
-              </div>
-
-              {/* ── MAIN TEXT centered ── */}
-              <div className="text-center mb-8">
-                <h1 className="text-4xl md:text-[3.4rem] lg:text-6xl font-black text-white leading-[1.15] mb-4" style={{ fontFamily: "'Cairo', serif" }}>
-                  ذوقك الرفيع
-                  <br />
-                  <span style={{ color: '#E8C4A0' }}>يستحق الأفضل</span>
+                <h1 className="text-white font-black text-lg md:text-2xl leading-tight mb-2">
+                  مخاوير فاخرة بتصاميم حصرية ✦
                 </h1>
-                <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-lg mx-auto font-medium">
-                  اكتشفي أرقى تشكيلات المخاوير والجلابيات الفاخرة — مصمّمة بعناية لتُبهر في كل مناسبة
-                </p>
-              </div>
-
-              {/* ── CTA BUTTONS centered ── */}
-              <div className="flex flex-wrap gap-3 justify-center mb-10">
                 <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="flex items-center gap-2 font-bold text-sm px-8 py-3.5 rounded-full transition-all hover:scale-105 active:scale-95"
-                  style={{ background: 'linear-gradient(135deg,#C4956A,#A07040)', color: 'white', boxShadow: '0 8px 28px rgba(196,149,106,0.45)' }}>
+                  className="inline-flex items-center gap-1.5 text-[#2C1810] font-black text-xs px-4 py-2 rounded-full transition-all hover:opacity-90 active:scale-95"
+                  style={{ background: 'linear-gradient(135deg,#E8C4A0,#C4956A)' }}>
                   تسوّقي الآن
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="flex items-center gap-2 text-white font-semibold text-sm px-8 py-3.5 rounded-full border border-white/30 hover:bg-white/10 backdrop-blur-sm transition-all">
-                  عرض التشكيلة
+                  <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
               </div>
-
-              {/* ── PRODUCT IMAGES strip ── */}
+              {/* Mini product thumbnails */}
               {products.filter(p=>!p.isDraft).length > 0 && (
-                <div className="flex gap-3 justify-center items-end overflow-hidden">
-                  {products.filter(p=>!p.isDraft).slice(0,4).map((p, i) => (
+                <div className="flex gap-1.5 shrink-0">
+                  {products.filter(p=>!p.isDraft).slice(0,3).map((p,i) => (
                     <button key={p.id} onClick={() => setSelectedProduct(p)}
-                      className={`relative rounded-2xl overflow-hidden flex-shrink-0 transition-all hover:scale-105 cursor-pointer shadow-2xl ${
-                        i === 1 || i === 2 ? 'w-[22vw] max-w-[130px] h-[28vw] max-h-[168px]' : 'w-[18vw] max-w-[108px] h-[23vw] max-h-[138px] opacity-80'
-                      }`}
-                      style={{ border: '2px solid rgba(255,255,255,0.25)' }}>
-                      <img src={p.image} alt={p.name} referrerPolicy="no-referrer"
+                      className={`rounded-xl overflow-hidden border-2 border-white/30 hover:border-white/70 transition-all hover:scale-105 ${i === 1 ? 'w-16 h-20 md:w-20 md:h-24' : 'w-12 h-16 md:w-16 md:h-20 opacity-80'}`}>
+                      <img src={p.image} alt={p.name} loading="lazy" referrerPolicy="no-referrer"
                         className="w-full h-full object-cover object-top" />
-                      <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(30,10,5,0.6) 0%,transparent 55%)' }} />
-                      <p className="absolute bottom-1.5 right-2 left-2 text-white text-[9px] font-bold truncate text-right">{p.price.toFixed(2)} د.ب</p>
                     </button>
                   ))}
                 </div>
               )}
-
-              {/* ── STATS strip ── */}
-              <div className="flex justify-center gap-8 mt-8 pt-6 border-t border-white/10">
-                {[
-                  { num: '500+', label: 'عميلة راضية' },
-                  { num: '4.9 ⭐', label: 'تقييم متوسط' },
-                  { num: '🚚', label: 'توصيل للخليج والعالم' },
-                ].map(({ num, label }) => (
-                  <div key={label} className="text-center">
-                    <p className="text-white font-black text-lg leading-none">{num}</p>
-                    <p className="text-white/50 text-[10px] font-medium mt-0.5">{label}</p>
-                  </div>
-                ))}
-              </div>
-
             </div>
-          </section>
+          </div>
 
           {/* ── 4. TRUST BADGES ─────────────────────────────────── */}
           <div className="border-b border-[#F2E4DC] bg-white">
