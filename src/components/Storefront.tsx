@@ -306,22 +306,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       {/* ── 1. ANNOUNCEMENT BAR ──────────────────────────────────── */}
       <div className="text-white py-2 px-4 text-[11px] font-bold" style={{ background: 'linear-gradient(90deg,#C4698B 0%,#A8456E 50%,#C4698B 100%)' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-          {/* Social icons - RIGHT (RTL) */}
-          <div className="flex items-center gap-3 shrink-0">
-            <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity"><Instagram className="w-3.5 h-3.5" /></a>
-            <a href="#" className="hover:opacity-80 transition-opacity">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12.206 1c-.576 0-3.545.163-5.122 3.151-.512.973-.39 2.669-.334 3.63l-.006.001c-.03.176-.153.33-.328.33a.61.61 0 0 1-.14-.019 2.36 2.36 0 0 0-.544-.067c-.666 0-1.368.335-1.368.906 0 .52.505.87 1.315 1.085.057.015.112.03.165.047.424.122.775.412.668.88-.3 1.298-2.175 3.573-2.175 3.573l-.002.003c-.283.355-.33.823-.12 1.23.27.52.849.79 1.52.726.136-.013.268-.025.395-.025.406 0 .755.08 1.043.237.592.328.977.945 1.176 1.483.127.344.33.524.62.522.084 0 .178-.017.277-.05.3-.095.627-.148.97-.148.26 0 .51.028.747.083.474.11.819.21 1.14.21.271 0 .516-.069.776-.21.237-.13.49-.253.849-.329.213-.045.448-.069.696-.069.269 0 .549.029.835.087.117.024.228.036.332.036.312-.002.534-.17.665-.528.198-.539.58-1.152 1.17-1.479.286-.157.633-.237 1.041-.237.128 0 .26.012.395.025.672.064 1.25-.207 1.52-.726.21-.406.163-.875-.12-1.23l-.002-.003S17.36 12.4 17.06 11.102c-.107-.468.244-.758.668-.88.053-.017.108-.032.165-.047.81-.214 1.315-.564 1.315-1.085 0-.571-.702-.906-1.368-.906-.19 0-.374.025-.544.067a.61.61 0 0 1-.14.019c-.175 0-.299-.154-.328-.33l-.006-.001c.055-.961.178-2.657-.334-3.63C15.711 1.163 12.782 1 12.206 1z"/></svg>
-            </a>
-            <a href="#" className="hover:opacity-80 transition-opacity">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.93a8.18 8.18 0 0 0 4.78 1.52V7.01a4.85 4.85 0 0 1-1.01-.32z"/></svg>
-            </a>
-          </div>
-          {/* Center text */}
-          <div className="flex-1 text-center flex items-center justify-center gap-1.5 overflow-hidden">
-            <Truck className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">شحن مجاني للطلبات فوق 50 د.ب</span>
-          </div>
-          {/* LEFT actions */}
+          {/* RIGHT (RTL start): تتبع + تواصل */}
           <div className="flex items-center gap-3 shrink-0">
             <button onClick={() => setActiveTab('tracking')} className="flex items-center gap-1 hover:opacity-80 transition-opacity whitespace-nowrap">
               <User className="w-3 h-3" />تتبع طلبك
@@ -331,67 +316,89 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <Phone className="w-3 h-3" />تواصل معنا
             </a>
           </div>
+          {/* CENTER: Shipping text */}
+          <div className="flex-1 text-center flex items-center justify-center gap-1.5 overflow-hidden">
+            <Truck className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">شحن مجاني للطلبات فوق 50 د.ب</span>
+          </div>
+          {/* LEFT (RTL end): Social icons */}
+          <div className="flex items-center gap-3 shrink-0">
+            <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity"><Instagram className="w-3.5 h-3.5" /></a>
+            <a href="#" className="hover:opacity-80 transition-opacity">
+              {/* Snapchat */}
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12.206 1c-.576 0-3.545.163-5.122 3.151-.512.973-.39 2.669-.334 3.63l-.006.001c-.03.176-.153.33-.328.33a.61.61 0 0 1-.14-.019 2.36 2.36 0 0 0-.544-.067c-.666 0-1.368.335-1.368.906 0 .52.505.87 1.315 1.085.057.015.112.03.165.047.424.122.775.412.668.88-.3 1.298-2.175 3.573-2.175 3.573l-.002.003c-.283.355-.33.823-.12 1.23.27.52.849.79 1.52.726.136-.013.268-.025.395-.025.406 0 .755.08 1.043.237.592.328.977.945 1.176 1.483.127.344.33.524.62.522.084 0 .178-.017.277-.05.3-.095.627-.148.97-.148.26 0 .51.028.747.083.474.11.819.21 1.14.21.271 0 .516-.069.776-.21.237-.13.49-.253.849-.329.213-.045.448-.069.696-.069.269 0 .549.029.835.087.117.024.228.036.332.036.312-.002.534-.17.665-.528.198-.539.58-1.152 1.17-1.479.286-.157.633-.237 1.041-.237.128 0 .26.012.395.025.672.064 1.25-.207 1.52-.726.21-.406.163-.875-.12-1.23l-.002-.003S17.36 12.4 17.06 11.102c-.107-.468.244-.758.668-.88.053-.017.108-.032.165-.047.81-.214 1.315-.564 1.315-1.085 0-.571-.702-.906-1.368-.906-.19 0-.374.025-.544.067a.61.61 0 0 1-.14.019c-.175 0-.299-.154-.328-.33l-.006-.001c.055-.961.178-2.657-.334-3.63C15.711 1.163 12.782 1 12.206 1z"/></svg>
+            </a>
+            <a href="#" className="hover:opacity-80 transition-opacity">
+              {/* TikTok */}
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.93a8.18 8.18 0 0 0 4.78 1.52V7.01a4.85 4.85 0 0 1-1.01-.32z"/></svg>
+            </a>
+          </div>
         </div>
       </div>
 
       {/* ── 2. HEADER ────────────────────────────────────────────── */}
       <header className={`sticky top-0 z-40 bg-white transition-shadow duration-300 ${isScrolled ? 'shadow-md' : 'border-b border-gray-100'}`}>
         <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex items-center h-[70px] gap-3">
+          <div className="flex items-center h-[76px] gap-2">
 
-            {/* RIGHT: Logo */}
-            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="shrink-0 flex items-center gap-2">
-              <img src="/logo.jpg" alt="ألماسة" className="h-12 w-auto object-contain" />
+            {/* RIGHT (RTL start): Logo */}
+            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="shrink-0 flex items-center">
+              <img src="/logo.jpg" alt="ألماسة" className="h-14 w-auto object-contain" />
             </button>
 
-            {/* CENTER: Nav */}
-            <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
+            {/* CENTER: Nav links */}
+            <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
               {[
                 { label: 'الرئيسية', action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
-                { label: 'المخاوير', action: () => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); } },
-                ...categories.filter(c=>c.id!=='all').slice(0,3).map(cat => ({ label: cat.name, action: () => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); } })),
+                { label: 'المخاوير', action: () => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } },
+                { label: 'وصل حديثاً', action: () => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } },
+                ...categories.filter(c=>c.id!=='all').slice(0,2).map(cat => ({ label: cat.name, action: () => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } })),
                 { label: 'عن المتجر', action: () => setShowAbout(true) },
               ].map((item, i) => (
                 <button key={i} onClick={item.action}
-                  className="px-3.5 py-2 text-[13px] font-bold text-[#2C1810] hover:text-[#C4698B] transition-colors relative group whitespace-nowrap">
+                  className="px-3 py-2 text-[13px] font-bold text-[#3D2314] hover:text-[#C4698B] transition-colors relative group whitespace-nowrap">
                   {item.label}
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C4698B] scale-x-0 group-hover:scale-x-100 transition-transform rounded-full" />
+                  <span className="absolute bottom-1 right-0 left-0 h-0.5 bg-[#C4698B] scale-x-0 group-hover:scale-x-100 transition-transform rounded-full origin-right" />
                 </button>
               ))}
             </nav>
 
-            {/* LEFT: Search + actions */}
-            <div className="flex items-center gap-1.5 shrink-0 mr-auto md:mr-0">
-              {/* Search */}
-              <div className="hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-full px-3.5 py-2 gap-2 w-44">
+            {/* LEFT: Search + Cart + Wishlist + User + "جميع الأقسام" + Mobile menu */}
+            <div className="flex items-center gap-1 shrink-0 mr-auto md:mr-0">
+              {/* Search bar */}
+              <div className="hidden md:flex items-center bg-[#F7F7F7] border border-gray-200 rounded-full px-3.5 py-2 gap-2 w-48">
                 <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                <input type="text" placeholder="ابحثي عن مخاوير..."
+                <input type="text" placeholder="ابحث عن مخاوير..."
                   value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  className="bg-transparent text-sm flex-1 focus:outline-none text-[#2C1810] placeholder-gray-400 font-medium" />
+                  className="bg-transparent text-[13px] flex-1 focus:outline-none text-[#2C1810] placeholder-gray-400" dir="rtl" />
                 {searchQuery && <button onClick={() => setSearchQuery('')}><X className="w-3 h-3 text-gray-400" /></button>}
               </div>
               {/* Cart */}
-              <button onClick={() => setIsCartOpen(true)} className="relative p-2 text-[#2C1810] hover:text-[#C4698B] transition-colors">
+              <button onClick={() => setIsCartOpen(true)} className="relative p-2 text-[#3D2314] hover:text-[#C4698B] transition-colors">
                 <ShoppingBag className="w-5 h-5" />
-                {cart.length > 0 && <span className="absolute -top-0.5 -right-0.5 bg-[#C4698B] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{cart.reduce((s,i)=>s+i.quantity,0)}</span>}
+                <span className="absolute -top-0.5 -right-0.5 bg-[#C4698B] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{cart.reduce((s,i)=>s+i.quantity,0)}</span>
               </button>
               {/* Wishlist */}
-              <button onClick={() => setShowWishlist(true)} className="relative p-2 text-[#2C1810] hover:text-[#C4698B] transition-colors">
-                <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-[#C4698B] text-[#C4698B]' : ''}`} />
-                {wishlist.length > 0 && <span className="absolute -top-0.5 -right-0.5 bg-[#C4698B] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{wishlist.length}</span>}
+              <button onClick={() => setShowWishlist(true)} className="relative p-2 text-[#3D2314] hover:text-[#C4698B] transition-colors">
+                <Heart className={`w-5 h-5 ${wishlist.length>0?'fill-[#C4698B] text-[#C4698B]':''}`} />
               </button>
               {/* User */}
-              <button className="p-2 text-[#2C1810] hover:text-[#C4698B] transition-colors hidden md:block">
+              <button className="p-2 text-[#3D2314] hover:text-[#C4698B] transition-colors hidden md:block">
                 <User className="w-5 h-5" />
               </button>
+              {/* جميع الأقسام */}
+              <button className="hidden md:flex items-center gap-1.5 border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-bold text-[#3D2314] hover:border-[#C4698B] hover:text-[#C4698B] transition-colors mr-1 whitespace-nowrap">
+                جميع الأقسام
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
               {/* Mobile menu */}
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-[#2C1810] md:hidden">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-[#3D2314] md:hidden">
                 <Menu className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* Mobile menu */}
+          {/* Mobile menu dropdown */}
           <AnimatePresence>
             {mobileMenuOpen && (
               <motion.div initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }} exit={{ height:0, opacity:0 }}
@@ -404,10 +411,12 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   </div>
                   {[
                     { label: 'الرئيسية', action: () => { setActiveTab('shop'); setSelectedCategory('all'); setMobileMenuOpen(false); } },
+                    { label: 'المخاوير', action: () => { setActiveTab('shop'); setSelectedCategory('all'); setMobileMenuOpen(false); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } },
                     ...categories.filter(c=>c.id!=='all').map(cat => ({ label: cat.name, action: () => { setActiveTab('shop'); setSelectedCategory(cat.id); setMobileMenuOpen(false); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } })),
-                    { label: '✈️ تتبع الطلب', action: () => { setActiveTab('tracking'); setMobileMenuOpen(false); } },
+                    { label: 'تتبع الطلب', action: () => { setActiveTab('tracking'); setMobileMenuOpen(false); } },
+                    { label: 'عن المتجر', action: () => { setShowAbout(true); setMobileMenuOpen(false); } },
                   ].map((item,i) => (
-                    <button key={i} onClick={item.action} className="w-full text-right py-2.5 px-4 rounded-xl text-sm font-semibold text-[#2C1810] hover:bg-[#FDF0F3] hover:text-[#C4698B] transition-colors">
+                    <button key={i} onClick={item.action} className="w-full text-right py-2.5 px-4 rounded-xl text-sm font-bold text-[#3D2314] hover:bg-[#FDF0F3] hover:text-[#C4698B] transition-colors">
                       {item.label}
                     </button>
                   ))}
@@ -424,82 +433,81 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* ── 3. HERO BANNER ───────────────────────────────── */}
           {(() => {
-            const heroProduct = products.filter(p => !p.isDraft)[0];
+            const heroProducts = products.filter(p => !p.isDraft).slice(0, 4);
+            const [heroIdx, setHeroIdx] = React.useState(0);
+            const heroProduct = heroProducts[heroIdx] ?? null;
             return (
-              <div className="relative w-full overflow-hidden bg-[#FDF0F3]" style={{ minHeight: 480 }} dir="rtl">
-                <div className="flex flex-col md:flex-row" style={{ minHeight: 480 }}>
-                  {/* RIGHT (RTL start): Text side */}
-                  <div className="flex-1 flex flex-col justify-center px-8 md:px-16 py-12 md:py-0 text-right order-2 md:order-1">
-                    <p className="text-[#C4698B] text-xs font-bold tracking-widest uppercase mb-3">✦ تشكيلة جديدة</p>
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#2C1810] leading-snug mb-4">
-                      أناقة لا تُضاهى
-                      <br />
-                      <span className="text-[#C4698B]">مخاوير الموسم الجديد</span>
-                    </h1>
-                    <p className="text-[#7A5560] text-sm md:text-base leading-relaxed mb-8 max-w-sm mr-0">
-                      اكتشفي أرقى تشكيلات المخاوير الفاخرة — مصممة لتعكس أناقتك وتميزك في كل مناسبة
-                    </p>
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="inline-flex items-center gap-2 text-white font-black text-sm px-8 py-3.5 rounded-full shadow-lg hover:opacity-90 active:scale-95 transition-all"
-                        style={{ background: 'linear-gradient(135deg,#C4698B 0%,#9A2D55 100%)' }}>
-                        تسوّقي الآن
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="inline-flex items-center gap-2 text-[#9A2D55] font-bold text-sm px-7 py-3.5 rounded-full border-2 border-[#C4698B]/40 hover:bg-white transition-all">
-                        استعرضي التشكيلة
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-2 mt-8">
-                      {[0,1,2].map(i=>(
-                        <div key={i} className={`rounded-full transition-all ${i===0?'w-6 h-2 bg-[#C4698B]':'w-2 h-2 bg-[#C4698B]/25'}`} />
-                      ))}
-                    </div>
+              <div className="relative w-full overflow-hidden bg-white" style={{ height: 380 }} dir="rtl">
+                {/* Image side (left visually = RTL end) */}
+                <div className="absolute inset-y-0 left-0 w-full md:w-[42%]">
+                  {heroProduct ? (
+                    <img src={heroProduct.image} alt={heroProduct.name} loading="eager" referrerPolicy="no-referrer"
+                      onClick={() => handleProductClick(heroProduct)}
+                      className="w-full h-full object-cover object-top cursor-pointer" />
+                  ) : (
+                    <div className="w-full h-full" style={{ background: 'linear-gradient(135deg,#F8D7E3,#C4698B)' }} />
+                  )}
+                  {/* fade to white on right edge */}
+                  <div className="absolute inset-y-0 right-0 w-24 hidden md:block" style={{ background: 'linear-gradient(to left, white, transparent)' }} />
+                </div>
+
+                {/* Text side (right visually = RTL start) */}
+                <div className="relative h-full flex flex-col justify-center md:mr-[42%] px-6 md:px-14 text-right">
+                  <p className="text-[#C4698B] text-xs font-bold tracking-widest mb-3">أناقة تنبض بالأنوثة</p>
+                  <h1 className="text-3xl md:text-4xl lg:text-[42px] font-black text-[#2C1810] leading-snug mb-3">
+                    مخاوير راقية
+                    <br />
+                    لتألقي في كل مناسبة
+                  </h1>
+                  <p className="text-[#7A7A7A] text-sm md:text-base mb-7">
+                    تصاميم فاخرة بأقمشة ناعمة وجودة عالية
+                  </p>
+                  <div>
+                    <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' })}
+                      className="inline-flex items-center gap-2 text-white font-black text-sm px-8 py-3.5 rounded-full hover:opacity-90 active:scale-95 transition-all"
+                      style={{ background: '#C4698B' }}>
+                      تسوّقي الآن
+                    </button>
                   </div>
-                  {/* LEFT: Full-bleed image */}
-                  <div className="relative w-full md:w-[45%] order-1 md:order-2" style={{ minHeight: 300 }}>
-                    {heroProduct ? (
-                      <img
-                        src={heroProduct.image}
-                        alt={heroProduct.name}
-                        loading="eager"
-                        referrerPolicy="no-referrer"
-                        onClick={() => handleProductClick(heroProduct)}
-                        className="w-full h-full object-cover object-top cursor-pointer"
-                        style={{ position: 'absolute', inset: 0, height: '100%', width: '100%' }}
-                      />
-                    ) : (
-                      <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg,#F8D7E3 0%,#C4698B 100%)' }} />
-                    )}
-                    {heroProduct?.originalPrice && (
-                      <div className="absolute top-5 right-5 bg-[#C4698B] text-white text-xs font-black px-3 py-1.5 rounded-full shadow-md z-10">
-                        -{Math.round(((heroProduct.originalPrice-heroProduct.price)/heroProduct.originalPrice)*100)}% خصم
-                      </div>
-                    )}
-                  </div>
+                </div>
+
+                {/* Prev arrow */}
+                <button onClick={() => setHeroIdx(i => (i - 1 + Math.max(heroProducts.length,1)) % Math.max(heroProducts.length,1))}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow-md flex items-center justify-center text-[#2C1810] hover:bg-white transition-all z-10">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                {/* Next arrow */}
+                <button onClick={() => setHeroIdx(i => (i + 1) % Math.max(heroProducts.length,1))}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow-md flex items-center justify-center text-[#2C1810] hover:bg-white transition-all z-10">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                {/* Dots */}
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                  {(heroProducts.length > 0 ? heroProducts : [null]).map((_,i) => (
+                    <button key={i} onClick={() => setHeroIdx(i)}
+                      className={`rounded-full transition-all ${i===heroIdx ? 'w-5 h-2 bg-[#C4698B]' : 'w-2 h-2 bg-[#C4698B]/30'}`} />
+                  ))}
                 </div>
               </div>
             );
           })()}
 
           {/* ── 4. TRUST BADGES ─────────────────────────────────── */}
-          <div className="border-y border-[#F2DCE4] bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-5">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="border-b border-gray-100 bg-white">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-x-reverse divide-gray-100">
                 {[
-                  { icon: BadgeCheck, label: 'جودة عالية', sub: 'أقمشة فاخرة مختارة بعناية' },
-                  { icon: Truck,      label: 'شحن سريع',  sub: 'لجميع دول الخليج والعالم' },
-                  { icon: ShieldCheck,label: 'دفع آمن',   sub: 'بيانات مشفرة ومحمية 100%' },
-                  { icon: Phone,      label: 'دعم عملاء', sub: 'نرد خلال دقائق 24/7' },
+                  { icon: BadgeCheck, label: 'جودة عالية',  sub: 'أقمشة فاخرة' },
+                  { icon: Truck,      label: 'شحن سريع',    sub: 'توصيل خلال 2-3 أيام' },
+                  { icon: ShieldCheck,label: 'دفع آمن',      sub: 'خيارات دفع متعددة' },
+                  { icon: Phone,      label: 'دعم عملاء',   sub: 'خدمة سريعة 24/7' },
                 ].map(({ icon: Icon, label, sub }) => (
-                  <div key={label} className="flex flex-col items-center text-center gap-2 p-4 rounded-2xl bg-[#FDF0F3] border border-[#F2DCE4] hover:border-[#C4698B]/30 hover:shadow-sm transition-all">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-[#F2DCE4]">
-                      <Icon className="w-5 h-5 text-[#C4698B]" />
-                    </div>
-                    <div>
+                  <div key={label} className="flex items-center justify-center gap-3 py-4 px-4">
+                    <Icon className="w-8 h-8 text-[#C4698B] shrink-0" strokeWidth={1.5} />
+                    <div className="text-right">
                       <p className="text-sm font-black text-[#2C1810]">{label}</p>
-                      <p className="text-[10px] text-[#8B7B78] mt-0.5 hidden sm:block">{sub}</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">{sub}</p>
                     </div>
                   </div>
                 ))}
@@ -510,16 +518,14 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* ── 4b. CATEGORY CARDS SECTION ──────────────────────── */}
           {categories.filter(c => c.id !== 'all').length > 0 && (
-            <section className="py-10 px-4 bg-[#FAFAFA]">
+            <section className="py-10 px-4 bg-white border-b border-gray-100">
               <div className="max-w-7xl mx-auto">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="text-right">
-                    <h2 className="text-xl md:text-2xl font-black text-[#2C1810]">تسوّقي حسب التصنيف</h2>
-                    <div className="flex items-center justify-end gap-1 mt-1">
-                      <span className="text-[#C4698B] text-xs">◆</span>
-                      <span className="h-px w-12 bg-[#C4698B]/30 inline-block" />
-                      <span className="text-[#C4698B] text-xs">◆</span>
-                    </div>
+                <div className="text-center mb-7">
+                  <h2 className="text-xl md:text-2xl font-black text-[#2C1810]">تسوّقي حسب التصنيف</h2>
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    <span className="h-px w-10 bg-[#C4698B]/30 inline-block" />
+                    <span className="text-[#C4698B] text-xs">◆</span>
+                    <span className="h-px w-10 bg-[#C4698B]/30 inline-block" />
                   </div>
                 </div>
                 <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
@@ -592,20 +598,15 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* ── 6. PRODUCTS SECTION ─────────────────────────────── */}
           <section id="products-section" className="max-w-7xl mx-auto px-4 pb-16">
-            <div className="flex items-center justify-between mb-6">
-              <div className="text-right">
-                <h2 className="text-2xl font-black text-[#2C1810]">
-                  {selectedCategory === 'all' ? 'وصل حديثاً' : categories.find(c => c.id === selectedCategory)?.name}
-                </h2>
-                <div className="flex items-center gap-1 mt-1">
-                  <span className="text-[#C4698B] text-xs">◆</span>
-                  <span className="h-px w-12 bg-[#C4698B]/30 inline-block" />
-                  <span className="text-[#C4698B] text-xs">◆</span>
-                </div>
+            <div className="text-center mb-7">
+              <h2 className="text-2xl font-black text-[#2C1810]">
+                {selectedCategory === 'all' ? 'وصل حديثاً' : categories.find(c => c.id === selectedCategory)?.name}
+              </h2>
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <span className="h-px w-10 bg-[#C4698B]/30 inline-block" />
+                <span className="text-[#C4698B] text-xs">◆</span>
+                <span className="h-px w-10 bg-[#C4698B]/30 inline-block" />
               </div>
-              <span className="text-xs text-[#8B7B78] font-medium bg-[#F8EDE8] px-3 py-1.5 rounded-xl">
-                {filteredProducts.length} منتج
-              </span>
             </div>
 
             {filteredProducts.length === 0 ? (
