@@ -307,8 +307,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       {/* ── 1. ANNOUNCEMENT BAR ──────────────────────────────────── */}
       <div className="text-white py-2 px-4 text-[11px] font-bold" style={{ background: 'linear-gradient(90deg,#C4698B 0%,#A8456E 50%,#C4698B 100%)' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-          {/* RIGHT (RTL start): تتبع + تواصل */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* RIGHT (RTL start): تتبع + تواصل — hidden on small mobile */}
+          <div className="hidden sm:flex items-center gap-3 shrink-0">
             <button onClick={() => setActiveTab('tracking')} className="flex items-center gap-1 hover:opacity-80 transition-opacity whitespace-nowrap">
               <User className="w-3 h-3" />تتبع طلبك
             </button>
@@ -320,17 +320,15 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           {/* CENTER: Shipping text */}
           <div className="flex-1 text-center flex items-center justify-center gap-1.5 overflow-hidden">
             <Truck className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">شحن مجاني للطلبات فوق 50 د.ب</span>
+            <span className="truncate text-[10px] sm:text-[11px]">شحن مجاني للطلبات فوق 50 د.ب</span>
           </div>
           {/* LEFT (RTL end): Social icons */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity"><Instagram className="w-3.5 h-3.5" /></a>
-            <a href="#" className="hover:opacity-80 transition-opacity">
-              {/* Snapchat */}
+            <a href="#" className="hidden sm:block hover:opacity-80 transition-opacity">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12.206 1c-.576 0-3.545.163-5.122 3.151-.512.973-.39 2.669-.334 3.63l-.006.001c-.03.176-.153.33-.328.33a.61.61 0 0 1-.14-.019 2.36 2.36 0 0 0-.544-.067c-.666 0-1.368.335-1.368.906 0 .52.505.87 1.315 1.085.057.015.112.03.165.047.424.122.775.412.668.88-.3 1.298-2.175 3.573-2.175 3.573l-.002.003c-.283.355-.33.823-.12 1.23.27.52.849.79 1.52.726.136-.013.268-.025.395-.025.406 0 .755.08 1.043.237.592.328.977.945 1.176 1.483.127.344.33.524.62.522.084 0 .178-.017.277-.05.3-.095.627-.148.97-.148.26 0 .51.028.747.083.474.11.819.21 1.14.21.271 0 .516-.069.776-.21.237-.13.49-.253.849-.329.213-.045.448-.069.696-.069.269 0 .549.029.835.087.117.024.228.036.332.036.312-.002.534-.17.665-.528.198-.539.58-1.152 1.17-1.479.286-.157.633-.237 1.041-.237.128 0 .26.012.395.025.672.064 1.25-.207 1.52-.726.21-.406.163-.875-.12-1.23l-.002-.003S17.36 12.4 17.06 11.102c-.107-.468.244-.758.668-.88.053-.017.108-.032.165-.047.81-.214 1.315-.564 1.315-1.085 0-.571-.702-.906-1.368-.906-.19 0-.374.025-.544.067a.61.61 0 0 1-.14.019c-.175 0-.299-.154-.328-.33l-.006-.001c.055-.961.178-2.657-.334-3.63C15.711 1.163 12.782 1 12.206 1z"/></svg>
             </a>
-            <a href="#" className="hover:opacity-80 transition-opacity">
-              {/* TikTok */}
+            <a href="#" className="hidden sm:block hover:opacity-80 transition-opacity">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.93a8.18 8.18 0 0 0 4.78 1.52V7.01a4.85 4.85 0 0 1-1.01-.32z"/></svg>
             </a>
           </div>
@@ -439,8 +437,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             const total = Math.max(heroProducts.length, 1);
             return (
               <section className="relative overflow-hidden" style={{ minHeight: 530, background: 'linear-gradient(135deg,#fdf0f3 0%,#fce4ec 100%)' }}>
-                {/* Image — right side, 52% width */}
-                <div className="absolute inset-y-0 right-0 w-full md:w-[52%] overflow-hidden">
+                {/* Image — right side, 52% on desktop; hidden on mobile (bg only) */}
+                <div className="hidden md:block absolute inset-y-0 right-0 w-[52%] overflow-hidden">
                   {heroProduct ? (
                     <img src={heroProduct.image} alt={heroProduct.name} loading="eager" referrerPolicy="no-referrer"
                       onClick={() => handleProductClick(heroProduct)}
@@ -452,8 +450,17 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   <div className="absolute inset-y-0 left-0 w-32 hidden md:block" style={{ background: 'linear-gradient(to right,#fdf0f3,transparent)' }} />
                 </div>
 
-                {/* Text content — left side */}
-                <div className="relative z-10 flex flex-col justify-center text-right px-10 md:px-20 py-16 max-w-[520px]">
+                {/* Mobile: product image strip at top */}
+                {heroProduct && (
+                  <div className="md:hidden w-full overflow-hidden" style={{ height: 240 }}>
+                    <img src={heroProduct.image} alt={heroProduct.name} loading="eager" referrerPolicy="no-referrer"
+                      onClick={() => handleProductClick(heroProduct)}
+                      className="w-full h-full object-cover object-top cursor-pointer" />
+                  </div>
+                )}
+
+                {/* Text content — left side on desktop, below image on mobile */}
+                <div className="relative z-10 flex flex-col justify-center text-right px-6 md:px-20 py-8 md:py-16 max-w-full md:max-w-[520px]">
                   <p className="text-[#888] text-[15px] font-normal mb-2">أناقة تنبض بالأنوثة</p>
                   <h1 className="font-black text-[#2d2d2d] leading-snug mb-3" style={{ fontSize: 'clamp(36px,5vw,56px)' }}>
                     مخاوير راقية<br />لتألقي في كل<br />مناسبة
@@ -493,15 +500,16 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* ── 4. TRUST BADGES ─────────────────────────────────── */}
           <div className="bg-white" style={{ borderBottom: '1px solid #f0e0e5', borderTop: '1px solid #f0e0e5' }}>
-            <div className="max-w-7xl mx-auto flex divide-x divide-x-reverse" style={{ borderColor: '#f0e0e5' }}>
+            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4" style={{ borderColor: '#f0e0e5' }}>
               {[
                 { emoji: '🏆', label: 'جودة عالية',  sub: 'أقمشة فاخرة' },
                 { emoji: '🚚', label: 'شحن سريع',    sub: 'توصيل خلال 2-3 أيام' },
                 { emoji: '🔒', label: 'دفع آمن',      sub: 'خيارات دفع متعددة' },
                 { emoji: '🎧', label: 'دعم عملاء',   sub: 'خدمة سريعة 24/7' },
-              ].map(({ emoji, label, sub }) => (
-                <div key={label} className="flex-1 flex items-center gap-3.5 px-7 py-5" style={{ borderLeftColor: '#f0e0e5' }}>
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl shrink-0" style={{ background: '#fdf0f3' }}>
+              ].map(({ emoji, label, sub }, i) => (
+                <div key={label} className="flex items-center gap-3 px-4 md:px-7 py-4 md:py-5"
+                  style={{ borderLeft: i % 2 === 0 ? 'none' : '1px solid #f0e0e5', borderTop: i >= 2 ? '1px solid #f0e0e5' : 'none' }}>
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-xl shrink-0" style={{ background: '#fdf0f3' }}>
                     {emoji}
                   </div>
                   <div className="text-right">
@@ -829,10 +837,10 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           {/* ── 10. FINAL CTA ──────────────────────────────────── */}
           <section className="py-16 px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #2C1810 0%, #4A1228 40%, #9A2D55 100%)' }}>
             {/* Decorative diamonds */}
-            <div className="absolute inset-0 opacity-5">
-              {[...Array(8)].map((_, i) => (
+            <div className="absolute inset-0 opacity-5 overflow-hidden">
+              {[[10,10,40],[25,70,60],[60,20,80],[80,60,50],[40,90,70],[70,40,45],[5,50,55],[90,10,65]].map(([t,l,s], i) => (
                 <div key={i} className="absolute border border-white rotate-45"
-                  style={{ width: `${40 + i*20}px`, height: `${40 + i*20}px`, top: `${Math.random()*80}%`, left: `${Math.random()*100}%` }} />
+                  style={{ width: s, height: s, top: `${t}%`, left: `${l}%` }} />
               ))}
             </div>
             <div className="relative max-w-4xl mx-auto text-center">
@@ -960,7 +968,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
       {/* ── FOOTER ──────────────────────────────────────────────── */}
       <footer style={{ background: '#2a2a2a', color: '#ccc' }}>
-        <div className="max-w-7xl mx-auto px-10 md:px-12 pt-14 pb-6">
+        <div className="max-w-7xl mx-auto px-5 md:px-12 pt-12 pb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-11">
 
             {/* Brand */}
