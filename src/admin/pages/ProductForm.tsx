@@ -118,7 +118,9 @@ export default function ProductForm() {
                 style={{ border: `1px solid ${errors.price ? '#EF4444' : '#F0DDE0'}`, background: '#FFF8F8', color: '#5A4047' }} dir="ltr" />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>السعر الأصلي (قبل الخصم)</label>
+              <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>
+                سعر التكلفة (للتقارير فقط — لا يظهر للعملاء)
+              </label>
               <input type="number" step="0.01" {...register('originalPrice', { min: 0 })}
                 className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
                 style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} dir="ltr" />

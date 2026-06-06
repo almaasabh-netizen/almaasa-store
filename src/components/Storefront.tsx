@@ -610,15 +610,10 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
                       {/* Badges top-right */}
                       <div className="absolute top-2.5 right-2.5 flex flex-col gap-1">
-                        {product.originalPrice && (
-                          <span className="bg-[#9A2D55] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">
-                            -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-                          </span>
-                        )}
                         {product.hasSheilah && (
                           <span className="bg-[#2C1810]/80 text-[#E8D5C4] text-[8px] font-bold px-2 py-0.5 rounded-full">+ شيلة</span>
                         )}
-                        {idx < 3 && !product.originalPrice && (
+                        {idx < 3 && (
                           <span className="bg-[#C4956A] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">جديد</span>
                         )}
                       </div>
@@ -683,9 +678,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                         <div className="leading-tight">
                           <span className="text-[#9A2D55] font-black text-sm">{product.price.toFixed(2)}</span>
                           <span className="text-[#9A2D55] text-[9px] font-semibold mr-0.5">د.ب</span>
-                          {product.originalPrice && (
-                            <div className="text-[#8B7B78] text-[9px] line-through">{product.originalPrice.toFixed(2)} د.ب</div>
-                          )}
                         </div>
                         <button
                           onClick={e => { e.stopPropagation(); handleProductClick(product); setIsCartOpen(true); }}
@@ -1180,9 +1172,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   <div className="flex items-baseline gap-2 mb-4">
                     <span className="text-3xl font-black text-[#9A2D55]">{selectedProduct.price.toFixed(2)}</span>
                     <span className="text-[#9A2D55] font-semibold">د.ب</span>
-                    {selectedProduct.originalPrice && (
-                      <span className="text-sm text-[#8B7B78] line-through">{selectedProduct.originalPrice.toFixed(2)} د.ب</span>
-                    )}
                   </div>
 
                   <p className="text-[#8B7B78] text-sm leading-relaxed mb-5 font-medium">{selectedProduct.description}</p>

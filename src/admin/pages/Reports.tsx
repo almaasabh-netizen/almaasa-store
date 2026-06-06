@@ -38,13 +38,30 @@ export default function Reports() {
   const deliveredOrders = orders.filter((o: any) => o.status === 'delivered').length;
   const conversionRate = orders.length > 0 ? ((deliveredOrders / orders.length) * 100).toFixed(1) : '0';
 
+  const productsWithCost = products.filter((p: any) => p.originalPrice && p.price > 0);
+  const avgMargin = productsWithCost.length > 0
+    ? productsWithCost.reduce((s: number, p: any) => s + ((p.price - p.originalPrice) / p.price) * 100, 0) / productsWithCost.length
+    : 0;
+  const estimatedProfit = orders.filter((o: any) => o.status === 'delivered').reduce((sum: number, o: any) => {
+    return sum + (o.items || []).reduce((s: number, item: any) => {
+      const prod = products.find((p: any) => p.id === item.productId);
+      if (prod?.originalPrice) return s + (prod.price - prod.originalPrice) * (item.quantity || 1);
+      return s + (item.price || 0) * (item.quantity || 1) * 0.3;
+    }, 0);
+  }, 0);
+  const profitMarginByProduct = productsWithCost.map((p: any) => ({
+    name: p.name?.slice(0, 12),
+    margin: Math.round(((p.price - p.originalPrice) / p.price) * 100),
+    profit: +(p.price - p.originalPrice).toFixed(3),
+  })).sort((a, b) => b.margin - a.margin).slice(0, 8);
+
   return (
     <div className="space-y-4" dir="rtl">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'إجمالي الإيرادات', value: `${totalRevenue.toFixed(0)} د.ب`, color: '#C77D8A', bg: '#F3E6E8' },
-          { label: 'إجمالي الطلبات', value: orders.length, color: '#3B82F6', bg: '#EBF5FF' },
-          { label: 'معدل التسليم', value: `${conversionRate}%`, color: '#22C55E', bg: '#F0FDF4' },
+          { label: 'الربح المقدر (مُسلَّم)', value: `${estimatedProfit.toFixed(0)} د.ب`, color: '#22C55E', bg: '#F0FDF4' },
+          { label: 'متوسط هامش الربح', value: productsWithCost.length > 0 ? `${avgMargin.toFixed(1)}%` : 'أضف سعر التكلفة', color: '#8B5CF6', bg: '#F5F3FF' },
           { label: 'المنتجات النشطة', value: products.filter((p: any) => !p.isDraft).length, color: '#F59E0B', bg: '#FFF7ED' },
         ].map(s => (
           <div key={s.label} className="rounded-2xl p-4" style={{ background: s.bg }}>
@@ -109,6 +126,44 @@ export default function Reports() {
           ) : <p className="text-sm text-center py-10" style={{ color: '#D79AA8' }}>لا توجد بيانات</p>}
         </Card>
       </div>
+
+      {profitMarginByProduct.length > 0 && (
+        <Card title="هامش الربح لكل منتج">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr style={{ color: '#D79AA8' }}>
+                  <th className="text-right pb-3 font-bold text-xs">المنتج</th>
+                  <th className="text-center pb-3 font-bold text-xs">سعر البيع</th>
+                  <th className="text-center pb-3 font-bold text-xs">سعر التكلفة</th>
+                  <th className="text-center pb-3 font-bold text-xs">الربح</th>
+                  <th className="text-center pb-3 font-bold text-xs">الهامش %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productsWithCost.sort((a: any, b: any) => ((b.price - b.originalPrice) / b.price) - ((a.price - a.originalPrice) / a.price)).map((p: any) => {
+                  const margin = Math.round(((p.price - p.originalPrice) / p.price) * 100);
+                  const profit = +(p.price - p.originalPrice).toFixed(3);
+                  return (
+                    <tr key={p.id} className="border-t" style={{ borderColor: '#F0DDE0' }}>
+                      <td className="py-2.5 font-medium text-xs" style={{ color: '#5A4047' }}>{p.name?.slice(0, 20)}</td>
+                      <td className="text-center text-xs" style={{ color: '#5A4047' }}>{p.price} د.ب</td>
+                      <td className="text-center text-xs" style={{ color: '#9A7A82' }}>{p.originalPrice} د.ب</td>
+                      <td className="text-center text-xs font-bold" style={{ color: '#22C55E' }}>{profit} د.ب</td>
+                      <td className="text-center">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black"
+                          style={{ background: margin >= 40 ? '#F0FDF4' : margin >= 20 ? '#FFF7ED' : '#FEF2F2', color: margin >= 40 ? '#22C55E' : margin >= 20 ? '#F59E0B' : '#EF4444' }}>
+                          {margin}%
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
