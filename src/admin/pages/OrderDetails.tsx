@@ -67,78 +67,149 @@ export default function OrderDetails() {
       const size = item.selectedSize || item.size || '';
       const color = item.selectedColor || item.color || '';
       return `<tr>
-        <td style="padding:8px 10px;border-bottom:1px solid #f0e0e4">${name}${size ? ' - ' + size : ''}${color ? ' / ' + color : ''}</td>
-        <td style="padding:8px 10px;border-bottom:1px solid #f0e0e4;text-align:center">${qty}</td>
-        <td style="padding:8px 10px;border-bottom:1px solid #f0e0e4;text-align:center">${price.toFixed(3)}</td>
-        <td style="padding:8px 10px;border-bottom:1px solid #f0e0e4;text-align:center;font-weight:900;color:#c4607a">${(price * qty).toFixed(3)}</td>
+        <td><div class="prod-name">${name}</div>${(size||color) ? `<div class="prod-meta">${size ? 'المقاس: '+size : ''}${size&&color?' | ':''}${color ? 'اللون: '+color : ''}</div>` : ''}</td>
+        <td class="num">${qty}</td>
+        <td class="price">${price.toFixed(3)} د.ب</td>
+        <td class="total">${(price * qty).toFixed(3)} د.ب</td>
       </tr>`;
     }).join('');
 
+    const statusLabel: Record<string,string> = { new:'جديد', processing:'قيد التجهيز', shipping:'تم الشحن', delivered:'تم التسليم', cancelled:'ملغي', returned:'مُرتجع' };
+    const subtotal = ((order.total || 0) - (order.shippingFee || 0) + (order.discount || 0));
+
     const html = `<!DOCTYPE html><html dir="rtl" lang="ar">
-<head><meta charset="UTF-8">
+<head><meta charset="UTF-8"><title>فاتورة #${order.id?.slice(-6)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: 'Tajawal', Arial, sans-serif; color:#3a2a2e; background:#fff; }
-  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
-  .page { max-width:700px; margin:0 auto; padding:30px; }
-  .header { display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #f0dde0; padding-bottom:20px; margin-bottom:24px; }
-  .logo { display:flex; align-items:center; gap:12px; }
-  .logo img { width:52px; height:52px; border-radius:12px; object-fit:cover; }
-  .logo-text h1 { font-size:20px; font-weight:900; color:#5a4047; }
-  .logo-text p { font-size:11px; color:#d79aa8; }
-  .badge { background:#f3e6e8; color:#c4607a; font-weight:900; padding:6px 16px; border-radius:20px; font-size:13px; }
-  .meta { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:22px; }
-  .meta-item { background:#fff8f8; border:1px solid #f0dde0; border-radius:10px; padding:10px 14px; }
-  .meta-item span { display:block; font-size:10px; color:#d79aa8; margin-bottom:2px; }
-  .meta-item strong { font-size:13px; color:#5a4047; }
-  table { width:100%; border-collapse:collapse; margin-bottom:18px; }
-  thead tr { background:#f3e6e8; }
-  thead th { padding:9px 10px; font-size:11px; color:#c4607a; text-align:right; }
-  tbody tr:hover { background:#fff8f8; }
-  .totals { border:1px solid #f0dde0; border-radius:10px; padding:14px 18px; }
-  .totals .row { display:flex; justify-content:space-between; padding:4px 0; font-size:12px; color:#9a7a82; }
-  .totals .total { font-size:16px; font-weight:900; color:#c4607a; border-top:1px solid #f0dde0; margin-top:8px; padding-top:8px; display:flex; justify-content:space-between; }
-  .footer { text-align:center; margin-top:24px; font-size:11px; color:#d79aa8; border-top:1px dashed #f0dde0; padding-top:16px; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Tajawal',sans-serif;background:#f9f0ee;color:#3a2a2e;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{margin:0;size:A4}
+  .wrap{max-width:794px;margin:0 auto;background:#fff;min-height:100vh;position:relative;overflow:hidden}
+
+  /* Decorative top band */
+  .top-band{height:8px;background:linear-gradient(135deg,#c4607a,#d79aa8,#e8b8c4)}
+
+  /* Header */
+  .header{display:flex;align-items:center;justify-content:space-between;padding:28px 40px 22px;background:#fff;border-bottom:1px solid #f0dde0}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand img{width:58px;height:58px;border-radius:14px;object-fit:cover;border:2px solid #f0dde0}
+  .brand-name{font-size:26px;font-weight:900;color:#5a4047;letter-spacing:-0.5px}
+  .brand-sub{font-size:11px;color:#d79aa8;margin-top:2px}
+  .invoice-tag{text-align:left}
+  .invoice-tag h2{font-size:22px;font-weight:900;color:#c4607a}
+  .invoice-tag .inv-num{font-size:13px;color:#9a7a82;margin-top:3px;direction:ltr}
+  .invoice-tag .inv-date{font-size:11px;color:#d79aa8;margin-top:2px}
+
+  /* Two-column info */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #f0dde0}
+  .info-col{padding:20px 40px}
+  .info-col:first-child{border-left:1px solid #f0dde0}
+  .info-col h4{font-size:10px;font-weight:700;color:#d79aa8;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .info-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .info-row .lbl{font-size:11px;color:#9a7a82}
+  .info-row .val{font-size:12px;font-weight:700;color:#5a4047;text-align:left;direction:ltr}
+
+  /* Items table */
+  .table-wrap{padding:24px 40px 0}
+  .table-title{font-size:12px;font-weight:700;color:#d79aa8;letter-spacing:1px;margin-bottom:10px;text-transform:uppercase}
+  table{width:100%;border-collapse:collapse}
+  thead tr{background:linear-gradient(135deg,#c4607a,#d79aa8)}
+  thead th{padding:11px 14px;font-size:11px;font-weight:700;color:#fff;text-align:right}
+  thead th:last-child{text-align:left;direction:ltr}
+  tbody tr{border-bottom:1px solid #f9f0ee}
+  tbody tr:nth-child(even){background:#fdf8f8}
+  tbody td{padding:12px 14px;font-size:12px;color:#5a4047;vertical-align:middle}
+  tbody td.num{text-align:center;font-weight:700;color:#9a7a82}
+  tbody td.price{text-align:left;direction:ltr;color:#9a7a82}
+  tbody td.total{text-align:left;direction:ltr;font-weight:900;color:#c4607a}
+  .prod-name{font-weight:700;color:#3a2a2e}
+  .prod-meta{font-size:10px;color:#d79aa8;margin-top:2px}
+
+  /* Totals */
+  .totals-wrap{display:flex;justify-content:flex-start;padding:20px 40px 24px}
+  .totals-box{background:#f9f0ee;border-radius:14px;padding:18px 24px;min-width:260px;border:1px solid #f0dde0}
+  .tot-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;color:#9a7a82}
+  .tot-row .amt{direction:ltr;text-align:left}
+  .tot-final{display:flex;justify-content:space-between;align-items:center;border-top:2px solid #d79aa8;margin-top:10px;padding-top:12px}
+  .tot-final .lbl{font-size:14px;font-weight:900;color:#5a4047}
+  .tot-final .amt{font-size:18px;font-weight:900;color:#c4607a;direction:ltr}
+  ${refCode ? `.ref-box{margin:0 40px;background:#fff8f8;border:1.5px dashed #d79aa8;border-radius:10px;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .ref-box .lbl{font-size:11px;color:#d79aa8;font-weight:700}.ref-box .val{font-size:13px;font-weight:900;color:#c4607a;direction:ltr;letter-spacing:1px}` : ''}
+
+  /* Footer */
+  .footer{margin-top:auto;padding:18px 40px;border-top:1px solid #f0dde0;display:flex;justify-content:space-between;align-items:center}
+  .footer-brand{font-size:13px;font-weight:900;color:#c4607a}
+  .footer-note{font-size:10px;color:#d79aa8;text-align:center}
+  .footer-site{font-size:10px;color:#d79aa8;direction:ltr}
+  .bottom-band{height:6px;background:linear-gradient(135deg,#e8b8c4,#d79aa8,#c4607a)}
+
+  @media print{body{background:#fff}.wrap{box-shadow:none}}
 </style></head>
-<body><div class="page">
+<body><div class="wrap">
+  <div class="top-band"></div>
+
   <div class="header">
-    <div class="logo">
+    <div class="brand">
       <img src="/logo.jpg" onerror="this.style.display='none'"/>
-      <div class="logo-text"><h1>ألماسة</h1><p>للمخاوير والأزياء الخليجية</p></div>
+      <div><div class="brand-name">ألماسة</div><div class="brand-sub">للمخاوير والأزياء الخليجية الفاخرة</div></div>
     </div>
-    <div style="text-align:left">
-      <div class="badge">فاتورة ضريبية</div>
-      <p style="font-size:11px;color:#d79aa8;margin-top:6px">التاريخ: ${order.date?.substring(0,10) || ''}</p>
+    <div class="invoice-tag">
+      <h2>فاتـورة</h2>
+      <div class="inv-num">#${order.id?.slice(-6) || ''}</div>
+      <div class="inv-date">${order.date?.substring(0,10) || ''}</div>
     </div>
   </div>
 
-  <div class="meta">
-    <div class="meta-item"><span>رقم الطلب</span><strong>#${order.id?.slice(-6) || ''}</strong></div>
-    <div class="meta-item"><span>حالة الطلب</span><strong>${{ new:'جديد', processing:'قيد التجهيز', shipping:'تم الشحن', delivered:'تم التسليم', cancelled:'ملغي', returned:'مُرتجع' }[order.status] || order.status || '—'}</strong></div>
-    <div class="meta-item"><span>العميل</span><strong>${customerName}</strong></div>
-    <div class="meta-item"><span>رقم الهاتف</span><strong>${customerPhone}</strong></div>
-    <div class="meta-item"><span>المدينة</span><strong>${customerCity || '—'}</strong></div>
-    <div class="meta-item"><span>العنوان</span><strong>${customerAddress || '—'}</strong></div>
-    ${refCode ? `<div class="meta-item" style="grid-column:span 2"><span>مرجع الدفع</span><strong>${refCode}</strong></div>` : ''}
+  <div class="info-grid">
+    <div class="info-col">
+      <h4>بيانات العميل</h4>
+      <div class="info-row"><span class="lbl">الاسم</span><span class="val" style="direction:rtl">${customerName}</span></div>
+      <div class="info-row"><span class="lbl">الهاتف</span><span class="val">${customerPhone}</span></div>
+      ${customerEmail && customerEmail !== 'guest@almaasa.bh' ? `<div class="info-row"><span class="lbl">الإيميل</span><span class="val">${customerEmail}</span></div>` : ''}
+      ${customerCity ? `<div class="info-row"><span class="lbl">المدينة</span><span class="val" style="direction:rtl">${customerCity}</span></div>` : ''}
+      ${customerAddress ? `<div class="info-row"><span class="lbl">العنوان</span><span class="val" style="direction:rtl;max-width:160px;text-align:right">${customerAddress}</span></div>` : ''}
+    </div>
+    <div class="info-col">
+      <h4>تفاصيل الطلب</h4>
+      <div class="info-row"><span class="lbl">رقم الطلب</span><span class="val">#${order.id?.slice(-6) || ''}</span></div>
+      <div class="info-row"><span class="lbl">الحالة</span><span class="val" style="direction:rtl;color:#c4607a">${statusLabel[order.status] || '—'}</span></div>
+      <div class="info-row"><span class="lbl">طريقة الدفع</span><span class="val">${order.paymentMethod?.toUpperCase() || '—'}</span></div>
+      <div class="info-row"><span class="lbl">تاريخ الطلب</span><span class="val">${order.date?.substring(0,10) || ''}</span></div>
+    </div>
   </div>
 
-  <table>
-    <thead><tr>
-      <th>المنتج</th><th style="text-align:center">الكمية</th><th style="text-align:center">السعر</th><th style="text-align:center">الإجمالي</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>
-
-  <div class="totals">
-    <div class="row"><span>المجموع الفرعي</span><span>${((order.total || 0) - (order.shippingFee || 0) + (order.discount || 0)).toFixed(3)} د.ب</span></div>
-    ${(order.shippingFee > 0) ? `<div class="row"><span>الشحن</span><span>${order.shippingFee?.toFixed(3)} د.ب</span></div>` : ''}
-    ${(order.discount > 0) ? `<div class="row" style="color:#22c55e"><span>الخصم</span><span>-${order.discount?.toFixed(3)} د.ب</span></div>` : ''}
-    <div class="total"><span>الإجمالي النهائي</span><span>${order.total?.toFixed(3)} د.ب</span></div>
+  <div class="table-wrap">
+    <div class="table-title">المنتجات المطلوبة</div>
+    <table>
+      <thead><tr>
+        <th style="width:50%">المنتج</th>
+        <th style="text-align:center;width:12%">الكمية</th>
+        <th style="text-align:left;direction:ltr;width:18%">سعر الوحدة</th>
+        <th style="text-align:left;direction:ltr;width:20%">الإجمالي</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
   </div>
 
-  <div class="footer">شكراً لتسوقكم من ألماسة 🌸 | almaasa-store.onrender.com</div>
+  <div class="totals-wrap">
+    <div class="totals-box">
+      <div class="tot-row"><span>المجموع الفرعي</span><span class="amt">${subtotal.toFixed(3)} د.ب</span></div>
+      ${(order.shippingFee > 0) ? `<div class="tot-row"><span>رسوم الشحن</span><span class="amt">${order.shippingFee?.toFixed(3)} د.ب</span></div>` : ''}
+      ${(order.discount > 0) ? `<div class="tot-row" style="color:#16a34a"><span>الخصم</span><span class="amt">- ${order.discount?.toFixed(3)} د.ب</span></div>` : ''}
+      <div class="tot-final"><span class="lbl">الإجمالي النهائي</span><span class="amt">${order.total?.toFixed(3)} د.ب</span></div>
+    </div>
+  </div>
+
+  ${refCode ? `<div class="ref-box"><span class="lbl">🔖 مرجع الدفع</span><span class="val">${refCode}</span></div>` : ''}
+
+  <div class="footer">
+    <div class="footer-brand">ألماسة 🌸</div>
+    <div class="footer-note">شكراً لثقتكم — نسعد بخدمتكم دائماً</div>
+    <div class="footer-site">almaasa-store.onrender.com</div>
+  </div>
+  <div class="bottom-band"></div>
 </div>
-<script>window.onload=()=>{window.print();window.close();}</script>
+<script>window.onload=()=>{window.print();}</script>
 </body></html>`;
 
     const w = window.open('', '_blank', 'width=750,height=900');
