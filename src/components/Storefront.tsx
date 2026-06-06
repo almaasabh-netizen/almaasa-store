@@ -830,9 +830,23 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   style={{ width: `${40 + i*20}px`, height: `${40 + i*20}px`, top: `${Math.random()*80}%`, left: `${Math.random()*100}%` }} />
               ))}
             </div>
-            <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-16" dir="rtl">
-              {/* Right: text */}
-              <div className="flex-1 text-right">
+            <div className="relative max-w-5xl mx-auto" dir="ltr" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '4rem' }}>
+              {/* Buttons on the LEFT */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flexShrink: 0, minWidth: '220px' }}>
+                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2.5 bg-white text-[#9A2D55] font-black px-7 py-3.5 rounded-xl shadow-xl transition-all hover:-translate-y-0.5 text-sm">
+                  <Phone className="w-4 h-4" />
+                  تواصلي على واتساب الآن
+                </a>
+                <button
+                  onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-bold px-7 py-3.5 rounded-xl hover:bg-white/10 transition-all text-sm">
+                  تصفحي التشكيلة
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
+              {/* Text on the RIGHT */}
+              <div className="flex-1 text-right" dir="rtl">
                 <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-[#E8D5C4] text-xs font-bold px-4 py-2 rounded-full mb-5">
                   <Sparkles className="w-3.5 h-3.5" />
                   طلبات خاصة ومخصصة
@@ -841,23 +855,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   أناقتك تبدأ من هنا
                 </h2>
                 <p className="text-[#E8D5C4] text-lg md:text-xl font-bold mb-3">نصنع لكِ تفاصيل لا تُنسى</p>
-                <p className="text-white/60 text-sm leading-relaxed max-w-sm">
+                <p className="text-white/60 text-sm leading-relaxed">
                   للطلبات الخاصة والتفصيل المخصص والاستفسارات — فريقنا جاهز للخدمة 24/7
                 </p>
-              </div>
-              {/* Left: buttons stacked */}
-              <div className="flex flex-col gap-3 shrink-0 w-full md:w-auto">
-                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2.5 bg-white text-[#9A2D55] font-black px-8 py-3.5 rounded-xl shadow-xl hover:shadow-white/20 transition-all hover:-translate-y-0.5 text-sm whitespace-nowrap">
-                  <Phone className="w-4 h-4" />
-                  تواصلي على واتساب الآن
-                </a>
-                <button
-                  onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-white/10 transition-all text-sm whitespace-nowrap">
-                  تصفحي التشكيلة
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
               </div>
             </div>
           </section>
