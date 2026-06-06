@@ -411,14 +411,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <button className="p-2 hover:text-[#C4607A] transition-colors hidden md:block" style={{ color: '#2d2d2d' }}>
                 <User className="w-5 h-5" />
               </button>
-              {/* جميع الأقسام */}
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors hover:border-[#C4607A] hover:text-[#C4607A]"
-                style={{ border: '1px solid #E0C8CC', color: '#2d2d2d' }}>
-                <Menu className="w-3.5 h-3.5" />
-                جميع الأقسام
-                <ChevronDown className="w-3 h-3" />
-              </button>
               {/* Mobile hamburger */}
               <button className="p-2 md:hidden" style={{ color: '#2d2d2d' }} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                 <Menu className="w-5 h-5" />
