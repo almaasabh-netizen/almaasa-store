@@ -38,6 +38,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const [heroIdx, setHeroIdx] = useState(0);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(0);
@@ -458,150 +459,100 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         <main>
 
           {/* ── 3. HERO SECTION ─────────────────────────────────── */}
-          <section className="relative overflow-hidden bg-[#F5EBE6]">
-            {/* Soft warm gradient bg */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#F5EBE6] via-[#F0E0D6] to-[#EDD5CA]" />
+          {(() => {
+            const heroSlides = [
+              {
+                image: 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
+                subtitle: 'أزياء تعكس ذوقك الرفيع',
+                title: <>ألماسة<br />للمخاوير الراقية</>,
+                desc: 'تصاميم استثنائية تجمع بين الفخامة والراحة لتتألقي بإطلالة مميزة في كل وقت',
+              },
+              {
+                image: products[0]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
+                subtitle: 'أناقة تنبض بالأنوثة',
+                title: <>مخاوير راقية<br />لتألقي في كل مناسبة</>,
+                desc: 'تصاميم فاخرة بأقمشة ناعمة وحالية',
+              },
+              {
+                image: products[1]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
+                subtitle: 'كولكشن 2026',
+                title: <>تشكيلة العيد<br />وصلت الآن</>,
+                desc: 'أحدث تصاميم المخاوير الخليجية بأقمشة فاخرة وألوان رائعة',
+              },
+              {
+                image: products[2]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
+                subtitle: 'جودة لا تضاهى',
+                title: <>تفصيل على المقاس<br />بأرقى الأقمشة</>,
+                desc: 'نصنع لكِ تفاصيل لا تُنسى — راسليننا على واتساب',
+              },
+            ];
+            const slide = heroSlides[heroIdx];
+            return (
+              <section className="relative overflow-hidden select-none" style={{ background: '#F9F0EE', minHeight: 520 }}>
+                {/* Background image (left half) */}
+                <div className="absolute inset-y-0 left-0 w-full md:w-1/2 overflow-hidden">
+                  <img
+                    src={slide.image}
+                    alt="hero"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover object-top transition-opacity duration-500"
+                    style={{ minHeight: 520 }}
+                  />
+                  {/* Right fade */}
+                  <div className="absolute inset-y-0 right-0 w-40 hidden md:block" style={{ background: 'linear-gradient(to left, #F9F0EE, transparent)' }} />
+                </div>
 
-            {/* Decorative elements */}
-            <div className="absolute top-0 left-0 w-72 h-72 bg-[#9A2D55]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C4956A]/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+                {/* Mobile image strip */}
+                <div className="md:hidden w-full h-64 overflow-hidden">
+                  <img src={slide.image} alt="hero" referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
+                </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-              <div className="flex flex-col md:flex-row items-center py-10 md:py-16 gap-8">
-
-                {/* Text content - right side (RTL) */}
-                <div className="flex-1 order-2 md:order-1 fade-up text-center md:text-right">
-                  <div className="inline-flex items-center gap-2 bg-[#9A2D55]/10 border border-[#9A2D55]/20 text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-6">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    ✦ كولكشن 2026 — وصل الجديد
-                  </div>
-
-                  <h1 className="text-[2.8rem] md:text-5xl lg:text-[3.8rem] font-black text-[#2C1810] leading-[1.1] mb-5">
-                    مخاوير فاخرة<br />
-                    <span style={{ background: 'linear-gradient(90deg, #9A2D55, #C4956A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                      بتصاميم حصرية
-                    </span>
-                  </h1>
-
-                  <p className="text-[#8B7B78] text-sm md:text-base leading-relaxed mb-8 max-w-md mx-auto md:mx-0">
-                    تشكيلة راقية من المخاوير والأقمشة الفاخرة — تصاميم عصرية وجودة استثنائية مع توصيل لجميع دول الخليج والعالم
-                  </p>
-
-                  <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                    <button
-                      onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                      className="bg-[#9A2D55] hover:bg-[#802446] text-white font-bold px-8 py-3.5 rounded-full shadow-lg shadow-[#9A2D55]/20 transition-all hover:-translate-y-0.5 flex items-center gap-2 text-sm"
-                    >
-                      تسوّقي الآن
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('shop'); setSelectedCategory(categories.filter(c=>c.id!=='all')[0]?.id || 'all'); }}
-                      className="bg-white border border-[#E8D5C4] text-[#2C1810] font-semibold px-6 py-3.5 rounded-full hover:border-[#9A2D55] hover:text-[#9A2D55] transition-all text-sm"
-                    >
-                      تصفح المخاوير
-                    </button>
-                  </div>
-
-                  {/* Stats row */}
-                  <div className="flex gap-6 mt-10 justify-center md:justify-start">
-                    {[
-                      { num: `${products.length}+`, label: 'منتج فاخر' },
-                      { num: '500+', label: 'عميلة سعيدة' },
-                      { num: '4.9', label: 'تقييم متوسط ⭐' },
-                    ].map(({ num, label }) => (
-                      <div key={label} className="text-center md:text-right">
-                        <p className="text-xl font-black text-[#9A2D55]">{num}</p>
-                        <p className="text-[11px] text-[#8B7B78] font-medium">{label}</p>
-                      </div>
-                    ))}
+                {/* Content — right side */}
+                <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
+                  <div className="flex justify-end">
+                    <div className="w-full md:w-1/2 py-14 md:py-20 text-right" dir="rtl">
+                      <p className="text-sm font-medium mb-3" style={{ color: '#7A5C60' }}>{slide.subtitle}</p>
+                      <h1 className="font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#2C1810' }}>
+                        {slide.title}
+                      </h1>
+                      <p className="mb-8 text-sm md:text-base leading-relaxed" style={{ color: '#7A5C60', maxWidth: 380 }}>{slide.desc}</p>
+                      <button
+                        onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="font-bold px-8 py-3.5 rounded-lg text-sm transition-all hover:opacity-90 hover:-translate-y-0.5"
+                        style={{ background: '#C4607A', color: 'white' }}>
+                        تسوقي الآن
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Hero image - left side */}
-                <div className="flex-1 order-1 md:order-2 relative flex justify-center items-center">
-                  {products.length > 0 && (
-                    <>
-                      {/* Main image card */}
-                      <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#9A2D55]/15 w-[75%] md:w-[85%] aspect-[3/4] max-h-[72vh]">
-                        <img src={products[0].image} alt="hero product"
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover object-top"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/40 via-transparent to-transparent" />
-                        {/* Price badge */}
-                        <div className="absolute bottom-5 right-5 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-lg">
-                          <p className="text-[10px] text-[#8B7B78] font-medium">{products[0].name.slice(0,18)}...</p>
-                          <p className="text-[#9A2D55] font-black text-base">{products[0].price.toFixed(2)} د.ب</p>
-                        </div>
-                      </div>
-                      {/* Floating second image */}
-                      {products[1] && (
-                        <div className="absolute left-0 bottom-10 w-[38%] aspect-[3/4] rounded-2xl overflow-hidden shadow-xl border-4 border-white hidden md:block">
-                          <img src={products[1].image} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                    </>
-                  )}
-                  {products.length === 0 && (
-                    <div className="relative w-[75%] md:w-[85%] aspect-[3/4] max-h-[72vh]">
-                      <div className="w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#9A2D55]/15"
-                        style={{ background: 'linear-gradient(145deg, #F2E4DC 0%, #E8D0C4 40%, #D4A5A0 100%)' }}>
-                        {/* Decorative abaya silhouette */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                          <svg viewBox="0 0 200 300" className="w-3/4 h-3/4 fill-[#9A2D55]">
-                            <ellipse cx="100" cy="40" rx="30" ry="35" />
-                            <path d="M50 80 Q30 100 20 200 Q15 260 100 270 Q185 260 180 200 Q170 100 150 80 Q130 70 100 75 Q70 70 50 80Z" />
-                            <path d="M50 80 Q20 90 5 150 Q0 180 15 185 Q30 150 55 120Z" />
-                            <path d="M150 80 Q180 90 195 150 Q200 180 185 185 Q170 150 145 120Z" />
-                          </svg>
-                        </div>
-                        {/* Logo overlay */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
-                          <img src="/logo.jpg" alt="ألماسة" className="w-40 h-auto object-contain drop-shadow-lg" />
-                          <div className="flex gap-1.5 mt-4">
-                            {[0,1,2,3,4].map(i => <Star key={i} className="w-4 h-4 fill-[#9A2D55] text-[#9A2D55]" />)}
-                          </div>
-                          <p className="text-[#6B3040] font-bold text-sm text-center">أرقى تصاميم المخاوير</p>
-                        </div>
-                      </div>
-                      {/* Floating badge */}
-                      <div className="absolute bottom-5 right-5 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-lg">
-                        <p className="text-[10px] text-[#8B7B78] font-medium">كولكشن 2026</p>
-                        <p className="text-[#9A2D55] font-black text-base">جديد ✨</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                {/* Left arrow */}
+                <button
+                  onClick={() => setHeroIdx((heroIdx - 1 + heroSlides.length) % heroSlides.length)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-shadow hidden md:flex"
+                  style={{ color: '#2C1810' }}>
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
 
-              </div>
-            </div>
+                {/* Right arrow */}
+                <button
+                  onClick={() => setHeroIdx((heroIdx + 1) % heroSlides.length)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-shadow hidden md:flex"
+                  style={{ color: '#2C1810' }}>
+                  <ChevronLeft className="w-5 h-5 rotate-180" />
+                </button>
 
-            {/* Trust badges bar */}
-            <div className="relative z-10 border-t border-[#E8D5C4] bg-white/60 backdrop-blur-sm">
-              <div className="max-w-7xl mx-auto px-4 py-3">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  {[
-                    { icon: Globe2, label: 'شحن لجميع الدول', sub: 'دول الخليج والعالم' },
-                    { icon: BadgeCheck, label: 'جودة فاخرة', sub: 'أقمشة مختارة بعناية' },
-                    { icon: ShieldCheck, label: 'دفع آمن 100%', sub: 'مشفر ومحمي' },
-                    { icon: Gift, label: 'تغليف هدايا', sub: 'مجاني مع كل طلب' },
-                  ].map(({ icon: Icon, label, sub }) => (
-                    <div key={label} className="flex items-center gap-2.5 justify-center md:justify-start">
-                      <div className="w-8 h-8 bg-[#F8EDE8] rounded-xl flex items-center justify-center shrink-0">
-                        <Icon className="w-4 h-4 text-[#9A2D55]" />
-                      </div>
-                      <div className="text-right hidden sm:block">
-                        <p className="text-xs font-bold text-[#2C1810]">{label}</p>
-                        <p className="text-[10px] text-[#8B7B78]">{sub}</p>
-                      </div>
-                      <span className="sm:hidden text-xs font-bold text-[#2C1810]">{label}</span>
-                    </div>
+                {/* Dots */}
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                  {heroSlides.map((_, i) => (
+                    <button key={i} onClick={() => setHeroIdx(i)}
+                      className="rounded-full transition-all"
+                      style={{ width: i === heroIdx ? 20 : 8, height: 8, background: i === heroIdx ? '#C4607A' : 'rgba(255,255,255,0.7)' }} />
                   ))}
                 </div>
-              </div>
-            </div>
-          </section>
+              </section>
+            );
+          })()}
 
 
           {/* ── 5. SEARCH + FILTER BAR ──────────────────────────── */}
