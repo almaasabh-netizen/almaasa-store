@@ -621,13 +621,13 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {filteredProducts.map((product, idx) => (
-                  <div key={product.id} className="bg-white rounded-2xl border border-[#F2E4DC] overflow-hidden luxury-card group cursor-pointer flex flex-col shadow-sm hover:shadow-xl hover:shadow-[#9A2D55]/10 hover:border-[#E8D5C4] transition-all"
+                  <div key={product.id} className="bg-white rounded-xl border border-[#F2E4DC] overflow-hidden luxury-card group cursor-pointer flex flex-col shadow-sm hover:shadow-lg hover:shadow-[#9A2D55]/10 hover:border-[#E8D5C4] transition-all"
                     style={{ animationDelay: `${idx * 0.05}s` }}>
 
                     {/* Image */}
-                    <div className="relative overflow-hidden bg-[#F8EDE8]" style={{ aspectRatio: '3/4' }}>
+                    <div className="relative overflow-hidden bg-[#F8EDE8]" style={{ aspectRatio: '1/1' }}>
                       <img src={product.image} alt={product.name} referrerPolicy="no-referrer"
                         onClick={() => handleProductClick(product)}
                         className="w-full h-full object-cover product-img"
@@ -687,37 +687,37 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     </div>
 
                     {/* Info */}
-                    <div className="p-3 flex-1 flex flex-col justify-between" onClick={() => handleProductClick(product)}>
+                    <div className="p-2.5 flex-1 flex flex-col justify-between" onClick={() => handleProductClick(product)}>
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center gap-0.5">
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                            <span className="text-[10px] font-bold text-[#5C3830]">{product.rating}</span>
-                            <span className="text-[9px] text-[#8B7B78]">({product.reviewCount})</span>
+                            <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                            <span className="text-[9px] font-bold text-[#5C3830]">{product.rating}</span>
+                            <span className="text-[8px] text-[#8B7B78]">({product.reviewCount})</span>
                           </div>
-                          <span className="text-[9px] bg-[#F8EDE8] text-[#9A2D55] font-bold px-1.5 py-0.5 rounded-full">
+                          <span className="text-[8px] bg-[#F8EDE8] text-[#9A2D55] font-bold px-1.5 py-0.5 rounded-full">
                             {categories.find(c => c.id === product.category)?.name || 'مخور'}
                           </span>
                         </div>
-                        <h3 className="font-bold text-[#2C1810] text-xs md:text-sm leading-snug line-clamp-2 group-hover:text-[#9A2D55] transition-colors">
+                        <h3 className="font-bold text-[#2C1810] text-[11px] leading-snug line-clamp-2 group-hover:text-[#9A2D55] transition-colors">
                           {product.name}
                         </h3>
                       </div>
 
-                      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[#F8EDE8]">
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#F8EDE8]">
                         <div className="leading-tight">
-                          <span className="text-[#9A2D55] font-black text-base">{product.price.toFixed(2)}</span>
-                          <span className="text-[#9A2D55] text-[10px] font-semibold mr-0.5">د.ب</span>
+                          <span className="text-[#9A2D55] font-black text-sm">{product.price.toFixed(2)}</span>
+                          <span className="text-[#9A2D55] text-[9px] font-semibold mr-0.5">د.ب</span>
                           {product.originalPrice && (
-                            <div className="text-[#8B7B78] text-[10px] line-through">{product.originalPrice.toFixed(2)} د.ب</div>
+                            <div className="text-[#8B7B78] text-[9px] line-through">{product.originalPrice.toFixed(2)} د.ب</div>
                           )}
                         </div>
                         <button
                           onClick={e => { e.stopPropagation(); handleProductClick(product); setIsCartOpen(true); }}
-                          className="w-8 h-8 bg-[#9A2D55] hover:bg-[#802446] text-white rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 disabled:bg-[#F2E4DC]"
+                          className="w-7 h-7 bg-[#9A2D55] hover:bg-[#802446] text-white rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 disabled:bg-[#F2E4DC]"
                           disabled={product.stock === 0}
                         >
-                          <Plus className="w-4 h-4" />
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
