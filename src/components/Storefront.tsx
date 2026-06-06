@@ -478,23 +478,22 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             const slide = heroSlides[idx];
             const img = slide.image || '';
             return (
-              <section className="select-none" style={{ background: '#F9F0EE', padding: '0 24px' }}>
+              <section className="select-none relative overflow-hidden" style={{ background: '#F9F0EE' }}>
                 {/* Desktop layout */}
-                <div className="hidden md:flex overflow-hidden rounded-2xl" style={{ minHeight: 420 }}>
+                <div className="hidden md:flex" dir="ltr" style={{ height: 420 }}>
                   {/* LEFT: image */}
-                  <div className="w-1/2 relative overflow-hidden" style={{ minHeight: 420 }}>
+                  <div className="relative overflow-hidden" style={{ width: '55%' }}>
                     {img && <img src={img} alt="hero" referrerPolicy="no-referrer"
                       className="absolute inset-0 w-full h-full object-cover object-top" />}
-                    {/* fade to cream on the right edge */}
-                    <div className="absolute inset-y-0 right-0 w-24 pointer-events-none"
+                    <div className="absolute inset-y-0 right-0 w-32 pointer-events-none"
                       style={{ background: 'linear-gradient(to right, transparent, #F9F0EE)' }} />
                   </div>
 
                   {/* RIGHT: text */}
-                  <div className="w-1/2 flex items-center px-12 xl:px-20" dir="rtl">
+                  <div className="flex items-center px-12 xl:px-20" dir="rtl" style={{ width: '45%' }}>
                     <div>
                       <p className="text-sm font-medium mb-3" style={{ color: '#9A7A82' }}>{slide.subtitle}</p>
-                      <h1 className="font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem,3.5vw,3rem)', color: '#2C1810', whiteSpace: 'pre-line' }}>
+                      <h1 className="font-black leading-tight mb-4" style={{ fontSize: 'clamp(1.8rem,3vw,2.8rem)', color: '#2C1810', whiteSpace: 'pre-line' }}>
                         {slide.title}
                       </h1>
                       <p className="text-sm leading-relaxed mb-8 max-w-sm" style={{ color: '#9A7A82' }}>{slide.desc}</p>
