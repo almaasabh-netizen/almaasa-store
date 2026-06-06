@@ -25,6 +25,15 @@ export default function OrderDetails() {
     </div>
   );
 
+  // Support both flat fields (old orders) and nested customer object (new orders)
+  const c = order.customer || {};
+  const customerName    = c.name    || order.customerName    || '—';
+  const customerPhone   = c.phone   || order.customerPhone   || '';
+  const customerEmail   = c.email   || order.customerEmail   || '';
+  const customerCity    = c.city    || order.customerCity    || '';
+  const customerAddress = c.address || order.customerAddress || '';
+  const customerNotes   = c.notes   || order.notes           || order.customerNotes || '';
+
   const sc = statusColors[order.status] ?? statusColors.new;
   const stepIdx = STEPS.findIndex(s => s.key === order.status);
   const products = data.products || [];
@@ -153,17 +162,17 @@ export default function OrderDetails() {
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black"
                 style={{ background: 'linear-gradient(135deg,#D79AA8,#C77D8A)' }}>
-                {order.customerName?.charAt(0)}
+                {customerName.charAt(0)}
               </div>
               <div>
-                <p className="font-bold text-sm" style={{ color: '#5A4047' }}>{order.customerName}</p>
-                <p className="text-xs" style={{ color: '#D79AA8' }}>{order.customerPhone}</p>
+                <p className="font-bold text-sm" style={{ color: '#5A4047' }}>{customerName}</p>
+                <p className="text-xs" style={{ color: '#D79AA8' }}>{customerPhone}</p>
               </div>
             </div>
             {[
-              { label: 'الإيميل', value: order.customerEmail },
-              { label: 'المدينة', value: order.customerCity },
-              { label: 'العنوان', value: order.customerAddress },
+              { label: 'الإيميل', value: customerEmail },
+              { label: 'المدينة', value: customerCity },
+              { label: 'العنوان', value: customerAddress },
               { label: 'طريقة الدفع', value: order.paymentMethod?.toUpperCase() },
             ].filter(x => x.value).map(({ label, value }) => (
               <div key={label} className="flex justify-between py-1.5 border-b text-xs last:border-0" style={{ borderColor: '#F0DDE0' }}>
@@ -173,10 +182,10 @@ export default function OrderDetails() {
             ))}
           </div>
 
-          {order.customerNotes && (
+          {customerNotes && (
             <div className="rounded-2xl p-4" style={{ background: '#FFF7ED', border: '1px solid #FED7AA' }}>
               <p className="text-xs font-bold mb-1.5" style={{ color: '#F59E0B' }}>ملاحظات العميل</p>
-              <p className="text-xs" style={{ color: '#5A4047' }}>{order.customerNotes}</p>
+              <p className="text-xs" style={{ color: '#5A4047' }}>{customerNotes}</p>
             </div>
           )}
         </div>

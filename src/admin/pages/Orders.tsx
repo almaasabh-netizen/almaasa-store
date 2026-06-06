@@ -16,9 +16,11 @@ export default function Orders() {
   const orders = useMemo(() => {
     let list = [...(data.orders || [])].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
     if (statusFilter !== 'الكل') list = list.filter((o: any) => o.status === statusFilter);
-    if (search) list = list.filter((o: any) =>
-      o.customerName?.includes(search) || o.id?.includes(search) || o.customerPhone?.includes(search)
-    );
+    if (search) list = list.filter((o: any) => {
+      const name = o.customer?.name || o.customerName || '';
+      const phone = o.customer?.phone || o.customerPhone || '';
+      return name.includes(search) || o.id?.includes(search) || phone.includes(search);
+    });
     return list;
   }, [data.orders, statusFilter, search]);
 
@@ -107,11 +109,11 @@ export default function Orders() {
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-black"
                             style={{ background: 'linear-gradient(135deg,#D79AA8,#C77D8A)' }}>
-                            {order.customerName?.charAt(0)}
+                            {(order.customer?.name || order.customerName || '?').charAt(0)}
                           </div>
                           <div>
-                            <p className="text-xs font-bold" style={{ color: '#5A4047' }}>{order.customerName}</p>
-                            <p className="text-[10px]" style={{ color: '#D79AA8' }}>{order.customerPhone}</p>
+                            <p className="text-xs font-bold" style={{ color: '#5A4047' }}>{order.customer?.name || order.customerName || '—'}</p>
+                            <p className="text-[10px]" style={{ color: '#D79AA8' }}>{order.customer?.phone || order.customerPhone || ''}</p>
                           </div>
                         </div>
                       </td>
