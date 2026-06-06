@@ -18,6 +18,7 @@ const titles: Record<string, string> = {
   '/admin/settings': 'الإعدادات',
   '/admin/users': 'المستخدمون',
   '/admin/support': 'الدعم',
+  '/admin/hero-banners': 'Hero Banners',
 };
 
 export default function AdminLayout() {

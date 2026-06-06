@@ -9,6 +9,7 @@ import AdminLayout from './admin/layout/AdminLayout';
 import Dashboard from './admin/pages/Dashboard';
 import Orders from './admin/pages/Orders';
 import OrderDetails from './admin/pages/OrderDetails';
+import HeroBanners from './admin/pages/HeroBanners';
 import Products from './admin/pages/Products';
 import ProductForm from './admin/pages/ProductForm';
 import Categories from './admin/pages/Categories';
@@ -30,6 +31,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="orders" element={<Orders />} />
         <Route path="orders/:id" element={<OrderDetails />} />
+        <Route path="hero-banners" element={<HeroBanners />} />
         <Route path="products" element={<Products />} />
         <Route path="products/new" element={<ProductForm />} />
         <Route path="products/:id" element={<ProductForm />} />

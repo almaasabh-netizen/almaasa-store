@@ -460,22 +460,23 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* ── 3. HERO SECTION ─────────────────────────────────── */}
           {(() => {
-            const imgs = [
-              products[0]?.image,
-              products[1]?.image,
-              products[2]?.image,
-              products[3]?.image,
-            ].filter(Boolean) as string[];
-            const heroSlides = [
+            // Load from admin-managed banners, fallback to product images
+            const savedBanners: Array<{ image: string; subtitle: string; title: string; desc: string; active: boolean }> = (() => {
+              try { return JSON.parse(localStorage.getItem('almaasa_hero_banners') || '[]'); } catch { return []; }
+            })();
+            const activeBanners = savedBanners.filter(b => b.active && b.image);
+            const fallbackImgs = [products[0]?.image, products[1]?.image, products[2]?.image, products[3]?.image].filter(Boolean) as string[];
+            const defaultSlides = [
               { subtitle: 'أزياء تعكس ذوقك الرفيع',   title: 'ألماسة\nللمخاوير الراقية',             desc: 'تصاميم استثنائية تجمع بين الفخامة والراحة لتتألقي بإطلالة مميزة في كل وقت' },
               { subtitle: 'أناقة تنبض بالأنوثة',        title: 'مخاوير راقية\nلتألقي في كل مناسبة',    desc: 'تصاميم فاخرة بأقمشة ناعمة وحالية' },
               { subtitle: 'كولكشن 2026',                title: 'تشكيلة العيد\nوصلت الآن',              desc: 'أحدث تصاميم المخاوير الخليجية بأقمشة فاخرة وألوان رائعة' },
               { subtitle: 'جودة لا تضاهى',              title: 'تفصيل على المقاس\nبأرقى الأقمشة',      desc: 'نصنع لكِ تفاصيل لا تُنسى — راسليننا على واتساب' },
             ];
-            const total = Math.min(heroSlides.length, imgs.length || 1);
+            const heroSlides = activeBanners.length > 0 ? activeBanners : defaultSlides.map((s, i) => ({ ...s, image: fallbackImgs[i] || '', active: true }));
+            const total = heroSlides.filter(s => s.image).length || heroSlides.length;
             const idx = heroIdx % (total || 1);
             const slide = heroSlides[idx];
-            const img = imgs[idx] || '';
+            const img = slide.image || '';
             return (
               <section className="select-none overflow-hidden" style={{ background: '#F9F0EE' }}>
                 {/* Desktop layout */}
