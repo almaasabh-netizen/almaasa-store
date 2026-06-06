@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowRight, Save, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowRight, Save, Sparkles, Loader2, X } from 'lucide-react';
 import { getStoredData, saveStoredData } from '../../data';
 
 const SIZES = ['XS','S','M','L','XL','XXL','فري سايز'];
