@@ -48,18 +48,20 @@ export default function ProductForm() {
     }
   }, [id, isNew, setValue]);
 
+  const watchCategory = watch('category');
+
   const generateDescription = async () => {
     const name = watchName?.trim();
     if (!name) return;
     setAiLoading(true);
     try {
-      const { GoogleGenAI } = await import('@google/genai');
-      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || (window as any).GEMINI_API_KEY || '' });
-      const res = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
-        contents: `اكتب وصفاً تسويقياً جذاباً باللغة العربية لمنتج اسمه: "${name}". المنتج من متجر ألماسة للمخاوير والأزياء النسائية الخليجية. الوصف يجب أن يكون 2-3 جمل فقط، مختصراً وجذاباً للعميلة.`,
+      const res = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productName: name, categoryName: watchCategory, imageBase64: watchImage }),
       });
-      setValue('description', res.text || '');
+      const json = await res.json();
+      setValue('description', json.description || json.error || 'تعذر توليد الوصف');
     } catch {
       setValue('description', 'تعذر توليد الوصف، يرجى المحاولة لاحقاً.');
     } finally {
@@ -123,9 +125,14 @@ export default function ProductForm() {
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>التصنيف</label>
-              <input {...register('category')}
+              <select {...register('category')}
                 className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
-                style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
+                style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}>
+                <option value="">— اختر تصنيف —</option>
+                {getStoredData().categories.filter((c: any) => c.id !== 'all').map((c: any) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>كود المنتج (SKU) — تلقائي</label>
