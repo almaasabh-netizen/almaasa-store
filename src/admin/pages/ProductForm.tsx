@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { ArrowRight, Save, X } from 'lucide-react';
+import { ArrowRight, Save, Sparkles, Loader2 } from 'lucide-react';
 import { getStoredData, saveStoredData } from '../../data';
+import { GoogleGenAI } from '@google/genai';
 
 const SIZES = ['XS','S','M','L','XL','XXL','فري سايز'];
 const COLORS = ['أسود','أبيض','بيج','رمادي','بني','ذهبي','كحلي','زيتي','وردي','أحمر'];
@@ -14,10 +15,18 @@ type FormData = {
   sizes: string[]; colors: string[]; isDraft: boolean;
 };
 
+function genSKU() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let s = 'ALM-';
+  for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
+
 export default function ProductForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isNew = id === 'new' || !id;
+  const [aiLoading, setAiLoading] = useState(false);
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
     defaultValues: { isDraft: false, sizes: [], colors: [], stock: 0 }
@@ -26,6 +35,7 @@ export default function ProductForm() {
   const watchSizes = watch('sizes') as string[];
   const watchColors = watch('colors') as string[];
   const watchImage = watch('image');
+  const watchName = watch('name');
 
   useEffect(() => {
     if (!isNew) {
@@ -34,8 +44,28 @@ export default function ProductForm() {
       if (product) {
         Object.entries(product).forEach(([k, v]) => setValue(k as any, v as any));
       }
+    } else {
+      setValue('sku', genSKU());
     }
   }, [id, isNew, setValue]);
+
+  const generateDescription = async () => {
+    const name = watchName?.trim();
+    if (!name) return;
+    setAiLoading(true);
+    try {
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || (window as any).GEMINI_API_KEY || '' });
+      const res = await ai.models.generateContent({
+        model: 'gemini-2.0-flash',
+        contents: `اكتب وصفاً تسويقياً جذاباً باللغة العربية لمنتج اسمه: "${name}". المنتج من متجر ألماسة للمخاوير والأزياء النسائية الخليجية. الوصف يجب أن يكون 2-3 جمل فقط، مختصراً وجذاباً للعميلة.`,
+      });
+      setValue('description', res.text || '');
+    } catch {
+      setValue('description', 'تعذر توليد الوصف، يرجى المحاولة لاحقاً.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const toggleArr = (field: 'sizes' | 'colors', val: string) => {
     const curr = field === 'sizes' ? watchSizes : watchColors;
@@ -98,10 +128,10 @@ export default function ProductForm() {
                 style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
             </div>
             <div>
-              <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>كود المنتج (SKU)</label>
-              <input {...register('sku')}
+              <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>كود المنتج (SKU) — تلقائي</label>
+              <input {...register('sku')} readOnly
                 className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
-                style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} dir="ltr" />
+                style={{ border: '1px solid #F0DDE0', background: '#F3E6E8', color: '#9A7A82', cursor: 'default' }} dir="ltr" />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>المخزون</label>
@@ -117,7 +147,15 @@ export default function ProductForm() {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>الوصف</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-bold" style={{ color: '#5A4047' }}>الوصف</label>
+              <button type="button" onClick={generateDescription} disabled={aiLoading || !watchName}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-opacity disabled:opacity-40"
+                style={{ background: '#C4607A', color: 'white' }}>
+                {aiLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                توليد بالذكاء الاصطناعي
+              </button>
+            </div>
             <textarea rows={3} {...register('description')}
               className="w-full rounded-xl px-3 py-2.5 text-sm outline-none resize-none"
               style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
