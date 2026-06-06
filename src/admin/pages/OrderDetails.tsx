@@ -15,8 +15,23 @@ export default function OrderDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(() => getStoredData());
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [refCode, setRefCode] = useState('');
+  const [refSaved, setRefSaved] = useState(false);
+  const statusRef = useRef<HTMLDivElement>(null);
 
   const order = data.orders?.find((o: any) => o.id === id);
+
+  useEffect(() => {
+    if (order?.paymentRef) setRefCode(order.paymentRef);
+  }, [order?.paymentRef]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   if (!order) return (
     <div className="text-center py-20" dir="rtl">
       <p className="text-4xl mb-3">🔍</p>
@@ -34,9 +49,6 @@ export default function OrderDetails() {
   const customerAddress = c.address || order.customerAddress || '';
   const customerNotes   = c.notes   || order.notes           || order.customerNotes || '';
 
-  const [refCode, setRefCode] = useState<string>(order.paymentRef || '');
-  const [refSaved, setRefSaved] = useState(false);
-
   const saveRefCode = () => {
     const updated = { ...data, orders: data.orders.map((o: any) => o.id === id ? { ...o, paymentRef: refCode } : o) };
     saveStoredData(updated);
@@ -44,13 +56,6 @@ export default function OrderDetails() {
     setRefSaved(true);
     setTimeout(() => setRefSaved(false), 2000);
   };
-  const statusRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => { if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
 
   const sc = statusColors[order.status] ?? statusColors.new;
   const stepIdx = STEPS.findIndex(s => s.key === order.status);
