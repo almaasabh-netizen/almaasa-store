@@ -460,65 +460,45 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* ── 3. HERO SECTION ─────────────────────────────────── */}
           {(() => {
+            const imgs = [
+              products[0]?.image,
+              products[1]?.image,
+              products[2]?.image,
+              products[3]?.image,
+            ].filter(Boolean) as string[];
             const heroSlides = [
-              {
-                image: 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
-                subtitle: 'أزياء تعكس ذوقك الرفيع',
-                title: <>ألماسة<br />للمخاوير الراقية</>,
-                desc: 'تصاميم استثنائية تجمع بين الفخامة والراحة لتتألقي بإطلالة مميزة في كل وقت',
-              },
-              {
-                image: products[0]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
-                subtitle: 'أناقة تنبض بالأنوثة',
-                title: <>مخاوير راقية<br />لتألقي في كل مناسبة</>,
-                desc: 'تصاميم فاخرة بأقمشة ناعمة وحالية',
-              },
-              {
-                image: products[1]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
-                subtitle: 'كولكشن 2026',
-                title: <>تشكيلة العيد<br />وصلت الآن</>,
-                desc: 'أحدث تصاميم المخاوير الخليجية بأقمشة فاخرة وألوان رائعة',
-              },
-              {
-                image: products[2]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
-                subtitle: 'جودة لا تضاهى',
-                title: <>تفصيل على المقاس<br />بأرقى الأقمشة</>,
-                desc: 'نصنع لكِ تفاصيل لا تُنسى — راسليننا على واتساب',
-              },
+              { subtitle: 'أزياء تعكس ذوقك الرفيع',   title: 'ألماسة\nللمخاوير الراقية',             desc: 'تصاميم استثنائية تجمع بين الفخامة والراحة لتتألقي بإطلالة مميزة في كل وقت' },
+              { subtitle: 'أناقة تنبض بالأنوثة',        title: 'مخاوير راقية\nلتألقي في كل مناسبة',    desc: 'تصاميم فاخرة بأقمشة ناعمة وحالية' },
+              { subtitle: 'كولكشن 2026',                title: 'تشكيلة العيد\nوصلت الآن',              desc: 'أحدث تصاميم المخاوير الخليجية بأقمشة فاخرة وألوان رائعة' },
+              { subtitle: 'جودة لا تضاهى',              title: 'تفصيل على المقاس\nبأرقى الأقمشة',      desc: 'نصنع لكِ تفاصيل لا تُنسى — راسليننا على واتساب' },
             ];
-            const slide = heroSlides[heroIdx];
+            const total = Math.min(heroSlides.length, imgs.length || 1);
+            const idx = heroIdx % (total || 1);
+            const slide = heroSlides[idx];
+            const img = imgs[idx] || '';
             return (
-              <section className="relative overflow-hidden select-none" style={{ background: '#F9F0EE', minHeight: 520 }}>
-                {/* Background image (left half) */}
-                <div className="absolute inset-y-0 left-0 w-full md:w-1/2 overflow-hidden">
-                  <img
-                    src={slide.image}
-                    alt="hero"
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-top transition-opacity duration-500"
-                    style={{ minHeight: 520 }}
-                  />
-                  {/* Right fade */}
-                  <div className="absolute inset-y-0 right-0 w-40 hidden md:block" style={{ background: 'linear-gradient(to left, #F9F0EE, transparent)' }} />
-                </div>
+              <section className="select-none overflow-hidden" style={{ background: '#F9F0EE' }}>
+                {/* Desktop layout */}
+                <div className="hidden md:flex" style={{ minHeight: 520 }}>
+                  {/* LEFT: image */}
+                  <div className="w-1/2 relative overflow-hidden" style={{ minHeight: 520 }}>
+                    {img && <img src={img} alt="hero" referrerPolicy="no-referrer"
+                      className="absolute inset-0 w-full h-full object-cover object-top" />}
+                    {/* fade to cream on the right edge */}
+                    <div className="absolute inset-y-0 right-0 w-24 pointer-events-none"
+                      style={{ background: 'linear-gradient(to right, transparent, #F9F0EE)' }} />
+                  </div>
 
-                {/* Mobile image strip */}
-                <div className="md:hidden w-full h-64 overflow-hidden">
-                  <img src={slide.image} alt="hero" referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
-                </div>
-
-                {/* Content — right side */}
-                <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
-                  <div className="flex justify-end">
-                    <div className="w-full md:w-1/2 py-14 md:py-20 text-right" dir="rtl">
-                      <p className="text-sm font-medium mb-3" style={{ color: '#7A5C60' }}>{slide.subtitle}</p>
-                      <h1 className="font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#2C1810' }}>
+                  {/* RIGHT: text */}
+                  <div className="w-1/2 flex items-center px-12 xl:px-20" dir="rtl">
+                    <div>
+                      <p className="text-sm font-medium mb-3" style={{ color: '#9A7A82' }}>{slide.subtitle}</p>
+                      <h1 className="font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem,3.5vw,3rem)', color: '#2C1810', whiteSpace: 'pre-line' }}>
                         {slide.title}
                       </h1>
-                      <p className="mb-8 text-sm md:text-base leading-relaxed" style={{ color: '#7A5C60', maxWidth: 380 }}>{slide.desc}</p>
-                      <button
-                        onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="font-bold px-8 py-3.5 rounded-lg text-sm transition-all hover:opacity-90 hover:-translate-y-0.5"
+                      <p className="text-sm leading-relaxed mb-8 max-w-sm" style={{ color: '#9A7A82' }}>{slide.desc}</p>
+                      <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="font-bold px-8 py-3.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
                         style={{ background: '#C4607A', color: 'white' }}>
                         تسوقي الآن
                       </button>
@@ -526,30 +506,43 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   </div>
                 </div>
 
-                {/* Left arrow */}
-                <button
-                  onClick={() => setHeroIdx((heroIdx - 1 + heroSlides.length) % heroSlides.length)}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-shadow hidden md:flex"
-                  style={{ color: '#2C1810' }}>
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-
-                {/* Right arrow */}
-                <button
-                  onClick={() => setHeroIdx((heroIdx + 1) % heroSlides.length)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-shadow hidden md:flex"
-                  style={{ color: '#2C1810' }}>
-                  <ChevronLeft className="w-5 h-5 rotate-180" />
-                </button>
-
-                {/* Dots */}
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-                  {heroSlides.map((_, i) => (
-                    <button key={i} onClick={() => setHeroIdx(i)}
-                      className="rounded-full transition-all"
-                      style={{ width: i === heroIdx ? 20 : 8, height: 8, background: i === heroIdx ? '#C4607A' : 'rgba(255,255,255,0.7)' }} />
-                  ))}
+                {/* Mobile layout */}
+                <div className="md:hidden">
+                  {img && <img src={img} alt="hero" referrerPolicy="no-referrer" className="w-full h-64 object-cover object-top" />}
+                  <div className="px-5 py-8 text-right" dir="rtl">
+                    <p className="text-xs font-medium mb-2" style={{ color: '#9A7A82' }}>{slide.subtitle}</p>
+                    <h1 className="font-black leading-tight mb-3 text-2xl" style={{ color: '#2C1810', whiteSpace: 'pre-line' }}>{slide.title}</h1>
+                    <p className="text-sm leading-relaxed mb-6" style={{ color: '#9A7A82' }}>{slide.desc}</p>
+                    <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="font-bold px-7 py-3 rounded-lg text-sm"
+                      style={{ background: '#C4607A', color: 'white' }}>
+                      تسوقي الآن
+                    </button>
+                  </div>
                 </div>
+
+                {/* Controls */}
+                {total > 1 && (
+                  <>
+                    <button onClick={() => setHeroIdx((idx - 1 + total) % total)}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center hidden md:flex"
+                      style={{ color: '#2C1810' }}>
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setHeroIdx((idx + 1) % total)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center hidden md:flex"
+                      style={{ color: '#2C1810' }}>
+                      <ChevronLeft className="w-4 h-4 rotate-180" />
+                    </button>
+                    <div className="flex justify-center gap-2 py-4">
+                      {Array.from({ length: total }).map((_, i) => (
+                        <button key={i} onClick={() => setHeroIdx(i)}
+                          className="rounded-full transition-all"
+                          style={{ width: i === idx ? 20 : 8, height: 8, background: i === idx ? '#C4607A' : '#D9B8C0' }} />
+                      ))}
+                    </div>
+                  </>
+                )}
               </section>
             );
           })()}
