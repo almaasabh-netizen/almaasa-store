@@ -34,7 +34,16 @@ export default function OrderDetails() {
   const customerAddress = c.address || order.customerAddress || '';
   const customerNotes   = c.notes   || order.notes           || order.customerNotes || '';
 
-  const [statusOpen, setStatusOpen] = useState(false);
+  const [refCode, setRefCode] = useState<string>(order.paymentRef || '');
+  const [refSaved, setRefSaved] = useState(false);
+
+  const saveRefCode = () => {
+    const updated = { ...data, orders: data.orders.map((o: any) => o.id === id ? { ...o, paymentRef: refCode } : o) };
+    saveStoredData(updated);
+    setData(updated);
+    setRefSaved(true);
+    setTimeout(() => setRefSaved(false), 2000);
+  };
   const statusRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -176,6 +185,12 @@ export default function OrderDetails() {
                 <span>الإجمالي</span>
                 <span style={{ color: '#C77D8A' }}>{order.total?.toFixed(2)} د.ب</span>
               </div>
+              {order.paymentRef && (
+                <div className="flex justify-between text-xs pt-1.5 border-t" style={{ borderColor: '#F0DDE0' }}>
+                  <span style={{ color: '#D79AA8' }}>مرجع الدفع</span>
+                  <span className="font-mono font-bold" style={{ color: '#5A4047' }}>{order.paymentRef}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -213,6 +228,26 @@ export default function OrderDetails() {
               <p className="text-xs" style={{ color: '#5A4047' }}>{customerNotes}</p>
             </div>
           )}
+
+          {/* Payment reference code */}
+          <div className="rounded-2xl p-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+            <p className="text-xs font-black mb-2" style={{ color: '#5A4047' }}>رقم مرجع الدفع</p>
+            <div className="flex gap-2">
+              <input
+                value={refCode}
+                onChange={e => setRefCode(e.target.value)}
+                placeholder="أدخل رقم المرجع أو التحويل..."
+                className="flex-1 rounded-xl px-3 py-2 text-sm outline-none"
+                style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}
+                dir="ltr"
+              />
+              <button onClick={saveRefCode}
+                className="px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+                style={{ background: refSaved ? '#22C55E' : '#D79AA8', color: 'white' }}>
+                {refSaved ? '✓' : 'حفظ'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
