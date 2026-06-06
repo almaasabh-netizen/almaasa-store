@@ -45,6 +45,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [showTerms, setShowTerms] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [heroIdx, setHeroIdx] = useState(0);
   const toastId = useRef(0);
 
   /* ── PRODUCT OPTIONS ─────────────────────────────────────────── */
@@ -434,84 +435,81 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           {/* ── 3. HERO BANNER ───────────────────────────────── */}
           {(() => {
             const heroProducts = products.filter(p => !p.isDraft).slice(0, 4);
-            const [heroIdx, setHeroIdx] = React.useState(0);
-            const heroProduct = heroProducts[heroIdx] ?? null;
+            const heroProduct = heroProducts[heroIdx % Math.max(heroProducts.length, 1)] ?? null;
+            const total = Math.max(heroProducts.length, 1);
             return (
-              <div className="relative w-full overflow-hidden bg-white" style={{ height: 380 }} dir="rtl">
-                {/* Image side (left visually = RTL end) */}
-                <div className="absolute inset-y-0 left-0 w-full md:w-[42%]">
+              <section className="relative overflow-hidden" style={{ minHeight: 530, background: 'linear-gradient(135deg,#fdf0f3 0%,#fce4ec 100%)' }}>
+                {/* Image — right side, 52% width */}
+                <div className="absolute inset-y-0 right-0 w-full md:w-[52%] overflow-hidden">
                   {heroProduct ? (
                     <img src={heroProduct.image} alt={heroProduct.name} loading="eager" referrerPolicy="no-referrer"
                       onClick={() => handleProductClick(heroProduct)}
                       className="w-full h-full object-cover object-top cursor-pointer" />
                   ) : (
-                    <div className="w-full h-full" style={{ background: 'linear-gradient(135deg,#F8D7E3,#C4698B)' }} />
+                    <div className="w-full h-full" style={{ background: 'linear-gradient(to bottom left,#f8d0e0,#fce4ec)' }} />
                   )}
-                  {/* fade to white on right edge */}
-                  <div className="absolute inset-y-0 right-0 w-24 hidden md:block" style={{ background: 'linear-gradient(to left, white, transparent)' }} />
+                  {/* fade left edge into page bg */}
+                  <div className="absolute inset-y-0 left-0 w-32 hidden md:block" style={{ background: 'linear-gradient(to right,#fdf0f3,transparent)' }} />
                 </div>
 
-                {/* Text side (right visually = RTL start) */}
-                <div className="relative h-full flex flex-col justify-center md:mr-[42%] px-6 md:px-14 text-right">
-                  <p className="text-[#C4698B] text-xs font-bold tracking-widest mb-3">أناقة تنبض بالأنوثة</p>
-                  <h1 className="text-3xl md:text-4xl lg:text-[42px] font-black text-[#2C1810] leading-snug mb-3">
-                    مخاوير راقية
-                    <br />
-                    لتألقي في كل مناسبة
+                {/* Text content — left side */}
+                <div className="relative z-10 flex flex-col justify-center text-right px-10 md:px-20 py-16 max-w-[520px]">
+                  <p className="text-[#888] text-[15px] font-normal mb-2">أناقة تنبض بالأنوثة</p>
+                  <h1 className="font-black text-[#2d2d2d] leading-snug mb-3" style={{ fontSize: 'clamp(36px,5vw,56px)' }}>
+                    مخاوير راقية<br />لتألقي في كل<br />مناسبة
                   </h1>
-                  <p className="text-[#7A7A7A] text-sm md:text-base mb-7">
-                    تصاميم فاخرة بأقمشة ناعمة وجودة عالية
-                  </p>
+                  <p className="text-[#888] text-base mb-8 font-normal">تصاميم فاخرة بأقمشة ناعمة وجودة عالية</p>
                   <div>
                     <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' })}
-                      className="inline-flex items-center gap-2 text-white font-black text-sm px-8 py-3.5 rounded-full hover:opacity-90 active:scale-95 transition-all"
-                      style={{ background: '#C4698B' }}>
-                      تسوّقي الآن
+                      className="font-black text-white text-base px-11 py-3.5 rounded-[30px] border-none cursor-pointer transition-all hover:opacity-90 hover:-translate-y-px active:scale-95"
+                      style={{ background: '#C4607A' }}>
+                      تسوقي الآن
                     </button>
+                  </div>
+                  {/* Dots */}
+                  <div className="flex items-center gap-2 mt-7">
+                    {Array.from({ length: total }).map((_, i) => (
+                      <button key={i} onClick={() => setHeroIdx(i)}
+                        className="transition-all rounded-full border-none cursor-pointer"
+                        style={{ width: i === heroIdx ? 28 : 10, height: 10, background: i === heroIdx ? '#C4607A' : '#f0c4cf', borderRadius: i === heroIdx ? 5 : 50 }} />
+                    ))}
                   </div>
                 </div>
 
-                {/* Prev arrow */}
-                <button onClick={() => setHeroIdx(i => (i - 1 + Math.max(heroProducts.length,1)) % Math.max(heroProducts.length,1))}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow-md flex items-center justify-center text-[#2C1810] hover:bg-white transition-all z-10">
-                  <ChevronLeft className="w-4 h-4" />
+                {/* Nav arrows */}
+                <button onClick={() => setHeroIdx(i => (i - 1 + total) % total)}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 w-[42px] h-[42px] rounded-full bg-white border-none cursor-pointer shadow-[0_2px_16px_rgba(0,0,0,.12)] flex items-center justify-center z-20 hover:shadow-lg transition-shadow"
+                  style={{ color: '#C4607A', fontSize: 20 }}>
+                  <ChevronRight className="w-5 h-5" />
                 </button>
-                {/* Next arrow */}
-                <button onClick={() => setHeroIdx(i => (i + 1) % Math.max(heroProducts.length,1))}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 shadow-md flex items-center justify-center text-[#2C1810] hover:bg-white transition-all z-10">
-                  <ChevronRight className="w-4 h-4" />
+                <button onClick={() => setHeroIdx(i => (i + 1) % total)}
+                  className="absolute left-5 top-1/2 -translate-y-1/2 w-[42px] h-[42px] rounded-full bg-white border-none cursor-pointer shadow-[0_2px_16px_rgba(0,0,0,.12)] flex items-center justify-center z-20 hover:shadow-lg transition-shadow"
+                  style={{ color: '#C4607A', fontSize: 20 }}>
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
-
-                {/* Dots */}
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                  {(heroProducts.length > 0 ? heroProducts : [null]).map((_,i) => (
-                    <button key={i} onClick={() => setHeroIdx(i)}
-                      className={`rounded-full transition-all ${i===heroIdx ? 'w-5 h-2 bg-[#C4698B]' : 'w-2 h-2 bg-[#C4698B]/30'}`} />
-                  ))}
-                </div>
-              </div>
+              </section>
             );
           })()}
 
           {/* ── 4. TRUST BADGES ─────────────────────────────────── */}
-          <div className="border-b border-gray-100 bg-white">
-            <div className="max-w-7xl mx-auto">
-              <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-x-reverse divide-gray-100">
-                {[
-                  { icon: BadgeCheck, label: 'جودة عالية',  sub: 'أقمشة فاخرة' },
-                  { icon: Truck,      label: 'شحن سريع',    sub: 'توصيل خلال 2-3 أيام' },
-                  { icon: ShieldCheck,label: 'دفع آمن',      sub: 'خيارات دفع متعددة' },
-                  { icon: Phone,      label: 'دعم عملاء',   sub: 'خدمة سريعة 24/7' },
-                ].map(({ icon: Icon, label, sub }) => (
-                  <div key={label} className="flex items-center justify-center gap-3 py-4 px-4">
-                    <Icon className="w-8 h-8 text-[#C4698B] shrink-0" strokeWidth={1.5} />
-                    <div className="text-right">
-                      <p className="text-sm font-black text-[#2C1810]">{label}</p>
-                      <p className="text-[11px] text-gray-500 mt-0.5">{sub}</p>
-                    </div>
+          <div className="bg-white" style={{ borderBottom: '1px solid #f0e0e5', borderTop: '1px solid #f0e0e5' }}>
+            <div className="max-w-7xl mx-auto flex divide-x divide-x-reverse" style={{ borderColor: '#f0e0e5' }}>
+              {[
+                { emoji: '🏆', label: 'جودة عالية',  sub: 'أقمشة فاخرة' },
+                { emoji: '🚚', label: 'شحن سريع',    sub: 'توصيل خلال 2-3 أيام' },
+                { emoji: '🔒', label: 'دفع آمن',      sub: 'خيارات دفع متعددة' },
+                { emoji: '🎧', label: 'دعم عملاء',   sub: 'خدمة سريعة 24/7' },
+              ].map(({ emoji, label, sub }) => (
+                <div key={label} className="flex-1 flex items-center gap-3.5 px-7 py-5" style={{ borderLeftColor: '#f0e0e5' }}>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl shrink-0" style={{ background: '#fdf0f3' }}>
+                    {emoji}
                   </div>
-                ))}
-              </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-[#2d2d2d]">{label}</p>
+                    <p className="text-xs text-[#888] mt-0.5">{sub}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -522,10 +520,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-7">
                   <h2 className="text-xl md:text-2xl font-black text-[#2C1810]">تسوّقي حسب التصنيف</h2>
-                  <div className="flex items-center justify-center gap-2 mt-2">
-                    <span className="h-px w-10 bg-[#C4698B]/30 inline-block" />
-                    <span className="text-[#C4698B] text-xs">◆</span>
-                    <span className="h-px w-10 bg-[#C4698B]/30 inline-block" />
+                  <div className="flex justify-center mt-2">
+                    <svg viewBox="0 0 90 16" width="90"><path d="M0 8 L32 8 L37 2 L42 14 L47 2 L52 14 L57 8 L90 8" fill="none" stroke="#C4607A" strokeWidth="1.5" strokeLinecap="round"/></svg>
                   </div>
                 </div>
                 <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
@@ -597,7 +593,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </div>
 
           {/* ── 6. PRODUCTS SECTION ─────────────────────────────── */}
-          <section id="products-section" className="max-w-7xl mx-auto px-4 pb-16">
+          <section id="products-section" className="px-4 md:px-12 pb-16 pt-12" style={{ background: '#fdf0f3' }}>
             <div className="text-center mb-7">
               <h2 className="text-2xl font-black text-[#2C1810]">
                 {selectedCategory === 'all' ? 'وصل حديثاً' : categories.find(c => c.id === selectedCategory)?.name}
@@ -620,106 +616,70 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
                 {filteredProducts.map((product, idx) => (
-                  <div key={product.id} className="bg-white rounded-2xl border border-[#F2E4DC] overflow-hidden luxury-card group cursor-pointer flex flex-col shadow-sm hover:shadow-xl hover:shadow-[#9A2D55]/10 hover:border-[#E8D5C4] transition-all"
-                    style={{ animationDelay: `${idx * 0.05}s` }}>
+                  <div key={product.id} className="bg-white rounded-[18px] overflow-hidden group cursor-pointer flex flex-col transition-all hover:-translate-y-1"
+                    style={{ border: '1px solid #f0e0e5', boxShadow: '0 1px 4px rgba(196,96,122,.06)' }}
+                    onMouseEnter={e => (e.currentTarget.style.boxShadow='0 10px 28px rgba(196,96,122,.18)')}
+                    onMouseLeave={e => (e.currentTarget.style.boxShadow='0 1px 4px rgba(196,96,122,.06)')}>
 
                     {/* Image */}
-                    <div className="relative overflow-hidden bg-[#F8EDE8]" style={{ aspectRatio: '3/4' }}>
+                    <div className="relative overflow-hidden" style={{ height: 250 }}>
                       <img src={product.image} alt={product.name} referrerPolicy="no-referrer"
                         loading="lazy"
                         onClick={() => handleProductClick(product)}
-                        className="w-full h-full object-cover product-img"
+                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
                       />
 
-                      {/* Badges top-right */}
-                      <div className="absolute top-2.5 right-2.5 flex flex-col gap-1">
-                        {product.originalPrice && (
-                          <span className="bg-[#9A2D55] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">
-                            -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-                          </span>
-                        )}
-                        {product.hasSheilah && (
-                          <span className="bg-[#2C1810]/80 text-[#E8D5C4] text-[8px] font-bold px-2 py-0.5 rounded-full">+ شيلة</span>
-                        )}
-                        {idx < 3 && !product.originalPrice && (
-                          <span className="bg-[#C4956A] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">جديد</span>
-                        )}
-                      </div>
+                      {/* Badge top-right */}
+                      {product.originalPrice ? (
+                        <div className="absolute top-3 right-3 text-white text-[11px] font-bold px-3 py-1 rounded-[20px]" style={{ background: '#C4607A' }}>
+                          -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                        </div>
+                      ) : idx < 4 ? (
+                        <div className="absolute top-3 right-3 text-white text-[11px] font-bold px-3 py-1 rounded-[20px]" style={{ background: '#22a060' }}>جديد</div>
+                      ) : null}
 
-                      {/* Wishlist */}
+                      {/* Wishlist top-left */}
                       <button
                         onClick={e => toggleWishlist(product.id, e)}
-                        className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 ${
-                          wishlist.includes(product.id) ? 'bg-[#9A2D55]' : 'bg-white/90 hover:bg-white'
-                        }`}
+                        className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                        style={{ background: wishlist.includes(product.id) ? '#C4607A' : 'white', boxShadow: '0 2px 8px rgba(0,0,0,.10)' }}
                       >
-                        <Heart className={`w-3.5 h-3.5 transition-all ${wishlist.includes(product.id) ? 'fill-white text-white' : 'text-[#8B7B78]'}`} />
+                        <Heart className="w-4 h-4" style={{ color: wishlist.includes(product.id) ? 'white' : '#888', fill: wishlist.includes(product.id) ? 'white' : 'none' }} />
                       </button>
 
-                      {/* Out of stock overlay */}
+                      {/* Out of stock */}
                       {product.stock === 0 && (
-                        <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center">
-                          <span className="text-[#9A2D55] font-black text-sm bg-white border border-[#F2E4DC] px-4 py-2 rounded-full shadow-sm">نفدت الكمية</span>
+                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                          <span className="font-black text-sm px-4 py-2 rounded-full border" style={{ color: '#C4607A', borderColor: '#f0e0e5', background: 'white' }}>نفدت الكمية</span>
                         </div>
                       )}
-
-                      {/* Low stock */}
-                      {product.stock > 0 && product.stock <= 5 && (
-                        <div className="absolute bottom-3 right-2.5">
-                          <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                            {product.stock} فقط!
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                        <button
-                          onClick={() => handleProductClick(product)}
-                          className="w-full bg-white text-[#9A2D55] font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          عرض التفاصيل
-                        </button>
-                      </div>
                     </div>
 
                     {/* Info */}
-                    <div className="p-3 flex-1 flex flex-col justify-between" onClick={() => handleProductClick(product)}>
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-0.5">
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                            <span className="text-[10px] font-bold text-[#5C3830]">{product.rating}</span>
-                            <span className="text-[9px] text-[#8B7B78]">({product.reviewCount})</span>
-                          </div>
-                          <span className="text-[9px] bg-[#F8EDE8] text-[#9A2D55] font-bold px-1.5 py-0.5 rounded-full">
-                            {categories.find(c => c.id === product.category)?.name || 'مخور'}
-                          </span>
-                        </div>
-                        <h3 className="font-bold text-[#2C1810] text-xs md:text-sm leading-snug line-clamp-2 group-hover:text-[#9A2D55] transition-colors">
-                          {product.name}
-                        </h3>
+                    <div className="p-4 flex-1 flex flex-col" onClick={() => handleProductClick(product)}>
+                      <h3 className="font-bold text-[#2d2d2d] text-[13px] leading-snug line-clamp-2 mb-2">{product.name}</h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-black text-[15px]" style={{ color: '#C4607A' }}>{product.price.toFixed(2)} د.ب</span>
+                        {product.originalPrice && (
+                          <span className="text-[12px] text-[#bbb] line-through">{product.originalPrice.toFixed(2)} د.ب</span>
+                        )}
                       </div>
-
-                      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[#F8EDE8]">
-                        <div className="leading-tight">
-                          <span className="text-[#9A2D55] font-black text-base">{product.price.toFixed(2)}</span>
-                          <span className="text-[#9A2D55] text-[10px] font-semibold mr-0.5">د.ب</span>
-                          {product.originalPrice && (
-                            <div className="text-[#8B7B78] text-[10px] line-through">{product.originalPrice.toFixed(2)} د.ب</div>
-                          )}
-                        </div>
-                        <button
-                          onClick={e => { e.stopPropagation(); handleProductClick(product); setIsCartOpen(true); }}
-                          className="w-8 h-8 bg-[#9A2D55] hover:bg-[#802446] text-white rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 disabled:bg-[#F2E4DC]"
-                          disabled={product.stock === 0}
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
+                      <div className="text-[11px] mb-3" style={{ color: '#f5a623' }}>
+                        {'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5-Math.round(product.rating))}
+                        <span className="text-[#888] mr-1">({product.reviewCount})</span>
                       </div>
+                      <button
+                        onClick={e => { e.stopPropagation(); if (product.stock > 0) { handleProductClick(product); } }}
+                        disabled={product.stock === 0}
+                        className="w-full py-2.5 rounded-[25px] text-[13px] font-bold transition-all mt-auto"
+                        style={{ background: '#fdf0f3', color: '#C4607A', border: '1px solid #f0c4cf' }}
+                        onMouseEnter={e => { if (product.stock > 0) { (e.currentTarget as HTMLButtonElement).style.background='#C4607A'; (e.currentTarget as HTMLButtonElement).style.color='white'; } }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background='#fdf0f3'; (e.currentTarget as HTMLButtonElement).style.color='#C4607A'; }}
+                      >
+                        {product.stock === 0 ? 'نفد المخزون' : 'أضف للسلة'}
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -728,68 +688,46 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </section>
 
           {/* ── 7. REVIEWS SECTION ──────────────────────────────── */}
-          <section className="py-16 px-4 bg-[#2C1810]">
+          <section className="py-14 px-4 md:px-12 bg-white">
             <div className="max-w-7xl mx-auto">
-              <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
-                <div>
-                  <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-2">آراء العملاء</p>
-                  <h2 className="text-2xl md:text-3xl font-black text-white">ماذا تقول زبائننا؟</h2>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex">
-                    {[5,5,5,5,4].map((r,i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
-                  </div>
-                  <span className="text-white/70 text-sm font-medium">4.9 من 5 — بناءً على {reviews.length || 120}+ تقييم</span>
+              <div className="sec-header text-center mb-9">
+                <h2 className="text-2xl font-black text-[#2d2d2d] mb-2">آراء عملاتنا</h2>
+                <div className="flex justify-center">
+                  <svg viewBox="0 0 90 16" width="90"><path d="M0 8 L32 8 L37 2 L42 14 L47 2 L52 14 L57 8 L90 8" fill="none" stroke="#C4607A" strokeWidth="1.5" strokeLinecap="round"/></svg>
                 </div>
               </div>
 
               {reviews.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {reviews.slice(0, 3).map(rev => (
-                    <div key={rev.id} className="bg-white/6 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-all group">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex gap-0.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-white/20'}`} />
-                          ))}
-                        </div>
-                        <span className="text-[10px] text-white/30 font-mono">{rev.date?.substring(0,10) || '2026'}</span>
-                      </div>
-                      <p className="text-[#E8D5C4] text-sm leading-relaxed font-medium mb-5 italic line-clamp-2">"{rev.comment}"</p>
-                      <div className="flex items-center gap-3 border-t border-white/5 pt-4">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#9A2D55] to-[#C4956A] flex items-center justify-center text-white font-black text-sm shrink-0">
-                          {rev.customerName.charAt(0)}
-                        </div>
+                    <div key={rev.id} className="bg-white rounded-[18px] p-6 hover:shadow-[0_6px_20px_rgba(196,96,122,.10)] transition-all" style={{ border: '1px solid #f0e0e5' }}>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center font-black text-base shrink-0" style={{ background: '#f0c4cf', color: '#9e3f58' }}>{rev.customerName.charAt(0)}{rev.customerName.charAt(1) || ''}</div>
                         <div>
-                          <p className="text-white font-bold text-sm">{rev.customerName}</p>
-                          <p className="text-[#8B7B78] text-[10px] line-clamp-1">{rev.productName}</p>
+                          <p className="font-black text-sm text-[#2d2d2d]">{rev.customerName}</p>
+                          <p className="text-[13px] mt-0.5" style={{ color: '#f5a623' }}>{'★'.repeat(rev.rating)}{'☆'.repeat(5-rev.rating)}</p>
                         </div>
                       </div>
+                      <p className="text-[13px] text-[#666] leading-[1.8]">{rev.comment}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                /* Placeholder reviews when none exist */
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {[
-                    { name: 'فاطمة ع.', comment: 'مخور رائع جداً، الخامة فاخرة والتطريز دقيق جداً. وصل بالوقت المحدد وكان في تغليف جميل.', rating: 5 },
-                    { name: 'نورة م.', comment: 'اشتريت طقم الأم والبنت وكان خيالي! الجودة ممتازة والتطريز يدوي احترافي. راضية 100%.', rating: 5 },
-                    { name: 'منى ك.', comment: 'تجربة تسوق رائعة من البداية للنهاية. الموقع سهل والتوصيل سريع والمنتج تجاوز توقعاتي.', rating: 5 },
+                    { name: 'سارة الغامدي', initials: 'سا', comment: 'الجودة ممتازة جداً والخياطة رائعة، استلمت طلبي في يومين بس! المخوار طلع أجمل من الصور بكثير.', stars: 5 },
+                    { name: 'نورة العتيبي', initials: 'نو', comment: 'المخوار أجمل من الصور، القماش ناعم جداً وأنيق جداً. راح أطلب مرة ثانية بالتأكيد وما راح تندمين!', stars: 5 },
+                    { name: 'منال الشمري', initials: 'من', comment: 'متجر محترم وخدمة عملاء ممتازة. المقاسات صحيحة ومطابقة للجدول وما في أي مفاجآت.', stars: 4 },
                   ].map((rev, i) => (
-                    <div key={i} className="bg-white/6 border border-white/10 rounded-2xl p-5">
-                      <div className="flex gap-0.5 mb-4">
-                        {Array.from({length:5}).map((_,j) => <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
-                      </div>
-                      <p className="text-[#E8D5C4] text-sm leading-relaxed font-medium mb-5 italic">"{rev.comment}"</p>
-                      <div className="flex items-center gap-3 border-t border-white/5 pt-4">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#9A2D55] to-[#C4956A] flex items-center justify-center text-white font-black text-sm shrink-0">
-                          {rev.name.charAt(0)}
-                        </div>
+                    <div key={i} className="bg-white rounded-[18px] p-6 hover:shadow-[0_6px_20px_rgba(196,96,122,.10)] transition-all" style={{ border: '1px solid #f0e0e5' }}>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center font-black text-base shrink-0" style={{ background: '#f0c4cf', color: '#9e3f58' }}>{rev.initials}</div>
                         <div>
-                          <p className="text-white font-bold text-sm">{rev.name}</p>
-                          <p className="text-[#8B7B78] text-[10px]">عميلة موثوقة ✓</p>
+                          <p className="font-black text-sm text-[#2d2d2d]">{rev.name}</p>
+                          <p className="text-[13px] mt-0.5" style={{ color: '#f5a623' }}>{'★'.repeat(rev.stars)}{'☆'.repeat(5-rev.stars)}</p>
                         </div>
                       </div>
+                      <p className="text-[13px] text-[#666] leading-[1.8]">{rev.comment}</p>
                     </div>
                   ))}
                 </div>
@@ -797,45 +735,24 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
               <div className="text-center mt-8">
                 <button onClick={() => setShowReviewsPopup(true)}
-                  className="border border-[#C4956A]/40 text-[#C4956A] hover:bg-[#C4956A]/10 font-bold px-8 py-3 rounded-full text-sm transition-all">
+                  className="font-bold px-10 py-3 rounded-[30px] text-sm transition-all hover:opacity-90"
+                  style={{ background: 'transparent', color: '#C4607A', border: '2px solid #C4607A' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background='#C4607A'; (e.currentTarget as HTMLButtonElement).style.color='white'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background='transparent'; (e.currentTarget as HTMLButtonElement).style.color='#C4607A'; }}>
                   عرض جميع التقييمات ({reviews.length || 120}+)
                 </button>
               </div>
             </div>
           </section>
 
-          {/* ── 8. FEATURES BAR ─────────────────────────────────── */}
-          <section className="py-10 px-4 bg-white border-y border-[#F2E4DC]">
-            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5">
-              {[
-                { icon: Globe2,     title: 'شحن دولي سريع',    desc: 'لجميع دول الخليج والعالم',   color: 'bg-blue-50 text-blue-600' },
-                { icon: BadgeCheck, title: 'جودة مضمونة',      desc: 'أقمشة فاخرة مختارة بعناية', color: 'bg-emerald-50 text-emerald-600' },
-                { icon: ShieldCheck,title: 'دفع آمن 100%',     desc: 'BenefitPay, KNet, Visa',    color: 'bg-amber-50 text-amber-600' },
-                { icon: Gift,       title: 'تغليف هدايا',      desc: 'مجاني مع كل طلب',           color: 'bg-[#F8EDE8] text-[#9A2D55]' },
-              ].map(({ icon: Icon, title, desc, color }) => (
-                <div key={title} className="flex items-center gap-3 p-4 rounded-2xl bg-[#FDF8F5] border border-[#F2E4DC] hover:border-[#9A2D55]/20 transition-all">
-                  <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shrink-0`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-black text-[#2C1810] text-sm">{title}</p>
-                    <p className="text-[#8B7B78] text-[11px] mt-0.5">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
           {/* ── 9. INSTAGRAM FEED ───────────────────────────────── */}
-          <section className="py-14 px-4 bg-white">
+          <section className="py-14 px-4 md:px-12" style={{ background: '#fdf0f3' }}>
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 text-[#9A2D55] text-xs font-bold mb-2">
-                  <Instagram className="w-4 h-4" />
-                  <span>تابعينا على إنستقرام</span>
+                <h2 className="text-2xl font-black text-[#2d2d2d] mb-2">تابعينا على إنستقرام</h2>
+                <div className="flex justify-center">
+                  <svg viewBox="0 0 90 16" width="90"><path d="M0 8 L32 8 L37 2 L42 14 L47 2 L52 14 L57 8 L90 8" fill="none" stroke="#C4607A" strokeWidth="1.5" strokeLinecap="round"/></svg>
                 </div>
-                <h2 className="text-2xl font-black text-[#2C1810]">@almaasa.bh</h2>
-                <p className="text-[#8B7B78] text-sm mt-1">أحدث تصاميمنا وكولكشناتنا الجديدة</p>
               </div>
               <behold-widget feed-id="HbcZC4oN0hh4xfAHUvTm"></behold-widget>
               <script
@@ -846,60 +763,22 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 10. WHATSAPP JOIN SECTION ───────────────────────── */}
-          <section className="py-14 px-4 bg-[#FDF8F5]">
-            <div className="max-w-4xl mx-auto">
-              {/* Main CTA card */}
-              <div className="relative rounded-3xl overflow-hidden p-8 md:p-12 text-center"
-                style={{ background: 'linear-gradient(135deg, #FDF0F5 0%, #F8E8EE 50%, #F5E0E8 100%)' }}>
-                {/* Decorative blobs */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[#9A2D55]/8 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#C4956A]/10 rounded-full blur-3xl" />
-                <div className="relative z-10">
-                  <div className="inline-flex items-center gap-2 bg-white border border-[#F2E4DC] shadow-sm text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-5">
-                    <Gift className="w-3.5 h-3.5" />
-                    انضمي لعائلة ألماسة
-                  </div>
-                  <h2 className="text-2xl md:text-4xl font-black text-[#2C1810] mb-3 leading-tight">
-                    اطلعي على جديدنا أولاً
-                  </h2>
-                  <p className="text-[#8B7B78] text-sm mb-8 max-w-md mx-auto">خصومات حصرية وتصاميم جديدة قبل الإعلان الرسمي — نرد خلال دقائق 24/7</p>
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#9A2D55] hover:bg-[#802446] text-white font-black px-8 py-4 rounded-full shadow-xl shadow-[#9A2D55]/25 transition-all hover:-translate-y-1 text-sm">
-                      <Phone className="w-4 h-4" />
-                      تواصلي على واتساب
-                    </a>
-                    <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer"
-                      className="inline-flex items-center gap-2 bg-white border border-[#F2E4DC] text-[#9A2D55] hover:border-[#9A2D55] font-bold px-8 py-4 rounded-full transition-all hover:-translate-y-1 text-sm shadow-sm">
-                      <Instagram className="w-4 h-4" />
-                      تابعينا على إنستقرام
-                    </a>
-                  </div>
-                  <p className="text-[11px] text-[#8B7B78] mt-4 font-mono">+973 37037697</p>
-                </div>
-              </div>
-
-              {/* 3 perks */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-                {[
-                  { icon: Gift, title: 'خصومات حصرية', desc: 'عروض خاصة للأعضاء على المخاوير والأقمشة', color: 'bg-rose-50 text-rose-500' },
-                  { icon: Sparkles, title: 'الجديد أولاً', desc: 'تصاميم جديدة قبل الإعلان الرسمي', color: 'bg-amber-50 text-amber-500' },
-                  { icon: BadgeCheck, title: 'مزايا العضوية', desc: 'نقاط مكافآت وهدايا مع كل طلب', color: 'bg-emerald-50 text-emerald-500' },
-                ].map(({ icon: Icon, title, desc, color }) => (
-                  <div key={title} className="bg-white rounded-2xl p-5 border border-[#F2E4DC] flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow">
-                    <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shrink-0`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-black text-[#2C1810] text-sm">{title}</p>
-                      <p className="text-[#8B7B78] text-xs mt-0.5 leading-relaxed">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* ── 10. NEWSLETTER BANNER ───────────────────────────── */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-10 px-10 md:px-16 py-11" style={{ background: '#C4607A' }}>
+            <div>
+              <h3 className="text-xl font-black text-white mb-1.5">اشتركي في نشرتنا البريدية</h3>
+              <p className="text-[14px]" style={{ color: 'rgba(255,255,255,.85)' }}>احصلي على آخر العروض والتشكيلات الجديدة أول بأول</p>
             </div>
-          </section>
+            <div className="flex gap-2.5 w-full max-w-md">
+              <input type="email" placeholder="أدخلي بريدك الإلكتروني..."
+                className="flex-1 px-5 py-3 rounded-[30px] border-none outline-none text-[14px] font-[Tajawal,sans-serif]"
+                style={{ background: 'rgba(255,255,255,.95)', color: '#2d2d2d' }} dir="rtl" />
+              <button className="px-7 py-3 rounded-[30px] font-black text-sm whitespace-nowrap border-none cursor-pointer hover:opacity-90 transition-opacity"
+                style={{ background: 'white', color: '#C4607A' }}>
+                اشتركي الآن
+              </button>
+            </div>
+          </div>
 
           {/* ── FAQ SECTION ─────────────────────────────────────── */}
           {(() => {
@@ -1080,63 +959,46 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       )}
 
       {/* ── FOOTER ──────────────────────────────────────────────── */}
-      <footer className="bg-[#1a0d08] text-[#8B7B78]">
-        <div className="max-w-7xl mx-auto px-4 pt-14 pb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+      <footer style={{ background: '#2a2a2a', color: '#ccc' }}>
+        <div className="max-w-7xl mx-auto px-10 md:px-12 pt-14 pb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-11">
 
             {/* Brand */}
-            <div className="sm:col-span-2 md:col-span-1">
-              <div className="mb-4">
-                <img src="/logo.jpg" alt="ألماسة" className="h-16 w-auto object-contain brightness-[1.1] contrast-[0.9] opacity-90" />
-              </div>
-              <p className="text-[13px] leading-relaxed text-[#8B7B78] font-medium">
-                متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.
+            <div>
+              <div className="text-3xl font-black text-white">ألماسة</div>
+              <span className="text-[10px] tracking-[4px] mb-3.5 block" style={{ color: '#888' }}>ALMAASA</span>
+              <p className="text-[13px] leading-[1.9] mb-4.5" style={{ color: '#999' }}>
+                ألماسة — مخاوير راقية، الأناقة بالتميز. تصاميم فاخرة لكل مناسبة بأعلى معايير الجودة وأرقى الأقمشة.
               </p>
-              <div className="flex gap-2.5 mt-5">
-                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                  className="w-9 h-9 bg-white/5 hover:bg-emerald-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
-                  <Phone className="w-4 h-4" />
-                </a>
-                <a href="https://instagram.com/almaasa_store" target="_blank" rel="noreferrer"
-                  className="w-9 h-9 bg-white/5 hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
-                  <Instagram className="w-4 h-4" />
-                </a>
+              <div className="flex gap-3 mt-4">
+                {[
+                  { href: 'https://instagram.com/almaasa.bh', label: '📸' },
+                  { href: '#', label: '👻' },
+                  { href: '#', label: '🎵' },
+                ].map(s => (
+                  <a key={s.href} href={s.href} target="_blank" rel="noreferrer"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-base transition-all hover:opacity-90"
+                    style={{ background: '#3d3d3d' }}>
+                    {s.label}
+                  </a>
+                ))}
               </div>
             </div>
 
-            {/* Shop links */}
+            {/* معلومات */}
             <div>
-              <p className="text-white font-black text-sm mb-4">التسوق</p>
+              <p className="text-white font-black text-[15px] mb-4.5 pb-2.5" style={{ borderBottom: '1px solid #3d3d3d' }}>معلومات</p>
               <ul className="space-y-2.5">
                 {[
-                  { label: 'جميع المنتجات', action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
-                  ...categories.filter(c=>c.id!=='all').slice(0,3).map(c => ({
-                    label: c.name,
-                    action: () => { setActiveTab('shop'); setSelectedCategory(c.id); }
-                  })),
-                  { label: 'العروض والتخفيضات', action: () => setActiveTab('shop') },
-                ].map(item => (
-                  <li key={item.label}>
-                    <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium text-right">
-                      {item.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Help links */}
-            <div>
-              <p className="text-white font-black text-sm mb-4">المساعدة</p>
-              <ul className="space-y-2.5">
-                {[
-                  { label: 'تتبع طلبي ✈️', action: () => setActiveTab('tracking') },
-                  { label: 'آراء الزبائن ⭐', action: () => setShowReviewsPopup(true) },
-                  { label: 'تواصلي معنا', action: () => window.open('https://wa.me/97337037697','_blank') },
+                  { label: 'من نحن', action: () => setShowAbout(true) },
+                  { label: 'الشروط والأحكام', action: () => setShowTerms(true) },
+                  { label: 'سياسة الخصوصية', action: () => setShowPrivacy(true) },
                   { label: 'سياسة الإرجاع', action: () => setShowReturnPolicy(true) },
                 ].map(item => (
                   <li key={item.label}>
-                    <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium">
+                    <button onClick={item.action} className="text-[13px] transition-colors font-normal text-right" style={{ color: '#999' }}
+                      onMouseEnter={e => (e.currentTarget.style.color='#f0c4cf')}
+                      onMouseLeave={e => (e.currentTarget.style.color='#999')}>
                       {item.label}
                     </button>
                   </li>
@@ -1144,40 +1006,47 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               </ul>
             </div>
 
-            {/* Payment + contact */}
+            {/* روابط سريعة */}
             <div>
-              <p className="text-white font-black text-sm mb-4">وسائل الدفع</p>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {['BenefitPay', 'KNet', 'Visa', 'Mastercard', 'Apple Pay'].map(p => (
-                  <span key={p} className="bg-white/5 border border-white/10 text-[#8B7B78] text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                    {p}
-                  </span>
+              <p className="text-white font-black text-[15px] mb-4.5 pb-2.5" style={{ borderBottom: '1px solid #3d3d3d' }}>روابط سريعة</p>
+              <ul className="space-y-2.5">
+                {[
+                  { label: 'المخاوير', action: () => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } },
+                  ...categories.filter(c=>c.id!=='all').slice(0,3).map(c => ({ label: c.name, action: () => { setActiveTab('shop'); setSelectedCategory(c.id); } })),
+                  { label: 'تتبع الطلب', action: () => setActiveTab('tracking') },
+                ].map(item => (
+                  <li key={item.label}>
+                    <button onClick={item.action} className="text-[13px] font-normal text-right transition-colors" style={{ color: '#999' }}
+                      onMouseEnter={e => (e.currentTarget.style.color='#f0c4cf')}
+                      onMouseLeave={e => (e.currentTarget.style.color='#999')}>
+                      {item.label}
+                    </button>
+                  </li>
                 ))}
+              </ul>
+            </div>
+
+            {/* تواصل */}
+            <div>
+              <p className="text-white font-black text-[15px] mb-4.5 pb-2.5" style={{ borderBottom: '1px solid #3d3d3d' }}>تواصل معنا</p>
+              <div className="space-y-2.5 text-[13px]" style={{ color: '#999' }}>
+                <div className="flex items-center gap-2.5"><Phone className="w-4 h-4 shrink-0" /><span>+973 37037697</span></div>
+                <div className="flex items-center gap-2.5"><MapPin className="w-4 h-4 shrink-0" /><span>المنامة، البحرين</span></div>
+                <div className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" /><span>9:00 ص - 11:00 م</span></div>
               </div>
-              <div className="space-y-2 text-[12px]">
-                <p className="flex items-center gap-1.5 text-[#8B7B78]">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  جميع المدفوعات مشفّرة وآمنة
-                </p>
-                <p className="flex items-center gap-1.5 text-[#8B7B78]">
-                  <MapPin className="w-3.5 h-3.5 text-[#C4956A] shrink-0" />
-                  المنامة، مملكة البحرين
-                </p>
+              {/* Payment icons */}
+              <div className="flex flex-wrap gap-2 mt-5">
+                {['VISA', 'Mastercard', 'Benefit', 'Apple Pay'].map(p => (
+                  <span key={p} className="bg-white rounded-md px-3 py-1 text-[11px] font-black text-[#333]">{p}</span>
+                ))}
               </div>
             </div>
 
           </div>
 
-          <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[#8B7B78]/60 font-medium">
-            <p>© 2026 مخاوير ألماسة — almaasa.bh — جميع الحقوق محفوظة</p>
-            <div className="flex items-center gap-4">
-              <button onClick={() => setShowAbout(true)} className="hover:text-[#8B7B78] transition-colors">من نحن</button>
-              <button onClick={() => setShowPrivacy(true)} className="hover:text-[#8B7B78] transition-colors">سياسة الخصوصية</button>
-              <button onClick={() => setShowTerms(true)} className="hover:text-[#8B7B78] transition-colors">الشروط والأحكام</button>
-              <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-60 transition-opacity">
-                إدارة المتجر
-              </button>
-            </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-5" style={{ borderTop: '1px solid #3d3d3d' }}>
+            <div className="text-[12px]" style={{ color: '#666' }}>© 2026 ألماسة. جميع الحقوق محفوظة</div>
+            <button onClick={onNavigateToAdmin} className="text-[11px] opacity-20 hover:opacity-60 transition-opacity" style={{ color: '#666' }}>إدارة المتجر</button>
           </div>
         </div>
       </footer>
