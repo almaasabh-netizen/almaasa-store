@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, Printer, Package, Truck, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
 import { getStoredData, saveStoredData } from '../../data';
@@ -34,6 +34,15 @@ export default function OrderDetails() {
   const customerAddress = c.address || order.customerAddress || '';
   const customerNotes   = c.notes   || order.notes           || order.customerNotes || '';
 
+  const [statusOpen, setStatusOpen] = useState(false);
+  const statusRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => { if (statusRef.current && !statusRef.current.contains(e.target as Node)) setStatusOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const sc = statusColors[order.status] ?? statusColors.new;
   const stepIdx = STEPS.findIndex(s => s.key === order.status);
   const products = data.products || [];
@@ -57,19 +66,22 @@ export default function OrderDetails() {
         </div>
         <div className="mr-auto flex items-center gap-2">
           <span className="px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: sc.bg, color: sc.text }}>{sc.label}</span>
-          <div className="relative group">
-            <button className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold border hover:bg-[#F3E6E8] transition-colors"
+          <div className="relative" ref={statusRef}>
+            <button onClick={() => setStatusOpen(o => !o)}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold border hover:bg-[#F3E6E8] transition-colors"
               style={{ color: '#5A4047', borderColor: '#F0DDE0' }}>
               تغيير الحالة <ChevronDown className="w-3 h-3" />
             </button>
-            <div className="absolute top-full left-0 mt-1 rounded-xl shadow-xl z-10 hidden group-hover:block"
-              style={{ background: '#FFFFFF', border: '1px solid #F0DDE0', minWidth: 150 }}>
-              {Object.entries(statusColors).map(([k, v]) => (
-                <button key={k} onClick={() => updateStatus(k)}
-                  className="w-full text-right px-3 py-2 text-xs font-medium hover:bg-[#FFF8F8] transition-colors"
-                  style={{ color: v.text }}>{v.label}</button>
-              ))}
-            </div>
+            {statusOpen && (
+              <div className="absolute top-full left-0 mt-1 rounded-xl shadow-xl z-20"
+                style={{ background: '#FFFFFF', border: '1px solid #F0DDE0', minWidth: 150 }}>
+                {Object.entries(statusColors).map(([k, v]) => (
+                  <button key={k} onClick={() => { updateStatus(k); setStatusOpen(false); }}
+                    className="w-full text-right px-3 py-2 text-xs font-medium hover:bg-[#FFF8F8] transition-colors"
+                    style={{ color: v.text }}>{v.label}</button>
+                ))}
+              </div>
+            )}
           </div>
           <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
             style={{ background: '#F3E6E8', color: '#C77D8A' }} onClick={() => window.print()}>
@@ -111,20 +123,30 @@ export default function OrderDetails() {
             <h3 className="font-black text-sm mb-4" style={{ color: '#5A4047' }}>المنتجات المطلوبة</h3>
             <div className="space-y-3">
               {order.items?.map((item: any, i: number) => {
-                const p = products.find((pr: any) => pr.id === item.productId);
+                // Support both old flat format and new nested {product, quantity} format
+                const prod = item.product || products.find((pr: any) => pr.id === item.productId) || {};
+                const name  = prod.name  || item.name  || '—';
+                const image = prod.image || item.image || '';
+                const price = prod.price || item.price || 0;
+                const size  = item.selectedSize  || item.size  || '';
+                const color = item.selectedColor || item.color || '';
                 return (
                   <div key={i} className="flex items-center gap-3 pb-3 border-b last:border-0 last:pb-0" style={{ borderColor: '#F0DDE0' }}>
-                    <img src={p?.image || ''} alt={item.name} referrerPolicy="no-referrer"
-                      className="w-14 h-14 rounded-xl object-cover shrink-0" style={{ border: '1px solid #F0DDE0' }} />
+                    {image
+                      ? <img src={image} alt={name} className="w-14 h-14 rounded-xl object-cover object-top shrink-0" style={{ border: '1px solid #F0DDE0' }} />
+                      : <div className="w-14 h-14 rounded-xl shrink-0 flex items-center justify-center" style={{ background: '#F3E6E8', border: '1px solid #F0DDE0' }}>
+                          <Package className="w-5 h-5" style={{ color: '#D79AA8' }} />
+                        </div>
+                    }
                     <div className="flex-1">
-                      <p className="text-sm font-bold" style={{ color: '#5A4047' }}>{item.name}</p>
+                      <p className="text-sm font-bold" style={{ color: '#5A4047' }}>{name}</p>
                       <p className="text-xs" style={{ color: '#D79AA8' }}>
-                        {item.size && `المقاس: ${item.size}`} {item.color && `| اللون: ${item.color}`}
+                        {size && `المقاس: ${size}`}{size && color && ' | '}{color && `اللون: ${color}`}
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-sm font-black" style={{ color: '#C77D8A' }}>{item.price?.toFixed(2)} د.ب</p>
-                      <p className="text-xs" style={{ color: '#D79AA8' }}>× {item.quantity}</p>
+                      <p className="text-sm font-black" style={{ color: '#C77D8A' }}>{(price * item.quantity).toFixed(3)} د.ب</p>
+                      <p className="text-xs" style={{ color: '#D79AA8' }}>{price.toFixed(3)} × {item.quantity}</p>
                     </div>
                   </div>
                 );
