@@ -93,19 +93,22 @@ export default function OrderDetails() {
       {/* Progress bar */}
       {order.status !== 'cancelled' && order.status !== 'returned' && (
         <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
-          <div className="flex items-center justify-between">
+          <p className="text-xs font-bold mb-4" style={{ color: '#D79AA8' }}>اضغط على الخطوة لتغيير حالة الطلب</p>
+          <div className="flex items-center justify-between" dir="ltr">
             {STEPS.map((step, i) => {
               const done = i <= stepIdx;
+              const isCurrent = i === stepIdx;
               const Icon = step.icon;
               return (
                 <React.Fragment key={step.key}>
-                  <div className="flex flex-col items-center gap-1.5">
+                  <button onClick={() => updateStatus(step.key)}
+                    className="flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                      style={{ background: done ? '#D79AA8' : '#F3E6E8' }}>
-                      <Icon className="w-4.5 h-4.5" style={{ width: 18, height: 18, color: done ? 'white' : '#D79AA8' }} />
+                      style={{ background: done ? '#D79AA8' : '#F3E6E8', boxShadow: isCurrent ? '0 0 0 3px #F0DDE0' : 'none' }}>
+                      <Icon style={{ width: 18, height: 18, color: done ? 'white' : '#D79AA8' }} />
                     </div>
                     <p className="text-[10px] font-bold" style={{ color: done ? '#C77D8A' : '#D79AA8' }}>{step.label}</p>
-                  </div>
+                  </button>
                   {i < STEPS.length - 1 && (
                     <div className="flex-1 h-0.5 mx-2" style={{ background: i < stepIdx ? '#D79AA8' : '#F0DDE0' }} />
                   )}
