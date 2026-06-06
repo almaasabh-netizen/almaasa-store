@@ -77,7 +77,14 @@ export default function SettingsPage() {
 
       <Section title="شريط الإعلان (أعلى الموقع)">
         <Field label="نص الإعلان" hint="النص الذي يظهر في الشريط الوردي أعلى الصفحة">
-          {input('announcementText')}
+          <input
+            type="text"
+            value={form.announcementText}
+            onChange={e => setForm(f => ({ ...f, announcementText: e.target.value }))}
+            className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
+            style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}
+            dir="rtl"
+          />
         </Field>
         <div className="rounded-xl p-3 text-center text-xs font-semibold text-white"
           style={{ background: '#C4607A' }}>
