@@ -38,8 +38,35 @@ export default function Dashboard() {
 
   const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
 
+  const isEmpty = orders.length === 0 && products.length === 0;
+
   return (
     <div className="space-y-6" dir="rtl">
+
+      {/* Welcome banner when store is empty */}
+      {isEmpty && (
+        <div className="rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6"
+          style={{ background: 'linear-gradient(135deg, #FFF0F4, #F3E6E8)', border: '1px solid #F0DDE0' }}>
+          <div className="text-4xl shrink-0">✨</div>
+          <div className="flex-1 text-right">
+            <p className="font-black text-base mb-1" style={{ color: '#5A4047' }}>مرحباً بكِ في لوحة تحكم ألماسة!</p>
+            <p className="text-sm" style={{ color: '#9A7A82' }}>ابدئي بإضافة منتجاتك وتهيئة المتجر</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => navigate('/admin/products/new')}
+              className="px-4 py-2 rounded-xl text-sm font-bold text-white"
+              style={{ background: '#D79AA8' }}>
+              أضف منتج
+            </button>
+            <button onClick={() => navigate('/admin/settings')}
+              className="px-4 py-2 rounded-xl text-sm font-bold"
+              style={{ background: '#FFFFFF', color: '#5A4047', border: '1px solid #F0DDE0' }}>
+              الإعدادات
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard

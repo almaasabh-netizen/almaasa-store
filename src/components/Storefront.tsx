@@ -481,9 +481,18 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 {/* Desktop layout */}
                 <div className="hidden md:flex" dir="ltr" style={{ height: 420 }}>
                   {/* LEFT: image */}
-                  <div className="relative overflow-hidden" style={{ width: '55%' }}>
-                    {img && <img src={img} alt="hero" referrerPolicy="no-referrer"
-                      className="absolute inset-0 w-full h-full object-cover object-top" />}
+                  <div className="relative overflow-hidden" style={{ width: '55%', background: 'linear-gradient(135deg, #F5E0E8 0%, #EDD5DC 50%, #E8C8D4 100%)' }}>
+                    {img ? (
+                      <img src={img} alt="hero" referrerPolicy="no-referrer"
+                        className="absolute inset-0 w-full h-full object-cover object-top" />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center opacity-30">
+                          <div className="text-8xl font-black" style={{ color: '#9A2D55', fontFamily: 'serif' }}>◆</div>
+                          <p className="text-sm font-bold mt-2" style={{ color: '#9A2D55' }}>ألماسة</p>
+                        </div>
+                      </div>
+                    )}
                     <div className="absolute inset-y-0 right-0 w-32 pointer-events-none"
                       style={{ background: 'linear-gradient(to right, transparent, #F9F0EE)' }} />
                   </div>
@@ -507,7 +516,15 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
                 {/* Mobile layout */}
                 <div className="md:hidden">
-                  {img && <img src={img} alt="hero" referrerPolicy="no-referrer" className="w-full h-64 object-cover object-top" />}
+                  {img ? (
+                    <img src={img} alt="hero" referrerPolicy="no-referrer" className="w-full h-64 object-cover object-top" />
+                  ) : (
+                    <div className="w-full h-48 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F5E0E8, #E8C8D4)' }}>
+                      <div className="text-center opacity-30">
+                        <div className="text-6xl font-black" style={{ color: '#9A2D55' }}>◆</div>
+                      </div>
+                    </div>
+                  )}
                   <div className="px-5 py-8 text-right" dir="rtl">
                     <p className="text-xs font-medium mb-2" style={{ color: '#9A7A82' }}>{slide.subtitle}</p>
                     <h1 className="font-black leading-tight mb-3 text-2xl" style={{ color: '#2C1810', whiteSpace: 'pre-line' }}>{slide.title}</h1>
@@ -832,7 +849,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
             <div className="relative max-w-5xl mx-auto" dir="ltr" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '4rem' }}>
               {/* Buttons on the LEFT */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flexShrink: 0, minWidth: '220px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '0.75rem', flexShrink: 0, width: '220px' }}>
                 <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
                   className="inline-flex items-center justify-center gap-2.5 bg-white text-[#9A2D55] font-black px-7 py-3.5 rounded-xl shadow-xl transition-all hover:-translate-y-0.5 text-sm">
                   <Phone className="w-4 h-4" />
@@ -864,6 +881,97 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
         </main>
       )}
+
+      {/* ── FOOTER ──────────────────────────────────────────────── */}
+      {(() => {
+        const fs = (() => { try { return JSON.parse(localStorage.getItem('almaasa_settings') || '{}'); } catch { return {}; } })();
+        return (
+      <footer dir="rtl" style={{ background: '#1A0F12', color: '#B89AA4' }}>
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-black" style={{ background: '#9A2D55' }}>◆</div>
+                <span className="font-black text-lg text-white">ألماسة</span>
+              </div>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: '#8A7080' }}>
+                متجر متخصص في المخاوير والأزياء النسائية الراقية — تصاميم استثنائية تجمع بين الفخامة والأناقة.
+              </p>
+              <div className="flex gap-3">
+                {(fs.instagram || 'https://instagram.com/almaasa.bh') && (
+                  <a href={fs.instagram || 'https://instagram.com/almaasa.bh'} target="_blank" rel="noreferrer"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:opacity-80"
+                    style={{ background: '#2A1520' }}>
+                    <Instagram className="w-4 h-4" style={{ color: '#E1306C' }} />
+                  </a>
+                )}
+                {(fs.whatsapp || '97337037697') && (
+                  <a href={`https://wa.me/${fs.whatsapp || '97337037697'}`} target="_blank" rel="noreferrer"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:opacity-80"
+                    style={{ background: '#2A1520' }}>
+                    <Phone className="w-4 h-4" style={{ color: '#25D366' }} />
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Quick links */}
+            <div>
+              <h4 className="text-white font-black text-sm mb-4">روابط سريعة</h4>
+              <ul className="space-y-2.5 text-sm">
+                {[
+                  { label: 'المنتجات', action: () => { setActiveTab('shop'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); } },
+                  { label: 'تتبع الطلب', action: () => setActiveTab('tracking') },
+                  { label: 'تواصلي معنا', action: () => window.open(`https://wa.me/${fs.whatsapp || '97337037697'}`) },
+                ].map(l => (
+                  <li key={l.label}>
+                    <button onClick={l.action} className="hover:text-white transition-colors" style={{ color: '#8A7080' }}>
+                      {l.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-white font-black text-sm mb-4">تواصلي معنا</h4>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-2" style={{ color: '#8A7080' }}>
+                    <Phone className="w-4 h-4 shrink-0" />
+                    <span dir="ltr">+{fs.whatsapp || '97337037697'}</span>
+                  </div>
+                {fs.storeEmail && (
+                  <div className="flex items-center gap-2" style={{ color: '#8A7080' }}>
+                    <Globe2 className="w-4 h-4 shrink-0" />
+                    <span>{fs.storeEmail}</span>
+                  </div>
+                )}
+                {fs.storeAddress && (
+                  <div className="flex items-center gap-2" style={{ color: '#8A7080' }}>
+                    <MapPin className="w-4 h-4 shrink-0" />
+                    <span>{fs.storeAddress}</span>
+                  </div>
+                )}
+                {!fs.storeAddress && (
+                  <div className="flex items-center gap-2" style={{ color: '#8A7080' }}>
+                    <MapPin className="w-4 h-4 shrink-0" />
+                    <span>البحرين 🇧🇭</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs" style={{ borderTop: '1px solid #2A1520', color: '#5A4050' }}>
+            <p>© {new Date().getFullYear()} ألماسة — جميع الحقوق محفوظة</p>
+            <p>مصنوع بـ ❤️ في البحرين</p>
+          </div>
+        </div>
+      </footer>
+        );
+      })()}
 
       {/* ── ORDER TRACKING TAB ──────────────────────────────────── */}
       {activeTab === 'tracking' && (

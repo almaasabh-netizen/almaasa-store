@@ -57,10 +57,18 @@ export default function Products() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {products.length === 0 ? (
-          <div className="col-span-full py-20 text-center">
-            <p className="text-4xl mb-3">📦</p>
-            <p className="font-bold text-sm" style={{ color: '#5A4047' }}>لا توجد منتجات</p>
-            <p className="text-xs mt-1" style={{ color: '#D79AA8' }}>ابدأ بإضافة منتجاتك</p>
+          <div className="col-span-full py-24 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-5" style={{ background: '#F3E6E8' }}>
+              <Package className="w-10 h-10" style={{ color: '#D79AA8' }} />
+            </div>
+            <p className="font-black text-base mb-1" style={{ color: '#5A4047' }}>لا توجد منتجات بعد</p>
+            <p className="text-sm mb-6" style={{ color: '#D79AA8' }}>ابدئي بإضافة أول منتج لمتجرك</p>
+            <button onClick={() => navigate('/admin/products/new')}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white transition-colors hover:opacity-90"
+              style={{ background: '#D79AA8' }}>
+              <Plus className="w-4 h-4" />
+              أضف أول منتج
+            </button>
           </div>
         ) : products.map((p: any) => (
           <div key={p.id} className="rounded-2xl overflow-hidden group relative"
