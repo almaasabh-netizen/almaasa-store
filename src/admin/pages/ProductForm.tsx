@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { ArrowRight, Save, Sparkles, Loader2 } from 'lucide-react';
 import { getStoredData, saveStoredData } from '../../data';
-import { GoogleGenAI } from '@google/genai';
 
 const SIZES = ['XS','S','M','L','XL','XXL','فري سايز'];
 const COLORS = ['أسود','أبيض','بيج','رمادي','بني','ذهبي','كحلي','زيتي','وردي','أحمر'];
@@ -54,6 +53,7 @@ export default function ProductForm() {
     if (!name) return;
     setAiLoading(true);
     try {
+      const { GoogleGenAI } = await import('@google/genai');
       const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || (window as any).GEMINI_API_KEY || '' });
       const res = await ai.models.generateContent({
         model: 'gemini-2.0-flash',
