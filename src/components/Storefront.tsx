@@ -820,60 +820,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 10. WHATSAPP JOIN SECTION ───────────────────────── */}
-          <section className="py-14 px-4 bg-[#FDF8F5]">
-            <div className="max-w-4xl mx-auto">
-              {/* Main CTA card */}
-              <div className="relative rounded-3xl overflow-hidden p-8 md:p-12 text-center"
-                style={{ background: 'linear-gradient(135deg, #FDF0F5 0%, #F8E8EE 50%, #F5E0E8 100%)' }}>
-                {/* Decorative blobs */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[#9A2D55]/8 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#C4956A]/10 rounded-full blur-3xl" />
-                <div className="relative z-10">
-                  <div className="inline-flex items-center gap-2 bg-white border border-[#F2E4DC] shadow-sm text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-5">
-                    <Gift className="w-3.5 h-3.5" />
-                    انضمي لعائلة ألماسة
-                  </div>
-                  <h2 className="text-2xl md:text-4xl font-black text-[#2C1810] mb-3 leading-tight">
-                    اطلعي على جديدنا أولاً
-                  </h2>
-                  <p className="text-[#8B7B78] text-sm mb-8 max-w-md mx-auto">خصومات حصرية وتصاميم جديدة قبل الإعلان الرسمي — نرد خلال دقائق 24/7</p>
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#9A2D55] hover:bg-[#802446] text-white font-black px-8 py-4 rounded-full shadow-xl shadow-[#9A2D55]/25 transition-all hover:-translate-y-1 text-sm">
-                      <Phone className="w-4 h-4" />
-                      تواصلي على واتساب
-                    </a>
-                    <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer"
-                      className="inline-flex items-center gap-2 bg-white border border-[#F2E4DC] text-[#9A2D55] hover:border-[#9A2D55] font-bold px-8 py-4 rounded-full transition-all hover:-translate-y-1 text-sm shadow-sm">
-                      <Instagram className="w-4 h-4" />
-                      تابعينا على إنستقرام
-                    </a>
-                  </div>
-                  <p className="text-[11px] text-[#8B7B78] mt-4 font-mono">+973 37037697</p>
-                </div>
-              </div>
-
-              {/* 3 perks */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-                {[
-                  { icon: Gift, title: 'خصومات حصرية', desc: 'عروض خاصة للأعضاء على المخاوير والأقمشة', color: 'bg-rose-50 text-rose-500' },
-                  { icon: Sparkles, title: 'الجديد أولاً', desc: 'تصاميم جديدة قبل الإعلان الرسمي', color: 'bg-amber-50 text-amber-500' },
-                  { icon: BadgeCheck, title: 'مزايا العضوية', desc: 'نقاط مكافآت وهدايا مع كل طلب', color: 'bg-emerald-50 text-emerald-500' },
-                ].map(({ icon: Icon, title, desc, color }) => (
-                  <div key={title} className="bg-white rounded-2xl p-5 border border-[#F2E4DC] flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow">
-                    <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shrink-0`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-black text-[#2C1810] text-sm">{title}</p>
-                      <p className="text-[#8B7B78] text-xs mt-0.5 leading-relaxed">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
 
           {/* ── 10. FINAL CTA ──────────────────────────────────── */}
           <section className="py-16 px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #2C1810 0%, #4A1228 40%, #9A2D55 100%)' }}>
