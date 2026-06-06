@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { ArrowRight, Save, X } from 'lucide-react';
@@ -126,10 +126,20 @@ export default function ProductForm() {
 
         <div className="rounded-2xl p-5 space-y-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
           <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>الصورة</h3>
-          <input {...register('image')} placeholder="رابط الصورة URL"
-            className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
-            style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} dir="ltr" />
-          {watchImage && <img src={watchImage} alt="preview" referrerPolicy="no-referrer" className="h-32 rounded-xl object-cover" />}
+          <input type="file" accept="image/*" className="hidden" id="product-img-upload"
+            onChange={e => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = ev => setValue('image', ev.target?.result as string);
+              reader.readAsDataURL(file);
+            }} />
+          <label htmlFor="product-img-upload"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl cursor-pointer font-bold text-sm transition-colors hover:opacity-80"
+            style={{ border: '2px dashed #D79AA8', color: '#C77D8A', background: '#FFF8F8' }}>
+            📷 اختر صورة من الجهاز
+          </label>
+          {watchImage && <img src={watchImage} alt="preview" className="h-40 rounded-xl object-cover w-full" style={{ objectPosition: 'top' }} />}
         </div>
 
         <div className="rounded-2xl p-5 space-y-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
