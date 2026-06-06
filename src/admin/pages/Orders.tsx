@@ -97,11 +97,11 @@ export default function Orders() {
                 {orders.map((order: any) => {
                   const sc = statusColors[order.status] ?? statusColors.new;
                   return (
-                    <tr key={order.id} className="border-t hover:bg-[#FFF8F8] transition-colors"
-                      style={{ borderColor: '#F0DDE0' }}>
+                    <tr key={order.id} className="border-t hover:bg-[#FFF8F8] transition-colors cursor-pointer"
+                      style={{ borderColor: '#F0DDE0' }}
+                      onClick={e => { if ((e.target as HTMLElement).closest('button,select') === null) navigate(`/admin/orders/${order.id}`); }}>
                       <td className="px-4 py-3">
-                        <span className="font-black text-sm cursor-pointer hover:underline" style={{ color: '#C77D8A' }}
-                          onClick={() => navigate(`/admin/orders/${order.id}`)}>
+                        <span className="font-black text-sm" style={{ color: '#C77D8A' }}>
                           #{order.id?.slice(-5)}
                         </span>
                       </td>
