@@ -478,11 +478,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             const slide = heroSlides[idx];
             const img = slide.image || '';
             return (
-              <section className="select-none overflow-hidden" style={{ background: '#F9F0EE' }}>
+              <section className="select-none" style={{ background: '#F9F0EE', padding: '0 24px' }}>
                 {/* Desktop layout */}
-                <div className="hidden md:flex" style={{ minHeight: 520 }}>
+                <div className="hidden md:flex overflow-hidden rounded-2xl" style={{ minHeight: 420 }}>
                   {/* LEFT: image */}
-                  <div className="w-1/2 relative overflow-hidden" style={{ minHeight: 520 }}>
+                  <div className="w-1/2 relative overflow-hidden" style={{ minHeight: 420 }}>
                     {img && <img src={img} alt="hero" referrerPolicy="no-referrer"
                       className="absolute inset-0 w-full h-full object-cover object-top" />}
                     {/* fade to cream on the right edge */}
