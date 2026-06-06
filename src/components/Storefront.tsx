@@ -38,14 +38,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
-  const [showWishlist, setShowWishlist] = useState(false);
-  const [showReturnPolicy, setShowReturnPolicy] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
-  const [showPrivacy, setShowPrivacy] = useState(false);
-  const [showTerms, setShowTerms] = useState(false);
+  const [heroIdx, setHeroIdx] = useState(0);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [heroIdx, setHeroIdx] = useState(0);
   const toastId = useRef(0);
 
   /* ── PRODUCT OPTIONS ─────────────────────────────────────────── */
@@ -278,7 +273,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
   /* ── FILTER ──────────────────────────────────────────────────── */
   const filteredProducts = products.filter(p => {
-    if (p.isDraft) return false; // لا تعرض المسودات للعملاء
     const cat = selectedCategory === 'all' || p.category === selectedCategory;
     const q = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.description.toLowerCase().includes(searchQuery.toLowerCase());
     return cat && q;
@@ -305,117 +299,151 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       </div>
 
       {/* ── 1. ANNOUNCEMENT BAR ──────────────────────────────────── */}
-      <div className="text-white py-2 px-4 text-[11px] font-bold" style={{ background: 'linear-gradient(90deg,#C4698B 0%,#A8456E 50%,#C4698B 100%)' }}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-          {/* RIGHT (RTL start): تتبع + تواصل — hidden on small mobile */}
-          <div className="hidden sm:flex items-center gap-3 shrink-0">
-            <button onClick={() => setActiveTab('tracking')} className="flex items-center gap-1 hover:opacity-80 transition-opacity whitespace-nowrap">
-              <User className="w-3 h-3" />تتبع طلبك
+      <div className="text-white py-2 px-4 md:px-8" style={{ background: '#C4607A' }}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between text-[11px] font-semibold">
+          {/* Right: تتبع + تواصل */}
+          <div className="hidden sm:flex items-center gap-4">
+            <button onClick={() => setActiveTab('tracking')} className="flex items-center gap-1.5 hover:text-white/80 transition-colors">
+              <Truck className="w-3.5 h-3.5" />
+              تتبع طلبك
             </button>
-            <span className="opacity-40">|</span>
-            <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:opacity-80 transition-opacity whitespace-nowrap">
-              <Phone className="w-3 h-3" />تواصل معنا
+            <span className="text-white/40">|</span>
+            <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white/80 transition-colors">
+              <Phone className="w-3.5 h-3.5" />
+              تواصل معنا
             </a>
           </div>
-          {/* CENTER: Shipping text */}
-          <div className="flex-1 text-center flex items-center justify-center gap-1.5 overflow-hidden">
+          {/* Center: shipping */}
+          <div className="flex items-center gap-1.5 mx-auto sm:mx-0">
             <Truck className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate text-[10px] sm:text-[11px]">شحن مجاني للطلبات فوق 50 د.ب</span>
+            <span>شحن مجاني للطلبات فوق 300 ريال</span>
           </div>
-          {/* LEFT (RTL end): Social icons */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity"><Instagram className="w-3.5 h-3.5" /></a>
-            <a href="#" className="hidden sm:block hover:opacity-80 transition-opacity">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12.206 1c-.576 0-3.545.163-5.122 3.151-.512.973-.39 2.669-.334 3.63l-.006.001c-.03.176-.153.33-.328.33a.61.61 0 0 1-.14-.019 2.36 2.36 0 0 0-.544-.067c-.666 0-1.368.335-1.368.906 0 .52.505.87 1.315 1.085.057.015.112.03.165.047.424.122.775.412.668.88-.3 1.298-2.175 3.573-2.175 3.573l-.002.003c-.283.355-.33.823-.12 1.23.27.52.849.79 1.52.726.136-.013.268-.025.395-.025.406 0 .755.08 1.043.237.592.328.977.945 1.176 1.483.127.344.33.524.62.522.084 0 .178-.017.277-.05.3-.095.627-.148.97-.148.26 0 .51.028.747.083.474.11.819.21 1.14.21.271 0 .516-.069.776-.21.237-.13.49-.253.849-.329.213-.045.448-.069.696-.069.269 0 .549.029.835.087.117.024.228.036.332.036.312-.002.534-.17.665-.528.198-.539.58-1.152 1.17-1.479.286-.157.633-.237 1.041-.237.128 0 .26.012.395.025.672.064 1.25-.207 1.52-.726.21-.406.163-.875-.12-1.23l-.002-.003S17.36 12.4 17.06 11.102c-.107-.468.244-.758.668-.88.053-.017.108-.032.165-.047.81-.214 1.315-.564 1.315-1.085 0-.571-.702-.906-1.368-.906-.19 0-.374.025-.544.067a.61.61 0 0 1-.14.019c-.175 0-.299-.154-.328-.33l-.006-.001c.055-.961.178-2.657-.334-3.63C15.711 1.163 12.782 1 12.206 1z"/></svg>
+          {/* Left: social icons */}
+          <div className="hidden sm:flex items-center gap-3">
+            <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer" className="hover:text-white/70 transition-colors">
+              <Instagram className="w-3.5 h-3.5" />
             </a>
-            <a href="#" className="hidden sm:block hover:opacity-80 transition-opacity">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.93a8.18 8.18 0 0 0 4.78 1.52V7.01a4.85 4.85 0 0 1-1.01-.32z"/></svg>
+            <a href="https://snapchat.com" target="_blank" rel="noreferrer" className="hover:text-white/70 transition-colors">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12.017 24c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/></svg>
             </a>
+            <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="hover:text-white/70 transition-colors">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+            </a>
+            <button onClick={onNavigateToAdmin} className="opacity-0 hover:opacity-30 transition-opacity text-[9px]">·</button>
           </div>
         </div>
       </div>
 
       {/* ── 2. HEADER ────────────────────────────────────────────── */}
-      <header className={`sticky top-0 z-40 bg-white transition-shadow duration-300 ${isScrolled ? 'shadow-md' : 'border-b border-gray-100'}`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex items-center h-[76px] gap-2">
+      <header className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/98 backdrop-blur-lg shadow-md' : 'bg-white'} border-b border-[#F0E0E5]`}>
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex items-center h-16 gap-3">
 
-            {/* RIGHT (RTL start): Logo */}
-            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="shrink-0 flex items-center">
-              <img src="/logo.jpg" alt="ألماسة" className="h-14 w-auto object-contain" />
+            {/* Right: Logo */}
+            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="shrink-0 hidden md:block">
+              <img src="/logo.jpg" alt="ألماسة" className="h-12 w-auto object-contain" />
             </button>
 
-            {/* CENTER: Nav links */}
-            <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
-              {[
-                { label: 'الرئيسية', action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
-                { label: 'المخاوير', action: () => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } },
-                { label: 'وصل حديثاً', action: () => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } },
-                ...categories.filter(c=>c.id!=='all').slice(0,2).map(cat => ({ label: cat.name, action: () => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } })),
-                { label: 'عن المتجر', action: () => setShowAbout(true) },
-              ].map((item, i) => (
-                <button key={i} onClick={item.action}
-                  className="px-3 py-2 text-[13px] font-bold text-[#3D2314] hover:text-[#C4698B] transition-colors relative group whitespace-nowrap">
-                  {item.label}
-                  <span className="absolute bottom-1 right-0 left-0 h-0.5 bg-[#C4698B] scale-x-0 group-hover:scale-x-100 transition-transform rounded-full origin-right" />
+            {/* Mobile: hamburger + logo */}
+            <div className="flex md:hidden items-center gap-2 mr-auto">
+              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}>
+                <img src="/logo.jpg" alt="ألماسة" className="h-10 w-auto object-contain" />
+              </button>
+            </div>
+
+            {/* Center: Nav links */}
+            <nav className="hidden md:flex items-center justify-center flex-1 gap-6 text-sm font-semibold" dir="rtl">
+              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}
+                className={`py-1 border-b-2 transition-colors ${activeTab === 'shop' && selectedCategory === 'all' ? 'border-[#C4607A] text-[#C4607A]' : 'border-transparent text-[#2d2d2d] hover:text-[#C4607A]'}`}>
+                الرئيسية
+              </button>
+              {categories.filter(c => c.id !== 'all').slice(0, 2).map(cat => (
+                <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className={`py-1 border-b-2 transition-colors ${selectedCategory === cat.id && activeTab === 'shop' ? 'border-[#C4607A] text-[#C4607A]' : 'border-transparent text-[#2d2d2d] hover:text-[#C4607A]'}`}>
+                  {cat.name}
                 </button>
               ))}
+              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="py-1 border-b-2 border-transparent text-[#2d2d2d] hover:text-[#C4607A] transition-colors">
+                وصل حديثاً
+              </button>
+              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="py-1 border-b-2 border-transparent text-[#2d2d2d] hover:text-[#C4607A] transition-colors">
+                عروض
+              </button>
+              {categories.filter(c => c.id !== 'all').slice(2, 4).map(cat => (
+                <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className={`py-1 border-b-2 transition-colors ${selectedCategory === cat.id && activeTab === 'shop' ? 'border-[#C4607A] text-[#C4607A]' : 'border-transparent text-[#2d2d2d] hover:text-[#C4607A]'}`}>
+                  {cat.name}
+                </button>
+              ))}
+              <button className="py-1 border-b-2 border-transparent text-[#2d2d2d] hover:text-[#C4607A] transition-colors">
+                عن المتجر
+              </button>
             </nav>
 
-            {/* LEFT: Search + Cart + Wishlist + User + "جميع الأقسام" + Mobile menu */}
-            <div className="flex items-center gap-1 shrink-0 mr-auto md:mr-0">
+            {/* Left: Search + icons + جميع الأقسام */}
+            <div className="flex items-center gap-2 shrink-0 mr-auto md:mr-0">
               {/* Search bar */}
-              <div className="hidden md:flex items-center bg-[#F7F7F7] border border-gray-200 rounded-full px-3.5 py-2 gap-2 w-48">
-                <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                <input type="text" placeholder="ابحث عن مخاوير..."
-                  value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  className="bg-transparent text-[13px] flex-1 focus:outline-none text-[#2C1810] placeholder-gray-400" dir="rtl" />
-                {searchQuery && <button onClick={() => setSearchQuery('')}><X className="w-3 h-3 text-gray-400" /></button>}
+              <div className="hidden md:flex items-center gap-2 bg-[#F8F3F4] rounded-full px-3 py-2 text-sm" style={{ minWidth: 180 }}>
+                <Search className="w-3.5 h-3.5 shrink-0" style={{ color: '#9A7A82' }} />
+                <input placeholder="ابحث عن مخاوير..." className="bg-transparent outline-none text-[13px] w-full" style={{ color: '#2d2d2d' }} dir="rtl" />
               </div>
               {/* Cart */}
-              <button onClick={() => setIsCartOpen(true)} className="relative p-2 text-[#3D2314] hover:text-[#C4698B] transition-colors">
+              <button className="relative p-2 hover:text-[#C4607A] transition-colors" style={{ color: '#2d2d2d' }} onClick={() => setIsCartOpen(true)}>
                 <ShoppingBag className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 bg-[#C4698B] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{cart.reduce((s,i)=>s+i.quantity,0)}</span>
+                {cart.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#C4607A] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                    {cart.reduce((s, i) => s + i.quantity, 0)}
+                  </span>
+                )}
               </button>
               {/* Wishlist */}
-              <button onClick={() => setShowWishlist(true)} className="relative p-2 text-[#3D2314] hover:text-[#C4698B] transition-colors">
-                <Heart className={`w-5 h-5 ${wishlist.length>0?'fill-[#C4698B] text-[#C4698B]':''}`} />
+              <button className="relative p-2 hover:text-[#C4607A] transition-colors hidden md:block" style={{ color: '#2d2d2d' }} onClick={() => {}}>
+                <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-[#C4607A] text-[#C4607A]' : ''}`} />
+                {wishlist.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#C4956A] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                    {wishlist.length}
+                  </span>
+                )}
               </button>
               {/* User */}
-              <button className="p-2 text-[#3D2314] hover:text-[#C4698B] transition-colors hidden md:block">
+              <button className="p-2 hover:text-[#C4607A] transition-colors hidden md:block" style={{ color: '#2d2d2d' }}>
                 <User className="w-5 h-5" />
               </button>
               {/* جميع الأقسام */}
-              <button className="hidden md:flex items-center gap-1.5 border border-gray-200 rounded-lg px-3 py-2 text-[12px] font-bold text-[#3D2314] hover:border-[#C4698B] hover:text-[#C4698B] transition-colors mr-1 whitespace-nowrap">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors hover:border-[#C4607A] hover:text-[#C4607A]"
+                style={{ border: '1px solid #E0C8CC', color: '#2d2d2d' }}>
+                <Menu className="w-3.5 h-3.5" />
                 جميع الأقسام
-                <ChevronDown className="w-3.5 h-3.5" />
+                <ChevronDown className="w-3 h-3" />
               </button>
-              {/* Mobile menu */}
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-[#3D2314] md:hidden">
+              {/* Mobile hamburger */}
+              <button className="p-2 md:hidden" style={{ color: '#2d2d2d' }} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                 <Menu className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* Mobile menu dropdown */}
+          {/* Mobile Nav Dropdown */}
           <AnimatePresence>
             {mobileMenuOpen && (
-              <motion.div initial={{ height:0, opacity:0 }} animate={{ height:'auto', opacity:1 }} exit={{ height:0, opacity:0 }}
-                className="md:hidden border-t border-gray-100 overflow-hidden">
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                className="border-t overflow-hidden bg-white" style={{ borderColor: '#F0E0E5' }}>
                 <div className="py-3 space-y-1 px-2">
-                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 gap-2 mb-2">
-                    <Search className="w-3.5 h-3.5 text-gray-400" />
-                    <input type="text" placeholder="ابحثي..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                      className="bg-transparent text-sm flex-1 focus:outline-none font-medium" />
-                  </div>
                   {[
                     { label: 'الرئيسية', action: () => { setActiveTab('shop'); setSelectedCategory('all'); setMobileMenuOpen(false); } },
-                    { label: 'المخاوير', action: () => { setActiveTab('shop'); setSelectedCategory('all'); setMobileMenuOpen(false); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } },
-                    ...categories.filter(c=>c.id!=='all').map(cat => ({ label: cat.name, action: () => { setActiveTab('shop'); setSelectedCategory(cat.id); setMobileMenuOpen(false); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } })),
+                    ...categories.filter(c => c.id !== 'all').map(cat => ({
+                      label: cat.name,
+                      action: () => { setActiveTab('shop'); setSelectedCategory(cat.id); setMobileMenuOpen(false); }
+                    })),
+                    { label: 'وصل حديثاً', action: () => { setActiveTab('shop'); setMobileMenuOpen(false); } },
+                    { label: 'عروض', action: () => { setActiveTab('shop'); setMobileMenuOpen(false); } },
                     { label: 'تتبع الطلب', action: () => { setActiveTab('tracking'); setMobileMenuOpen(false); } },
-                    { label: 'عن المتجر', action: () => { setShowAbout(true); setMobileMenuOpen(false); } },
-                  ].map((item,i) => (
-                    <button key={i} onClick={item.action} className="w-full text-right py-2.5 px-4 rounded-xl text-sm font-bold text-[#3D2314] hover:bg-[#FDF0F3] hover:text-[#C4698B] transition-colors">
+                    { label: 'عن المتجر', action: () => setMobileMenuOpen(false) },
+                  ].map((item, i) => (
+                    <button key={i} onClick={item.action} className="w-full text-right py-2.5 px-4 rounded-xl text-sm font-semibold hover:bg-[#FDF0F3] hover:text-[#C4607A] transition-colors" style={{ color: '#2d2d2d' }}>
                       {item.label}
                     </button>
                   ))}
@@ -430,144 +458,102 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       {activeTab === 'shop' && (
         <main>
 
-          {/* ── 3. HERO BANNER ───────────────────────────────── */}
+          {/* ── 3. HERO SECTION ─────────────────────────────────── */}
           {(() => {
-            const heroProducts = products.filter(p => !p.isDraft).slice(0, 4);
-            const heroProduct = heroProducts[heroIdx % Math.max(heroProducts.length, 1)] ?? null;
-            const total = Math.max(heroProducts.length, 1);
+            const heroSlides = [
+              {
+                image: 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
+                subtitle: 'أزياء تعكس ذوقك الرفيع',
+                title: <>ألماسة<br />للمخاوير الراقية</>,
+                desc: 'تصاميم استثنائية تجمع بين الفخامة والراحة لتتألقي بإطلالة مميزة في كل وقت',
+              },
+              {
+                image: products[0]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
+                subtitle: 'أناقة تنبض بالأنوثة',
+                title: <>مخاوير راقية<br />لتألقي في كل مناسبة</>,
+                desc: 'تصاميم فاخرة بأقمشة ناعمة وحالية',
+              },
+              {
+                image: products[1]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
+                subtitle: 'كولكشن 2026',
+                title: <>تشكيلة العيد<br />وصلت الآن</>,
+                desc: 'أحدث تصاميم المخاوير الخليجية بأقمشة فاخرة وألوان رائعة',
+              },
+              {
+                image: products[2]?.image || 'https://images.unsplash.com/photo-1594938298603-c8148c4b4ce0?w=900&q=85',
+                subtitle: 'جودة لا تضاهى',
+                title: <>تفصيل على المقاس<br />بأرقى الأقمشة</>,
+                desc: 'نصنع لكِ تفاصيل لا تُنسى — راسليننا على واتساب',
+              },
+            ];
+            const slide = heroSlides[heroIdx];
             return (
-              <section className="relative overflow-hidden" style={{ minHeight: 530, background: 'linear-gradient(135deg,#fdf0f3 0%,#fce4ec 100%)' }}>
-                {/* Image — right side, 52% on desktop; hidden on mobile (bg only) */}
-                <div className="hidden md:block absolute inset-y-0 right-0 w-[52%] overflow-hidden">
-                  {heroProduct ? (
-                    <img src={heroProduct.image} alt={heroProduct.name} loading="eager" referrerPolicy="no-referrer"
-                      onClick={() => handleProductClick(heroProduct)}
-                      className="w-full h-full object-cover object-top cursor-pointer" />
-                  ) : (
-                    <div className="w-full h-full" style={{ background: 'linear-gradient(to bottom left,#f8d0e0,#fce4ec)' }} />
-                  )}
-                  {/* fade left edge into page bg */}
-                  <div className="absolute inset-y-0 left-0 w-32 hidden md:block" style={{ background: 'linear-gradient(to right,#fdf0f3,transparent)' }} />
+              <section className="relative overflow-hidden select-none" style={{ background: '#F9F0EE', minHeight: 520 }}>
+                {/* Background image (left half) */}
+                <div className="absolute inset-y-0 left-0 w-full md:w-1/2 overflow-hidden">
+                  <img
+                    src={slide.image}
+                    alt="hero"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover object-top transition-opacity duration-500"
+                    style={{ minHeight: 520 }}
+                  />
+                  {/* Right fade */}
+                  <div className="absolute inset-y-0 right-0 w-40 hidden md:block" style={{ background: 'linear-gradient(to left, #F9F0EE, transparent)' }} />
                 </div>
 
-                {/* Mobile: product image strip at top */}
-                {heroProduct && (
-                  <div className="md:hidden w-full overflow-hidden" style={{ height: 240 }}>
-                    <img src={heroProduct.image} alt={heroProduct.name} loading="eager" referrerPolicy="no-referrer"
-                      onClick={() => handleProductClick(heroProduct)}
-                      className="w-full h-full object-cover object-top cursor-pointer" />
-                  </div>
-                )}
+                {/* Mobile image strip */}
+                <div className="md:hidden w-full h-64 overflow-hidden">
+                  <img src={slide.image} alt="hero" referrerPolicy="no-referrer" className="w-full h-full object-cover object-top" />
+                </div>
 
-                {/* Text content — left side on desktop, below image on mobile */}
-                <div className="relative z-10 flex flex-col justify-center text-right px-6 md:px-20 py-8 md:py-16 max-w-full md:max-w-[520px]">
-                  <p className="text-[#888] text-[15px] font-normal mb-2">أناقة تنبض بالأنوثة</p>
-                  <h1 className="font-black text-[#2d2d2d] leading-snug mb-3" style={{ fontSize: 'clamp(36px,5vw,56px)' }}>
-                    مخاوير راقية<br />لتألقي في كل<br />مناسبة
-                  </h1>
-                  <p className="text-[#888] text-base mb-8 font-normal">تصاميم فاخرة بأقمشة ناعمة وجودة عالية</p>
-                  <div>
-                    <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' })}
-                      className="font-black text-white text-base px-11 py-3.5 rounded-[30px] border-none cursor-pointer transition-all hover:opacity-90 hover:-translate-y-px active:scale-95"
-                      style={{ background: '#C4607A' }}>
-                      تسوقي الآن
-                    </button>
-                  </div>
-                  {/* Dots */}
-                  <div className="flex items-center gap-2 mt-7">
-                    {Array.from({ length: total }).map((_, i) => (
-                      <button key={i} onClick={() => setHeroIdx(i)}
-                        className="transition-all rounded-full border-none cursor-pointer"
-                        style={{ width: i === heroIdx ? 28 : 10, height: 10, background: i === heroIdx ? '#C4607A' : '#f0c4cf', borderRadius: i === heroIdx ? 5 : 50 }} />
-                    ))}
+                {/* Content — right side */}
+                <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
+                  <div className="flex justify-end">
+                    <div className="w-full md:w-1/2 py-14 md:py-20 text-right" dir="rtl">
+                      <p className="text-sm font-medium mb-3" style={{ color: '#7A5C60' }}>{slide.subtitle}</p>
+                      <h1 className="font-black leading-tight mb-4" style={{ fontSize: 'clamp(2rem,4vw,3.2rem)', color: '#2C1810' }}>
+                        {slide.title}
+                      </h1>
+                      <p className="mb-8 text-sm md:text-base leading-relaxed" style={{ color: '#7A5C60', maxWidth: 380 }}>{slide.desc}</p>
+                      <button
+                        onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="font-bold px-8 py-3.5 rounded-lg text-sm transition-all hover:opacity-90 hover:-translate-y-0.5"
+                        style={{ background: '#C4607A', color: 'white' }}>
+                        تسوقي الآن
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Nav arrows */}
-                <button onClick={() => setHeroIdx(i => (i - 1 + total) % total)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 w-[42px] h-[42px] rounded-full bg-white border-none cursor-pointer shadow-[0_2px_16px_rgba(0,0,0,.12)] flex items-center justify-center z-20 hover:shadow-lg transition-shadow"
-                  style={{ color: '#C4607A', fontSize: 20 }}>
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-                <button onClick={() => setHeroIdx(i => (i + 1) % total)}
-                  className="absolute left-5 top-1/2 -translate-y-1/2 w-[42px] h-[42px] rounded-full bg-white border-none cursor-pointer shadow-[0_2px_16px_rgba(0,0,0,.12)] flex items-center justify-center z-20 hover:shadow-lg transition-shadow"
-                  style={{ color: '#C4607A', fontSize: 20 }}>
+                {/* Left arrow */}
+                <button
+                  onClick={() => setHeroIdx((heroIdx - 1 + heroSlides.length) % heroSlides.length)}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-shadow hidden md:flex"
+                  style={{ color: '#2C1810' }}>
                   <ChevronLeft className="w-5 h-5" />
                 </button>
+
+                {/* Right arrow */}
+                <button
+                  onClick={() => setHeroIdx((heroIdx + 1) % heroSlides.length)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-shadow hidden md:flex"
+                  style={{ color: '#2C1810' }}>
+                  <ChevronLeft className="w-5 h-5 rotate-180" />
+                </button>
+
+                {/* Dots */}
+                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                  {heroSlides.map((_, i) => (
+                    <button key={i} onClick={() => setHeroIdx(i)}
+                      className="rounded-full transition-all"
+                      style={{ width: i === heroIdx ? 20 : 8, height: 8, background: i === heroIdx ? '#C4607A' : 'rgba(255,255,255,0.7)' }} />
+                  ))}
+                </div>
               </section>
             );
           })()}
 
-          {/* ── 4. TRUST BADGES ─────────────────────────────────── */}
-          <div className="bg-white" style={{ borderBottom: '1px solid #f0e0e5', borderTop: '1px solid #f0e0e5' }}>
-            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4" style={{ borderColor: '#f0e0e5' }}>
-              {[
-                { emoji: '🏆', label: 'جودة عالية',  sub: 'أقمشة فاخرة' },
-                { emoji: '🚚', label: 'شحن سريع',    sub: 'توصيل خلال 2-3 أيام' },
-                { emoji: '🔒', label: 'دفع آمن',      sub: 'خيارات دفع متعددة' },
-                { emoji: '🎧', label: 'دعم عملاء',   sub: 'خدمة سريعة 24/7' },
-              ].map(({ emoji, label, sub }, i) => (
-                <div key={label} className="flex items-center gap-3 px-4 md:px-7 py-4 md:py-5"
-                  style={{ borderLeft: i % 2 === 0 ? 'none' : '1px solid #f0e0e5', borderTop: i >= 2 ? '1px solid #f0e0e5' : 'none' }}>
-                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-xl shrink-0" style={{ background: '#fdf0f3' }}>
-                    {emoji}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-[#2d2d2d]">{label}</p>
-                    <p className="text-xs text-[#888] mt-0.5">{sub}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-
-          {/* ── 4b. CATEGORY CARDS SECTION ──────────────────────── */}
-          {categories.filter(c => c.id !== 'all').length > 0 && (
-            <section className="py-10 px-4 bg-white border-b border-gray-100">
-              <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-7">
-                  <h2 className="text-xl md:text-2xl font-black text-[#2C1810]">تسوّقي حسب التصنيف</h2>
-                  <div className="flex justify-center mt-2">
-                    <svg viewBox="0 0 90 16" width="90"><path d="M0 8 L32 8 L37 2 L42 14 L47 2 L52 14 L57 8 L90 8" fill="none" stroke="#C4607A" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                  </div>
-                </div>
-                <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                  {categories.filter(c => c.id !== 'all').map(cat => {
-                    const catProduct = products.filter(p => !p.isDraft && p.category === cat.id)[0];
-                    return (
-                      <button
-                        key={cat.id}
-                        onClick={() => { setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                        className="shrink-0 relative rounded-2xl overflow-hidden group cursor-pointer hover:scale-105 transition-all shadow-md"
-                        style={{ width: 160, height: 200 }}
-                      >
-                        {catProduct ? (
-                          <img src={catProduct.image} alt={cat.name} loading="lazy" referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full" style={{ background: 'linear-gradient(135deg, #F8D7E3 0%, #C4698B 100%)' }} />
-                        )}
-                        {/* Dark gradient overlay */}
-                        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(44,24,16,0.75) 0%, rgba(44,24,16,0.1) 60%, transparent 100%)' }} />
-                        <div className="absolute bottom-0 inset-x-0 p-3 text-right">
-                          <p className="text-white font-black text-sm drop-shadow-md">{cat.name}</p>
-                          <p className="text-white/70 text-[10px] font-medium mt-0.5">
-                            {products.filter(p => !p.isDraft && p.category === cat.id).length} منتج
-                          </p>
-                        </div>
-                        {selectedCategory === cat.id && (
-                          <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#C4698B] flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
-          )}
 
           {/* ── 5. SEARCH + FILTER BAR ──────────────────────────── */}
           <div className="max-w-7xl mx-auto px-4 pb-6">
@@ -601,16 +587,17 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </div>
 
           {/* ── 6. PRODUCTS SECTION ─────────────────────────────── */}
-          <section id="products-section" className="px-4 md:px-12 pb-16 pt-12" style={{ background: '#fdf0f3' }}>
-            <div className="text-center mb-7">
-              <h2 className="text-2xl font-black text-[#2C1810]">
-                {selectedCategory === 'all' ? 'وصل حديثاً' : categories.find(c => c.id === selectedCategory)?.name}
-              </h2>
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <span className="h-px w-10 bg-[#C4698B]/30 inline-block" />
-                <span className="text-[#C4698B] text-xs">◆</span>
-                <span className="h-px w-10 bg-[#C4698B]/30 inline-block" />
+          <section id="products-section" className="max-w-7xl mx-auto px-4 pb-16">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-1">كولكشن 2026</p>
+                <h2 className="text-2xl font-black text-[#2C1810]">
+                  {selectedCategory === 'all' ? 'الأكثر مبيعاً' : categories.find(c => c.id === selectedCategory)?.name}
+                </h2>
               </div>
+              <span className="text-xs text-[#8B7B78] font-medium bg-[#F8EDE8] px-3 py-1.5 rounded-xl">
+                {filteredProducts.length} منتج
+              </span>
             </div>
 
             {filteredProducts.length === 0 ? (
@@ -624,70 +611,105 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {filteredProducts.map((product, idx) => (
-                  <div key={product.id} className="bg-white rounded-[18px] overflow-hidden group cursor-pointer flex flex-col transition-all hover:-translate-y-1"
-                    style={{ border: '1px solid #f0e0e5', boxShadow: '0 1px 4px rgba(196,96,122,.06)' }}
-                    onMouseEnter={e => (e.currentTarget.style.boxShadow='0 10px 28px rgba(196,96,122,.18)')}
-                    onMouseLeave={e => (e.currentTarget.style.boxShadow='0 1px 4px rgba(196,96,122,.06)')}>
+                  <div key={product.id} className="bg-white rounded-xl border border-[#F2E4DC] overflow-hidden luxury-card group cursor-pointer flex flex-col shadow-sm hover:shadow-lg hover:shadow-[#9A2D55]/10 hover:border-[#E8D5C4] transition-all"
+                    style={{ animationDelay: `${idx * 0.05}s` }}>
 
                     {/* Image */}
-                    <div className="relative overflow-hidden" style={{ height: 250 }}>
+                    <div className="relative overflow-hidden bg-[#F8EDE8]" style={{ aspectRatio: '1/1' }}>
                       <img src={product.image} alt={product.name} referrerPolicy="no-referrer"
-                        loading="lazy"
                         onClick={() => handleProductClick(product)}
-                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover product-img"
                       />
 
-                      {/* Badge top-right */}
-                      {product.originalPrice ? (
-                        <div className="absolute top-3 right-3 text-white text-[11px] font-bold px-3 py-1 rounded-[20px]" style={{ background: '#C4607A' }}>
-                          -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-                        </div>
-                      ) : idx < 4 ? (
-                        <div className="absolute top-3 right-3 text-white text-[11px] font-bold px-3 py-1 rounded-[20px]" style={{ background: '#22a060' }}>جديد</div>
-                      ) : null}
+                      {/* Badges top-right */}
+                      <div className="absolute top-2.5 right-2.5 flex flex-col gap-1">
+                        {product.originalPrice && (
+                          <span className="bg-[#9A2D55] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">
+                            -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                          </span>
+                        )}
+                        {product.hasSheilah && (
+                          <span className="bg-[#2C1810]/80 text-[#E8D5C4] text-[8px] font-bold px-2 py-0.5 rounded-full">+ شيلة</span>
+                        )}
+                        {idx < 3 && !product.originalPrice && (
+                          <span className="bg-[#C4956A] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">جديد</span>
+                        )}
+                      </div>
 
-                      {/* Wishlist top-left */}
+                      {/* Wishlist */}
                       <button
                         onClick={e => toggleWishlist(product.id, e)}
-                        className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                        style={{ background: wishlist.includes(product.id) ? '#C4607A' : 'white', boxShadow: '0 2px 8px rgba(0,0,0,.10)' }}
+                        className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 ${
+                          wishlist.includes(product.id) ? 'bg-[#9A2D55]' : 'bg-white/90 hover:bg-white'
+                        }`}
                       >
-                        <Heart className="w-4 h-4" style={{ color: wishlist.includes(product.id) ? 'white' : '#888', fill: wishlist.includes(product.id) ? 'white' : 'none' }} />
+                        <Heart className={`w-3.5 h-3.5 transition-all ${wishlist.includes(product.id) ? 'fill-white text-white' : 'text-[#8B7B78]'}`} />
                       </button>
 
-                      {/* Out of stock */}
+                      {/* Out of stock overlay */}
                       {product.stock === 0 && (
-                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-                          <span className="font-black text-sm px-4 py-2 rounded-full border" style={{ color: '#C4607A', borderColor: '#f0e0e5', background: 'white' }}>نفدت الكمية</span>
+                        <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center">
+                          <span className="text-[#9A2D55] font-black text-sm bg-white border border-[#F2E4DC] px-4 py-2 rounded-full shadow-sm">نفدت الكمية</span>
                         </div>
                       )}
+
+                      {/* Low stock */}
+                      {product.stock > 0 && product.stock <= 5 && (
+                        <div className="absolute bottom-3 right-2.5">
+                          <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                            {product.stock} فقط!
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                        <button
+                          onClick={() => handleProductClick(product)}
+                          className="w-full bg-white text-[#9A2D55] font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          عرض التفاصيل
+                        </button>
+                      </div>
                     </div>
 
                     {/* Info */}
-                    <div className="p-4 flex-1 flex flex-col" onClick={() => handleProductClick(product)}>
-                      <h3 className="font-bold text-[#2d2d2d] text-[13px] leading-snug line-clamp-2 mb-2">{product.name}</h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-black text-[15px]" style={{ color: '#C4607A' }}>{product.price.toFixed(2)} د.ب</span>
-                        {product.originalPrice && (
-                          <span className="text-[12px] text-[#bbb] line-through">{product.originalPrice.toFixed(2)} د.ب</span>
-                        )}
+                    <div className="p-2.5 flex-1 flex flex-col justify-between" onClick={() => handleProductClick(product)}>
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-0.5">
+                            <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                            <span className="text-[9px] font-bold text-[#5C3830]">{product.rating}</span>
+                            <span className="text-[8px] text-[#8B7B78]">({product.reviewCount})</span>
+                          </div>
+                          <span className="text-[8px] bg-[#F8EDE8] text-[#9A2D55] font-bold px-1.5 py-0.5 rounded-full">
+                            {categories.find(c => c.id === product.category)?.name || 'مخور'}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-[#2C1810] text-[11px] leading-snug line-clamp-2 group-hover:text-[#9A2D55] transition-colors">
+                          {product.name}
+                        </h3>
                       </div>
-                      <div className="text-[11px] mb-3" style={{ color: '#f5a623' }}>
-                        {'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5-Math.round(product.rating))}
-                        <span className="text-[#888] mr-1">({product.reviewCount})</span>
+
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#F8EDE8]">
+                        <div className="leading-tight">
+                          <span className="text-[#9A2D55] font-black text-sm">{product.price.toFixed(2)}</span>
+                          <span className="text-[#9A2D55] text-[9px] font-semibold mr-0.5">د.ب</span>
+                          {product.originalPrice && (
+                            <div className="text-[#8B7B78] text-[9px] line-through">{product.originalPrice.toFixed(2)} د.ب</div>
+                          )}
+                        </div>
+                        <button
+                          onClick={e => { e.stopPropagation(); handleProductClick(product); setIsCartOpen(true); }}
+                          className="w-7 h-7 bg-[#9A2D55] hover:bg-[#802446] text-white rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 disabled:bg-[#F2E4DC]"
+                          disabled={product.stock === 0}
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
                       </div>
-                      <button
-                        onClick={e => { e.stopPropagation(); if (product.stock > 0) { handleProductClick(product); } }}
-                        disabled={product.stock === 0}
-                        className="w-full py-2.5 rounded-[25px] text-[13px] font-bold transition-all mt-auto"
-                        style={{ background: '#fdf0f3', color: '#C4607A', border: '1px solid #f0c4cf' }}
-                        onMouseEnter={e => { if (product.stock > 0) { (e.currentTarget as HTMLButtonElement).style.background='#C4607A'; (e.currentTarget as HTMLButtonElement).style.color='white'; } }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background='#fdf0f3'; (e.currentTarget as HTMLButtonElement).style.color='#C4607A'; }}
-                      >
-                        {product.stock === 0 ? 'نفد المخزون' : 'أضف للسلة'}
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -696,46 +718,68 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </section>
 
           {/* ── 7. REVIEWS SECTION ──────────────────────────────── */}
-          <section className="py-14 px-4 md:px-12 bg-white">
+          <section className="py-16 px-4 bg-[#2C1810]">
             <div className="max-w-7xl mx-auto">
-              <div className="sec-header text-center mb-9">
-                <h2 className="text-2xl font-black text-[#2d2d2d] mb-2">آراء عملاتنا</h2>
-                <div className="flex justify-center">
-                  <svg viewBox="0 0 90 16" width="90"><path d="M0 8 L32 8 L37 2 L42 14 L47 2 L52 14 L57 8 L90 8" fill="none" stroke="#C4607A" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
+                <div>
+                  <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-2">آراء العملاء</p>
+                  <h2 className="text-2xl md:text-3xl font-black text-white">ماذا تقول زبائننا؟</h2>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex">
+                    {[5,5,5,5,4].map((r,i) => <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />)}
+                  </div>
+                  <span className="text-white/70 text-sm font-medium">4.9 من 5 — بناءً على {reviews.length || 120}+ تقييم</span>
                 </div>
               </div>
 
               {reviews.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {reviews.slice(0, 3).map(rev => (
-                    <div key={rev.id} className="bg-white rounded-[18px] p-6 hover:shadow-[0_6px_20px_rgba(196,96,122,.10)] transition-all" style={{ border: '1px solid #f0e0e5' }}>
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center font-black text-base shrink-0" style={{ background: '#f0c4cf', color: '#9e3f58' }}>{rev.customerName.charAt(0)}{rev.customerName.charAt(1) || ''}</div>
+                    <div key={rev.id} className="bg-white/6 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-all group">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-amber-400 text-amber-400' : 'text-white/20'}`} />
+                          ))}
+                        </div>
+                        <span className="text-[10px] text-white/30 font-mono">{rev.date?.substring(0,10) || '2026'}</span>
+                      </div>
+                      <p className="text-[#E8D5C4] text-sm leading-relaxed font-medium mb-5 italic line-clamp-2">"{rev.comment}"</p>
+                      <div className="flex items-center gap-3 border-t border-white/5 pt-4">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#9A2D55] to-[#C4956A] flex items-center justify-center text-white font-black text-sm shrink-0">
+                          {rev.customerName.charAt(0)}
+                        </div>
                         <div>
-                          <p className="font-black text-sm text-[#2d2d2d]">{rev.customerName}</p>
-                          <p className="text-[13px] mt-0.5" style={{ color: '#f5a623' }}>{'★'.repeat(rev.rating)}{'☆'.repeat(5-rev.rating)}</p>
+                          <p className="text-white font-bold text-sm">{rev.customerName}</p>
+                          <p className="text-[#8B7B78] text-[10px] line-clamp-1">{rev.productName}</p>
                         </div>
                       </div>
-                      <p className="text-[13px] text-[#666] leading-[1.8]">{rev.comment}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                /* Placeholder reviews when none exist */
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
-                    { name: 'سارة الغامدي', initials: 'سا', comment: 'الجودة ممتازة جداً والخياطة رائعة، استلمت طلبي في يومين بس! المخوار طلع أجمل من الصور بكثير.', stars: 5 },
-                    { name: 'نورة العتيبي', initials: 'نو', comment: 'المخوار أجمل من الصور، القماش ناعم جداً وأنيق جداً. راح أطلب مرة ثانية بالتأكيد وما راح تندمين!', stars: 5 },
-                    { name: 'منال الشمري', initials: 'من', comment: 'متجر محترم وخدمة عملاء ممتازة. المقاسات صحيحة ومطابقة للجدول وما في أي مفاجآت.', stars: 4 },
+                    { name: 'فاطمة ع.', comment: 'مخور رائع جداً، الخامة فاخرة والتطريز دقيق جداً. وصل بالوقت المحدد وكان في تغليف جميل.', rating: 5 },
+                    { name: 'نورة م.', comment: 'اشتريت طقم الأم والبنت وكان خيالي! الجودة ممتازة والتطريز يدوي احترافي. راضية 100%.', rating: 5 },
+                    { name: 'منى ك.', comment: 'تجربة تسوق رائعة من البداية للنهاية. الموقع سهل والتوصيل سريع والمنتج تجاوز توقعاتي.', rating: 5 },
                   ].map((rev, i) => (
-                    <div key={i} className="bg-white rounded-[18px] p-6 hover:shadow-[0_6px_20px_rgba(196,96,122,.10)] transition-all" style={{ border: '1px solid #f0e0e5' }}>
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center font-black text-base shrink-0" style={{ background: '#f0c4cf', color: '#9e3f58' }}>{rev.initials}</div>
+                    <div key={i} className="bg-white/6 border border-white/10 rounded-2xl p-5">
+                      <div className="flex gap-0.5 mb-4">
+                        {Array.from({length:5}).map((_,j) => <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />)}
+                      </div>
+                      <p className="text-[#E8D5C4] text-sm leading-relaxed font-medium mb-5 italic">"{rev.comment}"</p>
+                      <div className="flex items-center gap-3 border-t border-white/5 pt-4">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#9A2D55] to-[#C4956A] flex items-center justify-center text-white font-black text-sm shrink-0">
+                          {rev.name.charAt(0)}
+                        </div>
                         <div>
-                          <p className="font-black text-sm text-[#2d2d2d]">{rev.name}</p>
-                          <p className="text-[13px] mt-0.5" style={{ color: '#f5a623' }}>{'★'.repeat(rev.stars)}{'☆'.repeat(5-rev.stars)}</p>
+                          <p className="text-white font-bold text-sm">{rev.name}</p>
+                          <p className="text-[#8B7B78] text-[10px]">عميلة موثوقة ✓</p>
                         </div>
                       </div>
-                      <p className="text-[13px] text-[#666] leading-[1.8]">{rev.comment}</p>
                     </div>
                   ))}
                 </div>
@@ -743,24 +787,45 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
               <div className="text-center mt-8">
                 <button onClick={() => setShowReviewsPopup(true)}
-                  className="font-bold px-10 py-3 rounded-[30px] text-sm transition-all hover:opacity-90"
-                  style={{ background: 'transparent', color: '#C4607A', border: '2px solid #C4607A' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background='#C4607A'; (e.currentTarget as HTMLButtonElement).style.color='white'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background='transparent'; (e.currentTarget as HTMLButtonElement).style.color='#C4607A'; }}>
+                  className="border border-[#C4956A]/40 text-[#C4956A] hover:bg-[#C4956A]/10 font-bold px-8 py-3 rounded-full text-sm transition-all">
                   عرض جميع التقييمات ({reviews.length || 120}+)
                 </button>
               </div>
             </div>
           </section>
 
+          {/* ── 8. FEATURES BAR ─────────────────────────────────── */}
+          <section className="py-10 px-4 bg-white border-y border-[#F2E4DC]">
+            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5">
+              {[
+                { icon: Globe2,     title: 'شحن دولي سريع',    desc: 'لجميع دول الخليج والعالم',   color: 'bg-blue-50 text-blue-600' },
+                { icon: BadgeCheck, title: 'جودة مضمونة',      desc: 'أقمشة فاخرة مختارة بعناية', color: 'bg-emerald-50 text-emerald-600' },
+                { icon: ShieldCheck,title: 'دفع آمن 100%',     desc: 'BenefitPay, KNet, Visa',    color: 'bg-amber-50 text-amber-600' },
+                { icon: Gift,       title: 'تغليف هدايا',      desc: 'مجاني مع كل طلب',           color: 'bg-[#F8EDE8] text-[#9A2D55]' },
+              ].map(({ icon: Icon, title, desc, color }) => (
+                <div key={title} className="flex items-center gap-3 p-4 rounded-2xl bg-[#FDF8F5] border border-[#F2E4DC] hover:border-[#9A2D55]/20 transition-all">
+                  <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shrink-0`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-black text-[#2C1810] text-sm">{title}</p>
+                    <p className="text-[#8B7B78] text-[11px] mt-0.5">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {/* ── 9. INSTAGRAM FEED ───────────────────────────────── */}
-          <section className="py-14 px-4 md:px-12" style={{ background: '#fdf0f3' }}>
+          <section className="py-14 px-4 bg-white">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-black text-[#2d2d2d] mb-2">تابعينا على إنستقرام</h2>
-                <div className="flex justify-center">
-                  <svg viewBox="0 0 90 16" width="90"><path d="M0 8 L32 8 L37 2 L42 14 L47 2 L52 14 L57 8 L90 8" fill="none" stroke="#C4607A" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                <div className="inline-flex items-center gap-2 text-[#9A2D55] text-xs font-bold mb-2">
+                  <Instagram className="w-4 h-4" />
+                  <span>تابعينا على إنستقرام</span>
                 </div>
+                <h2 className="text-2xl font-black text-[#2C1810]">@almaasa.bh</h2>
+                <p className="text-[#8B7B78] text-sm mt-1">أحدث تصاميمنا وكولكشناتنا الجديدة</p>
               </div>
               <behold-widget feed-id="HbcZC4oN0hh4xfAHUvTm"></behold-widget>
               <script
@@ -771,76 +836,68 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             </div>
           </section>
 
-          {/* ── 10. NEWSLETTER BANNER ───────────────────────────── */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-10 px-10 md:px-16 py-11" style={{ background: '#C4607A' }}>
-            <div>
-              <h3 className="text-xl font-black text-white mb-1.5">اشتركي في نشرتنا البريدية</h3>
-              <p className="text-[14px]" style={{ color: 'rgba(255,255,255,.85)' }}>احصلي على آخر العروض والتشكيلات الجديدة أول بأول</p>
-            </div>
-            <div className="flex gap-2.5 w-full max-w-md">
-              <input type="email" placeholder="أدخلي بريدك الإلكتروني..."
-                className="flex-1 px-5 py-3 rounded-[30px] border-none outline-none text-[14px] font-[Tajawal,sans-serif]"
-                style={{ background: 'rgba(255,255,255,.95)', color: '#2d2d2d' }} dir="rtl" />
-              <button className="px-7 py-3 rounded-[30px] font-black text-sm whitespace-nowrap border-none cursor-pointer hover:opacity-90 transition-opacity"
-                style={{ background: 'white', color: '#C4607A' }}>
-                اشتركي الآن
-              </button>
-            </div>
-          </div>
-
-          {/* ── FAQ SECTION ─────────────────────────────────────── */}
-          {(() => {
-            const faqs = [
-              { q: 'كيف يمكنني تتبع طلبي؟', a: 'بعد إتمام الطلب ستصلك رسالة برقم التتبع. يمكنك أيضاً تتبع طلبك من قسم "تتبع طلبي" في الموقع.' },
-              { q: 'ما هي مناطق الشحن المتاحة؟', a: 'نشحن لجميع دول الخليج العربي (البحرين، السعودية، الكويت، الإمارات، قطر، عُمان) وكثير من دول العالم.' },
-              { q: 'كم يستغرق الشحن؟', a: 'داخل البحرين: 1-2 يوم عمل. دول الخليج: 3-5 أيام. الدول الأخرى: 7-14 يوم عمل.' },
-              { q: 'هل يمكنني إرجاع المنتج؟', a: 'نعم، نقبل الإرجاع خلال 7 أيام من تاريخ الاستلام شريطة أن يكون المنتج بحالته الأصلية غير مستخدم.' },
-              { q: 'ما هي طرق الدفع المتاحة؟', a: 'نقبل Benefit Pay, كي نت, البطاقات الائتمانية (Visa/Mastercard), Apple Pay, والدفع عند الاستلام.' },
-              { q: 'هل يمكن الطلب بمقاسات خاصة؟', a: 'نعم! تواصلي معنا على واتساب للطلبات المخصصة والتفصيل على المقاس.' },
-            ];
-            const [openFaq, setOpenFaq] = React.useState<number | null>(null);
-            return (
-              <section className="py-14 px-4 bg-white" dir="rtl">
-                <div className="max-w-3xl mx-auto">
-                  <div className="text-center mb-10">
-                    <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-2">الأسئلة الشائعة</p>
-                    <h2 className="text-2xl md:text-3xl font-black text-[#2C1810]">كل ما تريدين معرفته</h2>
+          {/* ── 10. WHATSAPP JOIN SECTION ───────────────────────── */}
+          <section className="py-14 px-4 bg-[#FDF8F5]">
+            <div className="max-w-4xl mx-auto">
+              {/* Main CTA card */}
+              <div className="relative rounded-3xl overflow-hidden p-8 md:p-12 text-center"
+                style={{ background: 'linear-gradient(135deg, #FDF0F5 0%, #F8E8EE 50%, #F5E0E8 100%)' }}>
+                {/* Decorative blobs */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-[#9A2D55]/8 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#C4956A]/10 rounded-full blur-3xl" />
+                <div className="relative z-10">
+                  <div className="inline-flex items-center gap-2 bg-white border border-[#F2E4DC] shadow-sm text-[#9A2D55] text-xs font-bold px-4 py-2 rounded-full mb-5">
+                    <Gift className="w-3.5 h-3.5" />
+                    انضمي لعائلة ألماسة
                   </div>
-                  <div className="space-y-3">
-                    {faqs.map((faq, i) => (
-                      <div key={i} className="border border-[#F2E4DC] rounded-2xl overflow-hidden">
-                        <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                          className="w-full flex items-center justify-between px-5 py-4 text-right font-bold text-sm text-[#2C1810] hover:bg-[#FDF8F5] transition-colors">
-                          <span>{faq.q}</span>
-                          <span className={`text-[#9A2D55] text-lg font-black transition-transform ${openFaq === i ? 'rotate-45' : ''}`}>+</span>
-                        </button>
-                        {openFaq === i && (
-                          <div className="px-5 pb-4 text-sm text-[#8B7B78] leading-relaxed border-t border-[#F8EDE8] pt-3 bg-[#FDF8F5]">
-                            {faq.a}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-center mt-8">
-                    <p className="text-[#8B7B78] text-sm mb-3">لم تجدي إجابتك؟</p>
+                  <h2 className="text-2xl md:text-4xl font-black text-[#2C1810] mb-3 leading-tight">
+                    اطلعي على جديدنا أولاً
+                  </h2>
+                  <p className="text-[#8B7B78] text-sm mb-8 max-w-md mx-auto">خصومات حصرية وتصاميم جديدة قبل الإعلان الرسمي — نرد خلال دقائق 24/7</p>
+                  <div className="flex flex-wrap gap-3 justify-center">
                     <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#9A2D55] text-white font-bold px-6 py-2.5 rounded-full text-sm hover:bg-[#802446] transition-all">
-                      تواصلي معنا على واتساب
+                      className="inline-flex items-center gap-2 bg-[#9A2D55] hover:bg-[#802446] text-white font-black px-8 py-4 rounded-full shadow-xl shadow-[#9A2D55]/25 transition-all hover:-translate-y-1 text-sm">
+                      <Phone className="w-4 h-4" />
+                      تواصلي على واتساب
+                    </a>
+                    <a href="https://instagram.com/almaasa.bh" target="_blank" rel="noreferrer"
+                      className="inline-flex items-center gap-2 bg-white border border-[#F2E4DC] text-[#9A2D55] hover:border-[#9A2D55] font-bold px-8 py-4 rounded-full transition-all hover:-translate-y-1 text-sm shadow-sm">
+                      <Instagram className="w-4 h-4" />
+                      تابعينا على إنستقرام
                     </a>
                   </div>
+                  <p className="text-[11px] text-[#8B7B78] mt-4 font-mono">+973 37037697</p>
                 </div>
-              </section>
-            );
-          })()}
+              </div>
+
+              {/* 3 perks */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+                {[
+                  { icon: Gift, title: 'خصومات حصرية', desc: 'عروض خاصة للأعضاء على المخاوير والأقمشة', color: 'bg-rose-50 text-rose-500' },
+                  { icon: Sparkles, title: 'الجديد أولاً', desc: 'تصاميم جديدة قبل الإعلان الرسمي', color: 'bg-amber-50 text-amber-500' },
+                  { icon: BadgeCheck, title: 'مزايا العضوية', desc: 'نقاط مكافآت وهدايا مع كل طلب', color: 'bg-emerald-50 text-emerald-500' },
+                ].map(({ icon: Icon, title, desc, color }) => (
+                  <div key={title} className="bg-white rounded-2xl p-5 border border-[#F2E4DC] flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow">
+                    <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shrink-0`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-black text-[#2C1810] text-sm">{title}</p>
+                      <p className="text-[#8B7B78] text-xs mt-0.5 leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
 
           {/* ── 10. FINAL CTA ──────────────────────────────────── */}
           <section className="py-16 px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #2C1810 0%, #4A1228 40%, #9A2D55 100%)' }}>
             {/* Decorative diamonds */}
-            <div className="absolute inset-0 opacity-5 overflow-hidden">
-              {[[10,10,40],[25,70,60],[60,20,80],[80,60,50],[40,90,70],[70,40,45],[5,50,55],[90,10,65]].map(([t,l,s], i) => (
+            <div className="absolute inset-0 opacity-5">
+              {[...Array(8)].map((_, i) => (
                 <div key={i} className="absolute border border-white rotate-45"
-                  style={{ width: s, height: s, top: `${t}%`, left: `${l}%` }} />
+                  style={{ width: `${40 + i*20}px`, height: `${40 + i*20}px`, top: `${Math.random()*80}%`, left: `${Math.random()*100}%` }} />
               ))}
             </div>
             <div className="relative max-w-4xl mx-auto text-center">
@@ -967,46 +1024,44 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       )}
 
       {/* ── FOOTER ──────────────────────────────────────────────── */}
-      <footer style={{ background: '#2a2a2a', color: '#ccc' }}>
-        <div className="max-w-7xl mx-auto px-5 md:px-12 pt-12 pb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-11">
+      <footer className="bg-[#1a0d08] text-[#8B7B78]">
+        <div className="max-w-7xl mx-auto px-4 pt-14 pb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
 
             {/* Brand */}
-            <div>
-              <div className="text-3xl font-black text-white">ألماسة</div>
-              <span className="text-[10px] tracking-[4px] mb-3.5 block" style={{ color: '#888' }}>ALMAASA</span>
-              <p className="text-[13px] leading-[1.9] mb-4.5" style={{ color: '#999' }}>
-                ألماسة — مخاوير راقية، الأناقة بالتميز. تصاميم فاخرة لكل مناسبة بأعلى معايير الجودة وأرقى الأقمشة.
+            <div className="sm:col-span-2 md:col-span-1">
+              <div className="mb-4">
+                <img src="/logo.jpg" alt="ألماسة" className="h-16 w-auto object-contain brightness-[1.1] contrast-[0.9] opacity-90" />
+              </div>
+              <p className="text-[13px] leading-relaxed text-[#8B7B78] font-medium">
+                متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.
               </p>
-              <div className="flex gap-3 mt-4">
-                {[
-                  { href: 'https://instagram.com/almaasa.bh', label: '📸' },
-                  { href: '#', label: '👻' },
-                  { href: '#', label: '🎵' },
-                ].map(s => (
-                  <a key={s.href} href={s.href} target="_blank" rel="noreferrer"
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-base transition-all hover:opacity-90"
-                    style={{ background: '#3d3d3d' }}>
-                    {s.label}
-                  </a>
-                ))}
+              <div className="flex gap-2.5 mt-5">
+                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                  className="w-9 h-9 bg-white/5 hover:bg-emerald-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
+                  <Phone className="w-4 h-4" />
+                </a>
+                <a href="https://instagram.com/almaasa_store" target="_blank" rel="noreferrer"
+                  className="w-9 h-9 bg-white/5 hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
+                  <Instagram className="w-4 h-4" />
+                </a>
               </div>
             </div>
 
-            {/* معلومات */}
+            {/* Shop links */}
             <div>
-              <p className="text-white font-black text-[15px] mb-4.5 pb-2.5" style={{ borderBottom: '1px solid #3d3d3d' }}>معلومات</p>
+              <p className="text-white font-black text-sm mb-4">التسوق</p>
               <ul className="space-y-2.5">
                 {[
-                  { label: 'من نحن', action: () => setShowAbout(true) },
-                  { label: 'الشروط والأحكام', action: () => setShowTerms(true) },
-                  { label: 'سياسة الخصوصية', action: () => setShowPrivacy(true) },
-                  { label: 'سياسة الإرجاع', action: () => setShowReturnPolicy(true) },
+                  { label: 'جميع المنتجات', action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
+                  ...categories.filter(c=>c.id!=='all').slice(0,3).map(c => ({
+                    label: c.name,
+                    action: () => { setActiveTab('shop'); setSelectedCategory(c.id); }
+                  })),
+                  { label: 'العروض والتخفيضات', action: () => setActiveTab('shop') },
                 ].map(item => (
                   <li key={item.label}>
-                    <button onClick={item.action} className="text-[13px] transition-colors font-normal text-right" style={{ color: '#999' }}
-                      onMouseEnter={e => (e.currentTarget.style.color='#f0c4cf')}
-                      onMouseLeave={e => (e.currentTarget.style.color='#999')}>
+                    <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium text-right">
                       {item.label}
                     </button>
                   </li>
@@ -1014,19 +1069,18 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               </ul>
             </div>
 
-            {/* روابط سريعة */}
+            {/* Help links */}
             <div>
-              <p className="text-white font-black text-[15px] mb-4.5 pb-2.5" style={{ borderBottom: '1px solid #3d3d3d' }}>روابط سريعة</p>
+              <p className="text-white font-black text-sm mb-4">المساعدة</p>
               <ul className="space-y-2.5">
                 {[
-                  { label: 'المخاوير', action: () => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior:'smooth' }); } },
-                  ...categories.filter(c=>c.id!=='all').slice(0,3).map(c => ({ label: c.name, action: () => { setActiveTab('shop'); setSelectedCategory(c.id); } })),
-                  { label: 'تتبع الطلب', action: () => setActiveTab('tracking') },
+                  { label: 'تتبع طلبي ✈️', action: () => setActiveTab('tracking') },
+                  { label: 'آراء الزبائن ⭐', action: () => setShowReviewsPopup(true) },
+                  { label: 'تواصلي معنا', action: () => window.open('https://wa.me/97337037697','_blank') },
+                  { label: 'سياسة الإرجاع', action: () => {} },
                 ].map(item => (
                   <li key={item.label}>
-                    <button onClick={item.action} className="text-[13px] font-normal text-right transition-colors" style={{ color: '#999' }}
-                      onMouseEnter={e => (e.currentTarget.style.color='#f0c4cf')}
-                      onMouseLeave={e => (e.currentTarget.style.color='#999')}>
+                    <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium">
                       {item.label}
                     </button>
                   </li>
@@ -1034,27 +1088,39 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               </ul>
             </div>
 
-            {/* تواصل */}
+            {/* Payment + contact */}
             <div>
-              <p className="text-white font-black text-[15px] mb-4.5 pb-2.5" style={{ borderBottom: '1px solid #3d3d3d' }}>تواصل معنا</p>
-              <div className="space-y-2.5 text-[13px]" style={{ color: '#999' }}>
-                <div className="flex items-center gap-2.5"><Phone className="w-4 h-4 shrink-0" /><span>+973 37037697</span></div>
-                <div className="flex items-center gap-2.5"><MapPin className="w-4 h-4 shrink-0" /><span>المنامة، البحرين</span></div>
-                <div className="flex items-center gap-2.5"><Clock className="w-4 h-4 shrink-0" /><span>9:00 ص - 11:00 م</span></div>
-              </div>
-              {/* Payment icons */}
-              <div className="flex flex-wrap gap-2 mt-5">
-                {['VISA', 'Mastercard', 'Benefit', 'Apple Pay'].map(p => (
-                  <span key={p} className="bg-white rounded-md px-3 py-1 text-[11px] font-black text-[#333]">{p}</span>
+              <p className="text-white font-black text-sm mb-4">وسائل الدفع</p>
+              <div className="flex flex-wrap gap-2 mb-5">
+                {['BenefitPay', 'KNet', 'Visa', 'Mastercard', 'Apple Pay'].map(p => (
+                  <span key={p} className="bg-white/5 border border-white/10 text-[#8B7B78] text-[10px] font-bold px-2.5 py-1 rounded-lg">
+                    {p}
+                  </span>
                 ))}
+              </div>
+              <div className="space-y-2 text-[12px]">
+                <p className="flex items-center gap-1.5 text-[#8B7B78]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  جميع المدفوعات مشفّرة وآمنة
+                </p>
+                <p className="flex items-center gap-1.5 text-[#8B7B78]">
+                  <MapPin className="w-3.5 h-3.5 text-[#C4956A] shrink-0" />
+                  المنامة، مملكة البحرين
+                </p>
               </div>
             </div>
 
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-5" style={{ borderTop: '1px solid #3d3d3d' }}>
-            <div className="text-[12px]" style={{ color: '#666' }}>© 2026 ألماسة. جميع الحقوق محفوظة</div>
-            <button onClick={onNavigateToAdmin} className="text-[11px] opacity-20 hover:opacity-60 transition-opacity" style={{ color: '#666' }}>إدارة المتجر</button>
+          <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[#8B7B78]/60 font-medium">
+            <p>© 2026 مخاوير ألماسة — almaasa.bh — جميع الحقوق محفوظة</p>
+            <div className="flex items-center gap-4">
+              <button className="hover:text-[#8B7B78] transition-colors">سياسة الخصوصية</button>
+              <button className="hover:text-[#8B7B78] transition-colors">الشروط والأحكام</button>
+              <button onClick={onNavigateToAdmin} className="opacity-20 hover:opacity-60 transition-opacity">
+                إدارة المتجر
+              </button>
+            </div>
           </div>
         </div>
       </footer>
@@ -1066,7 +1132,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             { icon: Home,        label: 'الرئيسية',   action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
             { icon: Grid3X3,     label: 'الأقسام',    action: () => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }) },
             { icon: ShoppingBag, label: 'السلة',      action: () => setIsCartOpen(true), badge: cart.reduce((s, i) => s + i.quantity, 0) },
-            { icon: Heart,       label: 'المفضلة',   action: () => setShowWishlist(true), badge: wishlist.length },
+            { icon: Heart,       label: 'المفضلة',   action: () => {}, badge: wishlist.length },
             { icon: Truck,       label: 'تتبع طلبي', action: () => setActiveTab('tracking') },
           ].map(({ icon: Icon, label, action, badge }) => (
             <button key={label} onClick={action}
@@ -1626,202 +1692,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <p className="text-[10px] text-[#8B7B78] mt-4 leading-relaxed font-medium">
                 * القياسات بالبوصة (Inches). للتفصيل بمقاسات خاصة راسليننا على واتساب.
               </p>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ── MODAL: About ────────────────────────────────────── */}
-      <AnimatePresence>
-        {showAbout && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#F2E4DC]">
-                <h3 className="font-black text-[#2C1810] text-lg">من نحن</h3>
-                <button onClick={() => setShowAbout(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-500" /></button>
-              </div>
-              <div className="space-y-4 text-[13px] text-[#5C3830] leading-relaxed font-medium">
-                <div className="flex justify-center mb-4"><img src="/logo.jpg" alt="ألماسة" className="h-16 w-auto object-contain" /></div>
-                <p><strong className="text-[#9A2D55]">بوتيك ألماسة</strong> — وجهتك الأولى لأرقى تصاميم المخاوير والجلابيات الخليجية الفاخرة في مملكة البحرين.</p>
-                <p>نؤمن بأن كل امرأة تستحق أن تبدو استثنائية في كل مناسبة. لذلك نختار بعناية فائقة أجود الأقمشة وأرقى التطريزات لنقدم لك تشكيلة لا مثيل لها من المخاوير التقليدية المعاصرة.</p>
-                <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                  <p className="font-black text-[#9A2D55] mb-2">قيمنا</p>
-                  <ul className="space-y-1.5 list-disc list-inside">
-                    <li>الجودة الاستثنائية في كل قطعة</li>
-                    <li>التصاميم الحصرية المصنوعة بحب</li>
-                    <li>خدمة عملاء متميزة ومتاحة دائماً</li>
-                    <li>توصيل سريع وآمن لجميع أنحاء العالم</li>
-                  </ul>
-                </div>
-                <div className="text-center pt-2">
-                  <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                    className="inline-flex items-center gap-2 bg-[#9A2D55] text-white font-bold px-5 py-2.5 rounded-xl text-sm">
-                    تواصلي معنا
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ── MODAL: Privacy Policy ────────────────────────────── */}
-      <AnimatePresence>
-        {showPrivacy && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#F2E4DC]">
-                <h3 className="font-black text-[#2C1810] text-lg">سياسة الخصوصية</h3>
-                <button onClick={() => setShowPrivacy(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-500" /></button>
-              </div>
-              <div className="space-y-4 text-[13px] text-[#5C3830] leading-relaxed font-medium">
-                {[
-                  { title: 'جمع المعلومات', body: 'نجمع المعلومات التي تزودينا بها عند إتمام طلبك مثل الاسم والعنوان ورقم الهاتف والبريد الإلكتروني.' },
-                  { title: 'استخدام المعلومات', body: 'تُستخدم بياناتك حصراً لمعالجة طلباتك، التواصل معك بشأن طلبك، وتحسين تجربتك في المتجر.' },
-                  { title: 'حماية البيانات', body: 'جميع المعلومات الشخصية محفوظة بأمان ولا تُشارك مع أطراف ثالثة إلا عند الضرورة لإتمام التوصيل.' },
-                  { title: 'ملفات الكوكيز', body: 'نستخدم ملفات الكوكيز لتحسين تجربة التصفح وتذكر تفضيلاتك. يمكنك تعطيلها من إعدادات المتصفح.' },
-                  { title: 'التواصل', body: 'لأي استفسار عن سياسة الخصوصية، تواصلي معنا على واتساب أو البريد الإلكتروني.' },
-                ].map(s => (
-                  <div key={s.title} className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                    <p className="font-black text-[#9A2D55] mb-1">{s.title}</p>
-                    <p>{s.body}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ── MODAL: Terms ────────────────────────────────────── */}
-      <AnimatePresence>
-        {showTerms && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#F2E4DC]">
-                <h3 className="font-black text-[#2C1810] text-lg">الشروط والأحكام</h3>
-                <button onClick={() => setShowTerms(false)} className="p-1.5 hover:bg-slate-100 rounded-lg"><X className="w-5 h-5 text-slate-500" /></button>
-              </div>
-              <div className="space-y-4 text-[13px] text-[#5C3830] leading-relaxed font-medium">
-                {[
-                  { title: 'قبول الشروط', body: 'باستخدامك هذا الموقع فأنتِ توافقين على الشروط والأحكام الواردة هنا.' },
-                  { title: 'الطلبات والدفع', body: 'يُعتبر الطلب مؤكداً بعد إتمام عملية الدفع. نحتفظ بحق رفض أي طلب في حالات استثنائية مع إعادة المبلغ كاملاً.' },
-                  { title: 'الأسعار', body: 'الأسعار بالدينار البحريني وتشمل ضريبة القيمة المضافة حيثما ينطبق. قد تتغير الأسعار دون إشعار مسبق.' },
-                  { title: 'الشحن والتوصيل', body: 'مواعيد التوصيل تقريبية وقد تتأثر بظروف خارجة عن إرادتنا. نحن غير مسؤولين عن تأخيرات شركات الشحن.' },
-                  { title: 'الملكية الفكرية', body: 'جميع المحتويات (صور، نصوص، تصاميم) ملك حصري لبوتيك ألماسة ومحمية بقوانين حقوق النشر.' },
-                ].map(s => (
-                  <div key={s.title} className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                    <p className="font-black text-[#9A2D55] mb-1">{s.title}</p>
-                    <p>{s.body}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ── MODAL: Return Policy ────────────────────────────── */}
-      <AnimatePresence>
-        {showReturnPolicy && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir="rtl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#F2E4DC]">
-                <h3 className="font-black text-[#2C1810] text-lg">سياسة الإرجاع والاستبدال</h3>
-                <button onClick={() => setShowReturnPolicy(false)} className="p-1.5 hover:bg-slate-100 rounded-lg">
-                  <X className="w-5 h-5 text-slate-500" />
-                </button>
-              </div>
-              <div className="space-y-4 text-[13px] text-[#5C3830] leading-relaxed font-medium">
-                <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                  <p className="font-black text-[#9A2D55] mb-2">✅ شروط الإرجاع</p>
-                  <ul className="space-y-1.5 list-disc list-inside">
-                    <li>يُقبل الإرجاع خلال <strong>7 أيام</strong> من تاريخ الاستلام</li>
-                    <li>يجب أن يكون المنتج بحالته الأصلية غير مُستخدَم</li>
-                    <li>يجب الاحتفاظ بالوسم الأصلي والتغليف</li>
-                    <li>لا يُقبل إرجاع المنتجات المُقصَّة أو المُعدَّلة</li>
-                  </ul>
-                </div>
-                <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                  <p className="font-black text-[#9A2D55] mb-2">🔄 الاستبدال</p>
-                  <ul className="space-y-1.5 list-disc list-inside">
-                    <li>الاستبدال مجاني في حال وجود عيب مصنعي</li>
-                    <li>في حال الرغبة في الاستبدال بمقاس مختلف تتحمل العميلة رسوم الشحن</li>
-                  </ul>
-                </div>
-                <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                  <p className="font-black text-[#9A2D55] mb-2">💬 للتواصل</p>
-                  <p>للإرجاع أو الاستبدال تواصلي معنا على واتساب:</p>
-                  <button onClick={() => window.open('https://wa.me/97337037697','_blank')}
-                    className="mt-2 bg-green-500 text-white font-bold text-xs px-4 py-2 rounded-xl">
-                    واتساب: 97337037697+
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ── DRAWER: Wishlist ────────────────────────────────── */}
-      <AnimatePresence>
-        {showWishlist && (
-          <div className="fixed inset-0 z-50 flex" dir="rtl">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowWishlist(false)} />
-            <motion.div initial={{ x: -320 }} animate={{ x: 0 }} exit={{ x: -320 }} transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="relative mr-auto w-full max-w-sm bg-white h-full flex flex-col shadow-2xl">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#F2E4DC]">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 fill-[#9A2D55] text-[#9A2D55]" />
-                  <h2 className="font-black text-[#2C1810] text-base">المفضلة</h2>
-                  <span className="bg-[#F8EDE8] text-[#9A2D55] text-[10px] font-black px-2 py-0.5 rounded-full">{wishlist.length}</span>
-                </div>
-                <button onClick={() => setShowWishlist(false)} className="p-1.5 hover:bg-slate-100 rounded-lg">
-                  <X className="w-5 h-5 text-slate-500" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4">
-                {wishlist.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-                    <Heart className="w-14 h-14 text-[#F2E4DC]" />
-                    <p className="text-[#8B7B78] font-semibold text-sm">قائمة المفضلة فارغة</p>
-                    <p className="text-[#8B7B78] text-xs">اضغطي على قلب المنتج لإضافته للمفضلة</p>
-                    <button onClick={() => setShowWishlist(false)} className="bg-[#9A2D55] text-white font-bold text-sm px-6 py-2.5 rounded-xl">
-                      تصفحي المنتجات
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {products.filter(p => wishlist.includes(p.id)).map(p => (
-                      <div key={p.id} className="flex gap-3 bg-[#FDF8F5] rounded-2xl p-3 border border-[#F2E4DC]">
-                        <img src={p.image} alt={p.name} className="w-16 h-16 rounded-xl object-cover shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-sm text-[#2C1810] truncate">{p.name}</p>
-                          <p className="text-[#9A2D55] font-black text-sm mt-0.5">{p.price} د.ب</p>
-                          <button onClick={() => {
-                            setSelectedProduct(p);
-                            setShowWishlist(false);
-                          }} className="mt-1.5 text-[10px] font-bold text-[#9A2D55] hover:underline">
-                            عرض المنتج ←
-                          </button>
-                        </div>
-                        <button onClick={() => {
-                          const next = wishlist.filter(id => id !== p.id);
-                          setWishlist(next);
-                          localStorage.setItem('ama_wishlist', JSON.stringify(next));
-                        }} className="p-1 text-slate-400 hover:text-rose-500 shrink-0">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </motion.div>
           </div>
         )}
