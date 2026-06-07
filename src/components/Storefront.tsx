@@ -863,8 +863,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         </main>
       )}
 
-      {/* ── FOOTER ──────────────────────────────────────────────── */}
-      {(() => {
+      {/* ── FOOTER REMOVED ── */}
+      {false && (() => {
         const fs = (() => { try { return JSON.parse(localStorage.getItem('almaasa_settings') || '{}'); } catch { return {}; } })();
         return (
       <footer dir="rtl" style={{ background: '#1A0F12', color: '#B89AA4' }}>
