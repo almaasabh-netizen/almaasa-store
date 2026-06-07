@@ -1056,8 +1056,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <img src="/logo.jpg" alt="ألماسة" className="h-16 w-auto object-contain brightness-[1.1] contrast-[0.9] opacity-90" />
               </div>
               <p className="text-[13px] leading-relaxed text-[#8B7B78] font-medium">
-                متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.
-              </p>
+                متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.              </p>
               <div className="flex gap-2.5 mt-5">
                 <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
                   className="w-9 h-9 bg-white/5 hover:bg-emerald-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
