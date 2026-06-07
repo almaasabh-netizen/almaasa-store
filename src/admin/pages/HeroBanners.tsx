@@ -62,7 +62,7 @@ export default function HeroBanners() {
     <div className="space-y-4 max-w-4xl" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-black text-lg" style={{ color: '#5A4047' }}>Hero Banners</h2>
+          <h2 className="font-black text-lg" style={{ color: '#5A4047' }}>البانرات الرئيسية</h2>
           <p className="text-xs mt-0.5" style={{ color: '#D79AA8' }}>صور وتفاصيل السلايدر الرئيسي في الواجهة</p>
         </div>
         <button onClick={add}

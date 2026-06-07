@@ -10,13 +10,16 @@ export default function Customers() {
   const customers = useMemo(() => {
     const map: Record<string, any> = {};
     orders.forEach((o: any) => {
-      const key = o.customerPhone || o.customerEmail || o.customerName;
+      // Support both nested (o.customer.phone) and flat (o.customerPhone)
+      const c = o.customer || {};
+      const phone = c.phone || o.customerPhone || '';
+      const email = c.email || o.customerEmail || '';
+      const name  = c.name  || o.customerName  || '';
+      const city  = c.city  || o.customerCity  || '';
+      const key = phone || email || name;
       if (!key) return;
       if (!map[key]) {
-        map[key] = {
-          name: o.customerName, phone: o.customerPhone, email: o.customerEmail,
-          city: o.customerCity, orders: [], total: 0,
-        };
+        map[key] = { name, phone, email, city, orders: [], total: 0 };
       }
       map[key].orders.push(o);
       if (o.status !== 'cancelled') map[key].total += o.total || 0;
@@ -25,7 +28,7 @@ export default function Customers() {
   }, [orders]);
 
   const filtered = search
-    ? customers.filter((c: any) => c.name?.includes(search) || c.phone?.includes(search))
+    ? customers.filter((c: any) => c.name?.includes(search) || c.phone?.includes(search) || c.email?.includes(search))
     : customers;
 
   return (

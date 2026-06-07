@@ -4,7 +4,7 @@ import {
   LayoutDashboard, ShoppingBag, Package, Users, BarChart2,
   Tag, MessageSquare, Settings, LogOut, Megaphone, Star,
   Truck, ChevronLeft, Percent, Layers, HelpCircle, UserCog,
-  Bell, Boxes, Image
+  Bell, Boxes, Image, MapPin
 } from 'lucide-react';
 
 const navGroups = [
@@ -21,6 +21,7 @@ const navGroups = [
       { to: '/admin/products',  icon: Package,     label: 'المنتجات' },
       { to: '/admin/categories',icon: Layers,      label: 'التصنيفات' },
       { to: '/admin/inventory', icon: Boxes,       label: 'المخزون' },
+      { to: '/admin/shipping',  icon: MapPin,      label: 'الشحن' },
     ]
   },
   {

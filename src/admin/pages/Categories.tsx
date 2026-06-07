@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Plus, Edit2, Trash2, Save, X, Image as ImageIcon } from 'lucide-react';
 import { getStoredData, saveStoredData } from '../../data';
 
 type Category = { id: string; name: string; nameEn: string; image: string; order: number };
@@ -91,6 +91,14 @@ export default function Categories() {
 }
 
 function FormRow({ form, setForm, onSave, onCancel }: any) {
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = e => setForm({ ...form, image: e.target?.result as string });
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="rounded-xl p-4 space-y-3" style={{ background: '#FFF8F8', border: '1px solid #F0DDE0' }}>
       <div className="grid grid-cols-2 gap-3">
@@ -106,9 +114,30 @@ function FormRow({ form, setForm, onSave, onCancel }: any) {
         </div>
       </div>
       <div>
-        <label className="block text-xs font-bold mb-1" style={{ color: '#5A4047' }}>رابط الصورة</label>
-        <input value={form.image} onChange={e => setForm({ ...form, image: e.target.value })}
-          className="w-full rounded-xl px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: 'white', color: '#5A4047' }} dir="ltr" />
+        <label className="block text-xs font-bold mb-1" style={{ color: '#5A4047' }}>صورة التصنيف</label>
+        <div className="flex gap-2 items-center">
+          <div
+            className="w-16 h-16 rounded-xl overflow-hidden flex items-center justify-center cursor-pointer shrink-0"
+            style={{ background: '#F3E6E8', border: '2px dashed #D79AA8' }}
+            onClick={() => fileRef.current?.click()}>
+            {form.image
+              ? <img src={form.image} alt="" className="w-full h-full object-cover" />
+              : <ImageIcon className="w-6 h-6" style={{ color: '#D79AA8' }} />}
+          </div>
+          <div className="flex-1 space-y-1.5">
+            <button onClick={() => fileRef.current?.click()} type="button"
+              className="text-xs font-bold px-3 py-1.5 rounded-lg"
+              style={{ background: '#F3E6E8', color: '#C77D8A' }}>
+              رفع صورة
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+            <input value={form.image?.startsWith('data:') ? '' : form.image}
+              onChange={e => setForm({ ...form, image: e.target.value })}
+              placeholder="أو الصق رابط URL..."
+              className="w-full rounded-xl px-3 py-1.5 text-xs outline-none" style={{ border: '1px solid #F0DDE0', background: 'white', color: '#5A4047' }} dir="ltr" />
+          </div>
+        </div>
       </div>
       <div className="flex gap-2">
         <button onClick={onCancel} className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold" style={{ background: '#F3E6E8', color: '#C77D8A' }}>

@@ -22,6 +22,7 @@ import Reports from './admin/pages/Reports';
 import Settings from './admin/pages/Settings';
 import Users from './admin/pages/Users';
 import Support from './admin/pages/Support';
+import Shipping from './admin/pages/Shipping';
 import StorefrontApp from './StorefrontApp';
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="settings" element={<Settings />} />
         <Route path="users" element={<Users />} />
         <Route path="support" element={<Support />} />
+        <Route path="shipping" element={<Shipping />} />
       </Route>
       <Route path="*" element={<StorefrontApp />} />
     </Routes>

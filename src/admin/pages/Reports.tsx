@@ -25,9 +25,19 @@ export default function Reports() {
     orders: orders.filter((o: any) => new Date(o.date).getMonth() === i).length,
   }));
 
-  const topProducts = [...products].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 7).map(p => ({
-    name: p.name?.slice(0, 10), value: p.reviewCount || 0,
-  }));
+  // Count actual sold units per product from orders
+  const salesByProduct: Record<string, number> = {};
+  orders.filter((o: any) => o.status !== 'cancelled').forEach((o: any) => {
+    (o.items || []).forEach((item: any) => {
+      const pid = item.product?.id || item.productId;
+      if (pid) salesByProduct[pid] = (salesByProduct[pid] || 0) + (item.quantity || 1);
+    });
+  });
+  const topProducts = [...products]
+    .map(p => ({ name: p.name?.slice(0, 10), value: salesByProduct[p.id] || 0 }))
+    .filter(p => p.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 7);
 
   const statusDist = ['new','processing','shipping','delivered','cancelled','returned'].map(s => ({
     name: { new:'جديد', processing:'تجهيز', shipping:'شحن', delivered:'تسليم', cancelled:'ملغي', returned:'مُرتجع' }[s],
@@ -44,9 +54,11 @@ export default function Reports() {
     : 0;
   const estimatedProfit = orders.filter((o: any) => o.status === 'delivered').reduce((sum: number, o: any) => {
     return sum + (o.items || []).reduce((s: number, item: any) => {
-      const prod = products.find((p: any) => p.id === item.productId);
+      const pid = item.product?.id || item.productId;
+      const prod = products.find((p: any) => p.id === pid) || item.product;
+      const price = item.product?.price || item.price || 0;
       if (prod?.originalPrice) return s + (prod.price - prod.originalPrice) * (item.quantity || 1);
-      return s + (item.price || 0) * (item.quantity || 1) * 0.3;
+      return s + price * (item.quantity || 1) * 0.3;
     }, 0);
   }, 0);
   const profitMarginByProduct = productsWithCost.map((p: any) => ({
