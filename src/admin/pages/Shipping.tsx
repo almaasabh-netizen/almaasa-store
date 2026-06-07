@@ -66,27 +66,18 @@ export default function Shipping() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="md:col-span-2">
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>اسم المنطقة</label>
-              {customName ? (
-                <div className="flex gap-1.5">
-                  <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                    className={inp + ' flex-1'} style={inpStyle} placeholder="اكتب اسم المنطقة..." autoFocus />
-                  <button type="button" onClick={() => { setCustomName(false); setForm({ ...form, name: '' }); }}
-                    className="px-2.5 rounded-xl text-xs" style={{ background: '#F3E6E8', color: '#C77D8A' }}>←</button>
-                </div>
-              ) : (
-                <div className="flex gap-1.5">
-                  <select value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                    className={inp + ' flex-1'} style={inpStyle}>
-                    <option value="">-- اختر منطقة --</option>
-                    {BAHRAIN_AREAS.filter(a => !zones.find(z => z.name === a)).map(a => (
-                      <option key={a} value={a}>{a}</option>
-                    ))}
-                  </select>
-                  <button type="button" onClick={() => setCustomName(true)}
-                    className="px-2.5 rounded-xl text-xs font-bold whitespace-nowrap"
-                    style={{ background: '#F3E6E8', color: '#C77D8A' }}>+ منطقة أخرى</button>
-                </div>
-              )}
+              <input
+                list="bahrain-areas"
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                className={inp} style={inpStyle}
+                placeholder="اختر أو اكتب اسم المنطقة..."
+              />
+              <datalist id="bahrain-areas">
+                {BAHRAIN_AREAS.filter(a => !zones.find(z => z.name === a)).map(a => (
+                  <option key={a} value={a} />
+                ))}
+              </datalist>
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>تكلفة الشحن (د.ب)</label>
