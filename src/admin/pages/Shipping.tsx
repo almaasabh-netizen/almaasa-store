@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Save, X, Truck, CheckSquare, Square } from 'lucide-react';
-import { getStoredData, saveStoredData } from '../../data';
 
 type ShippingZone = { id: string; name: string; cost: number; freeMin: number; days: string; active: boolean };
+
+const KEY = 'ama_shipping_zones';
+const loadZones = (): ShippingZone[] => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } };
+const saveZones = (z: ShippingZone[]) => localStorage.setItem(KEY, JSON.stringify(z));
 
 const BAHRAIN_AREAS = [
   'المنامة', 'المحرق', 'الرفاع', 'مدينة عيسى', 'مدينة حمد',
@@ -15,14 +18,13 @@ const BAHRAIN_AREAS = [
 ];
 
 export default function Shipping() {
-  const [data, setData] = useState(() => getStoredData());
+  const [zones, setZones] = useState<ShippingZone[]>(loadZones);
   const [adding, setAdding] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [cost, setCost] = useState(1);
   const [freeMin, setFreeMin] = useState(20);
   const [days, setDays] = useState('2-3');
 
-  const zones: ShippingZone[] = data.shippingZones || [];
   const available = BAHRAIN_AREAS.filter(a => !zones.find(z => z.name === a));
 
   const toggleArea = (area: string) =>
@@ -37,24 +39,24 @@ export default function Shipping() {
       id: `sz_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,
       name, cost, freeMin, days, active: true,
     }));
-    const updated = { ...data, shippingZones: [...zones, ...newZones] };
-    saveStoredData(updated);
-    setData(updated);
+    const updated = [...zones, ...newZones];
+    saveZones(updated);
+    setZones(updated);
     setAdding(false);
     setSelected([]);
     setCost(1); setFreeMin(20); setDays('2-3');
   };
 
   const del = (id: string) => {
-    const updated = { ...data, shippingZones: zones.filter(z => z.id !== id) };
-    saveStoredData(updated);
-    setData(updated);
+    const updated = zones.filter(z => z.id !== id);
+    saveZones(updated);
+    setZones(updated);
   };
 
   const toggle = (id: string) => {
-    const updated = { ...data, shippingZones: zones.map(z => z.id === id ? { ...z, active: !z.active } : z) };
-    saveStoredData(updated);
-    setData(updated);
+    const updated = zones.map(z => z.id === id ? { ...z, active: !z.active } : z);
+    saveZones(updated);
+    setZones(updated);
   };
 
   const inp = 'w-full rounded-xl px-3 py-2 text-sm outline-none';
@@ -88,7 +90,6 @@ export default function Shipping() {
             </button>
           </div>
 
-          {/* Areas grid */}
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
             {available.map(area => {
               const checked = selected.includes(area);
@@ -122,7 +123,6 @@ export default function Shipping() {
             </div>
           )}
 
-          {/* Shared settings */}
           <div className="grid grid-cols-3 gap-4 pt-1">
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>تكلفة الشحن (د.ب)</label>
@@ -159,7 +159,6 @@ export default function Shipping() {
         </div>
       )}
 
-      {/* Table */}
       <div className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
         {zones.length === 0 && !adding ? (
           <div className="py-16 text-center">
