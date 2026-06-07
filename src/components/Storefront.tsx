@@ -877,7 +877,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <span className="font-black text-lg text-white">ألماسة</span>
               </div>
               <p className="text-sm leading-relaxed mb-5" style={{ color: '#8A7080' }}>
-                متجر متخصص في المخاوير والأزياء النسائية الراقية — تصاميم استثنائية تجمع بين الفخامة والأناقة.
+                متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.
               </p>
               <div className="flex gap-3">
                 {(fs.instagram || 'https://instagram.com/almaasa.bh') && (
