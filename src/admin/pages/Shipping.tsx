@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Save, X, Truck } from 'lucide-react';
+import { Plus, Trash2, Save, X, Truck, CheckSquare, Square } from 'lucide-react';
 import { getStoredData, saveStoredData } from '../../data';
 
 type ShippingZone = { id: string; name: string; cost: number; freeMin: number; days: string; active: boolean };
@@ -17,18 +17,32 @@ const BAHRAIN_AREAS = [
 export default function Shipping() {
   const [data, setData] = useState(() => getStoredData());
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState<Omit<ShippingZone,'id'>>({ name: '', cost: 1, freeMin: 20, days: '2-3', active: true });
-  const [customName, setCustomName] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [cost, setCost] = useState(1);
+  const [freeMin, setFreeMin] = useState(20);
+  const [days, setDays] = useState('2-3');
 
   const zones: ShippingZone[] = data.shippingZones || [];
+  const available = BAHRAIN_AREAS.filter(a => !zones.find(z => z.name === a));
+
+  const toggleArea = (area: string) =>
+    setSelected(prev => prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area]);
+
+  const selectAll = () =>
+    setSelected(selected.length === available.length ? [] : [...available]);
 
   const save = () => {
-    if (!form.name) return;
-    const updated = { ...data, shippingZones: [...zones, { ...form, id: `sz_${Date.now()}` }] };
+    if (selected.length === 0) return;
+    const newZones = selected.map(name => ({
+      id: `sz_${Date.now()}_${Math.random().toString(36).slice(2,6)}`,
+      name, cost, freeMin, days, active: true,
+    }));
+    const updated = { ...data, shippingZones: [...zones, ...newZones] };
     saveStoredData(updated);
     setData(updated);
     setAdding(false);
-    setForm({ name: '', cost: 1, freeMin: 20, days: '2-3', active: true });
+    setSelected([]);
+    setCost(1); setFreeMin(20); setDays('2-3');
   };
 
   const del = (id: string) => {
@@ -47,69 +61,105 @@ export default function Shipping() {
   const inpStyle = { border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' };
 
   return (
-    <div className="max-w-3xl space-y-4" dir="rtl">
+    <div className="max-w-4xl space-y-4" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-black text-lg" style={{ color: '#5A4047' }}>مناطق الشحن</h2>
           <p className="text-xs mt-0.5" style={{ color: '#D79AA8' }}>حدد تكاليف الشحن لكل منطقة</p>
         </div>
-        <button onClick={() => setAdding(true)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold"
-          style={{ background: '#D79AA8', color: 'white' }}>
-          <Plus className="w-4 h-4" /> إضافة منطقة
-        </button>
+        {!adding && (
+          <button onClick={() => setAdding(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold"
+            style={{ background: '#D79AA8', color: 'white' }}>
+            <Plus className="w-4 h-4" /> إضافة مناطق
+          </button>
+        )}
       </div>
 
       {adding && (
-        <div className="rounded-2xl p-5 space-y-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
-          <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>منطقة جديدة</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>اسم المنطقة</label>
-              <input
-                list="bahrain-areas"
-                value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
-                className={inp} style={inpStyle}
-                placeholder="اختر أو اكتب اسم المنطقة..."
-              />
-              <datalist id="bahrain-areas">
-                {BAHRAIN_AREAS.filter(a => !zones.find(z => z.name === a)).map(a => (
-                  <option key={a} value={a} />
-                ))}
-              </datalist>
+        <div className="rounded-2xl p-5 space-y-5" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+          <div className="flex items-center justify-between">
+            <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>اختر المناطق</h3>
+            <button onClick={selectAll} className="flex items-center gap-1.5 text-xs font-bold"
+              style={{ color: '#D79AA8' }}>
+              {selected.length === available.length
+                ? <><CheckSquare className="w-4 h-4" /> إلغاء تحديد الكل</>
+                : <><Square className="w-4 h-4" /> تحديد الكل</>}
+            </button>
+          </div>
+
+          {/* Areas grid */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+            {available.map(area => {
+              const checked = selected.includes(area);
+              return (
+                <button key={area} onClick={() => toggleArea(area)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-right transition-all"
+                  style={{
+                    background: checked ? '#F3E6E8' : '#FFF8F8',
+                    border: `1px solid ${checked ? '#D79AA8' : '#F0DDE0'}`,
+                    color: checked ? '#C77D8A' : '#5A4047',
+                  }}>
+                  <div className="w-3.5 h-3.5 rounded shrink-0 flex items-center justify-center"
+                    style={{ background: checked ? '#D79AA8' : 'transparent', border: checked ? 'none' : '1.5px solid #D79AA8' }}>
+                    {checked && <span className="text-white text-[9px] font-black">✓</span>}
+                  </div>
+                  {area}
+                </button>
+              );
+            })}
+            {available.length === 0 && (
+              <p className="col-span-full text-xs text-center py-4" style={{ color: '#D79AA8' }}>
+                جميع المناطق مضافة بالفعل
+              </p>
+            )}
+          </div>
+
+          {selected.length > 0 && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold"
+              style={{ background: '#F3E6E8', color: '#C77D8A' }}>
+              ✓ تم اختيار {selected.length} منطقة
             </div>
+          )}
+
+          {/* Shared settings */}
+          <div className="grid grid-cols-3 gap-4 pt-1">
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>تكلفة الشحن (د.ب)</label>
-              <input type="number" min={0} step={0.1} value={form.cost} onChange={e => setForm({ ...form, cost: Number(e.target.value) })}
+              <input type="number" min={0} step={0.1} value={cost}
+                onChange={e => setCost(Number(e.target.value))}
                 className={inp} style={inpStyle} dir="ltr" />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>شحن مجاني من (د.ب)</label>
-              <input type="number" min={0} value={form.freeMin} onChange={e => setForm({ ...form, freeMin: Number(e.target.value) })}
+              <input type="number" min={0} value={freeMin}
+                onChange={e => setFreeMin(Number(e.target.value))}
                 className={inp} style={inpStyle} dir="ltr" />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>مدة التوصيل (أيام)</label>
-              <input value={form.days} onChange={e => setForm({ ...form, days: e.target.value })}
+              <input value={days} onChange={e => setDays(e.target.value)}
                 className={inp} style={inpStyle} dir="ltr" placeholder="2-3" />
             </div>
           </div>
+
           <div className="flex gap-2">
-            <button onClick={() => setAdding(false)}
+            <button onClick={() => { setAdding(false); setSelected([]); }}
               className="flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold"
               style={{ background: '#F3E6E8', color: '#C77D8A' }}>
               <X className="w-3.5 h-3.5" /> إلغاء
             </button>
-            <button onClick={save}
-              className="flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold"
+            <button onClick={save} disabled={selected.length === 0}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold disabled:opacity-50"
               style={{ background: '#D79AA8', color: 'white' }}>
-              <Save className="w-3.5 h-3.5" /> حفظ
+              <Save className="w-3.5 h-3.5" />
+              حفظ {selected.length > 0 ? `(${selected.length} مناطق)` : ''}
             </button>
           </div>
         </div>
       )}
 
+      {/* Table */}
       <div className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
         {zones.length === 0 && !adding ? (
           <div className="py-16 text-center">
@@ -117,17 +167,17 @@ export default function Shipping() {
             <p className="font-bold text-sm" style={{ color: '#5A4047' }}>لا توجد مناطق شحن</p>
             <p className="text-xs mt-1" style={{ color: '#D79AA8' }}>أضف مناطق الشحن وتكاليفها</p>
           </div>
-        ) : (
+        ) : zones.length > 0 && (
           <table className="w-full text-right">
             <thead>
               <tr style={{ background: '#FFF8F8' }}>
-                {['المنطقة', 'تكلفة الشحن', 'شحن مجاني من', 'مدة التوصيل', 'الحالة', ''].map(h => (
+                {['المنطقة','تكلفة الشحن','شحن مجاني من','مدة التوصيل','الحالة',''].map(h => (
                   <th key={h} className="px-4 py-3 text-xs font-bold" style={{ color: '#D79AA8' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {zones.map((z, i) => (
+              {zones.map(z => (
                 <tr key={z.id} className="border-t" style={{ borderColor: '#F0DDE0' }}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
