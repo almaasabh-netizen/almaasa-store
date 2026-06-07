@@ -39,7 +39,7 @@ export default function AdminLayout() {
   }, [darkMode]);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#FFF8F8', direction: 'rtl', fontFamily: 'Tajawal, sans-serif' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: '#FFF8F8', direction: 'rtl' }}>
       {/* Desktop sidebar */}
       <div className="hidden lg:flex">
         <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />

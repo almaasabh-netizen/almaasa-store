@@ -17,10 +17,16 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Cairo', system-ui, sans-serif;
+  font-family: 'Tajawal', system-ui, sans-serif;
   background-color: var(--color-cream);
   color: var(--color-dark);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ─── HEADING FONT ───────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6,
+.font-naskh {
+  font-family: 'Noto Naskh Arabic', 'Tajawal', system-ui, serif;
 }
 
 /* ─── SCROLLBAR ──────────────────────────────────────────── */
