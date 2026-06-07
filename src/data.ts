@@ -325,8 +325,9 @@ export const getStoredData = () => {
   const settings = localStorage.getItem('ama_settings') ? JSON.parse(localStorage.getItem('ama_settings')!) : INITIAL_SETTINGS;
   const sizeGuides = localStorage.getItem('ama_size_guides') ? JSON.parse(localStorage.getItem('ama_size_guides')!) : INITIAL_SIZE_GUIDES;
   const reviews = localStorage.getItem('ama_reviews') ? JSON.parse(localStorage.getItem('ama_reviews')!) : INITIAL_REVIEWS;
+  const shippingZones = localStorage.getItem('ama_shipping_zones') ? JSON.parse(localStorage.getItem('ama_shipping_zones')!) : [];
 
-  return { products, orders, logs, categories, coupons, settings, sizeGuides, reviews };
+  return { products, orders, logs, categories, coupons, settings, sizeGuides, reviews, shippingZones };
 };
 
 export const saveStoredData = (data: {
@@ -338,6 +339,7 @@ export const saveStoredData = (data: {
   settings?: StoreSettings;
   sizeGuides?: SizeGuide[];
   reviews?: Review[];
+  shippingZones?: any[];
 }) => {
   if (typeof window === 'undefined') return;
 
@@ -349,6 +351,7 @@ export const saveStoredData = (data: {
   if (data.settings) localStorage.setItem('ama_settings', JSON.stringify(data.settings));
   if (data.sizeGuides) localStorage.setItem('ama_size_guides', JSON.stringify(data.sizeGuides));
   if (data.reviews) localStorage.setItem('ama_reviews', JSON.stringify(data.reviews));
+  if (data.shippingZones) localStorage.setItem('ama_shipping_zones', JSON.stringify(data.shippingZones));
 };
 
 export const addOperationLog = (action: string, details: string, operator: string, type: OperationLog['type'], severity: OperationLog['severity'] = 'info') => {
