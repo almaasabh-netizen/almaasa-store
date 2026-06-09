@@ -58,6 +58,15 @@ export default function Products() {
     setData(updated);
   };
 
+  const deleteWithoutImages = () => {
+    const count = (data.products || []).filter((p: any) => !p.image).length;
+    if (count === 0) { alert('لا توجد منتجات بدون صور'); return; }
+    if (!confirm(`سيتم حذف ${count} منتج بدون صورة. متأكدة؟`)) return;
+    const updated = { ...data, products: data.products.filter((p: any) => p.image) };
+    saveStoredData(updated);
+    setData(updated);
+  };
+
   return (
     <div className="space-y-4" dir="rtl">
       <div className="flex flex-wrap items-center gap-3">
@@ -76,6 +85,11 @@ export default function Products() {
           ))}
         </div>
         <div className="flex gap-2 mr-auto">
+          <button onClick={deleteWithoutImages}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold"
+            style={{ background: '#FEF2F2', color: '#EF4444', border: '1px solid #FECACA' }}>
+            <Trash2 className="w-4 h-4" /> حذف بدون صور
+          </button>
           <button onClick={importFromInstagram} disabled={isImporting}
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-60"
             style={{ background: 'linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)', color: 'white' }}>
