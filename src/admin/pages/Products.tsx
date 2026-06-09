@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Edit2, Trash2, Eye, EyeOff, Package } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Eye, EyeOff, Package, Instagram } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getStoredData, saveStoredData } from '../../data';
 
@@ -8,6 +8,33 @@ export default function Products() {
   const [data, setData] = useState(() => getStoredData());
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('الكل');
+  const [isImporting, setIsImporting] = useState(false);
+
+  const importFromInstagram = async () => {
+    setIsImporting(true);
+    try {
+      const res = await fetch('/api/instagram-feed');
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      const posts = json.posts || json.feed || json;
+      const newProducts = (Array.isArray(posts) ? posts : []).map((p: any) => ({
+        id: `ig_${p.id || Date.now()}_${Math.random().toString(36).slice(2,6)}`,
+        name: (p.caption || p.title || 'منتج من إنستقرام').slice(0, 60),
+        price: 0, stock: 0, category: '', description: p.caption || '',
+        image: p.perm_url || p.media_url || p.thumbnail_url || '',
+        isDraft: true,
+      }));
+      if (newProducts.length === 0) { alert('لم يتم العثور على منشورات'); return; }
+      const updated = { ...data, products: [...(data.products || []), ...newProducts] };
+      saveStoredData(updated);
+      setData(updated);
+      alert(`تم استيراد ${newProducts.length} منتج بنجاح`);
+    } catch {
+      alert('فشل الاستيراد — تأكد من إعداد Behold API');
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   const products = useMemo(() => {
     let list = [...(data.products || [])];
@@ -48,11 +75,19 @@ export default function Products() {
             </button>
           ))}
         </div>
-        <button onClick={() => navigate('/admin/products/new')}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold mr-auto"
-          style={{ background: '#D79AA8', color: 'white' }}>
-          <Plus className="w-4 h-4" /> إضافة منتج
-        </button>
+        <div className="flex gap-2 mr-auto">
+          <button onClick={importFromInstagram} disabled={isImporting}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-60"
+            style={{ background: 'linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)', color: 'white' }}>
+            <Instagram className="w-4 h-4" />
+            {isImporting ? 'جاري الاستيراد...' : 'استيراد من إنستقرام'}
+          </button>
+          <button onClick={() => navigate('/admin/products/new')}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold"
+            style={{ background: '#D79AA8', color: 'white' }}>
+            <Plus className="w-4 h-4" /> إضافة منتج
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
