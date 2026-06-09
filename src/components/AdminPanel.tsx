@@ -1433,6 +1433,14 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       <Plus className="w-4 h-4" />
                       <span>إضافة منتج جديد</span>
                     </button>
+                    <button
+                      onClick={handleImportFromInstagram}
+                      disabled={isImportingFromIG}
+                      className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-60 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Instagram className="w-4 h-4" />
+                      <span>{isImportingFromIG ? 'جاري الاستيراد...' : 'استيراد من إنستقرام'}</span>
+                    </button>
                   </div>
                 </div>
 
