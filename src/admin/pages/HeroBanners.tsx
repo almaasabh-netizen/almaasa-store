@@ -186,13 +186,13 @@ export default function HeroBanners() {
                 {/* Preview */}
                 <div>
                   <label className="block text-xs font-bold mb-2" style={{ color: '#5A4047' }}>معاينة</label>
-                  <div className="rounded-xl overflow-hidden flex" style={{ background: '#F9F0EE', height: 120 }}>
-                    <div className="w-1/2 overflow-hidden">
-                      {b.image
-                        ? <img src={b.image} alt="" className="w-full h-full object-cover object-top" />
-                        : <div className="w-full h-full" style={{ background: '#E8D5C8' }} />}
-                    </div>
-                    <div className="w-1/2 px-3 py-3 flex flex-col justify-center" dir="rtl">
+                  <div className="rounded-xl overflow-hidden relative" style={{ background: '#F9F0EE', height: 120 }}>
+                    {b.image
+                      ? <img src={b.image} alt="" className="absolute inset-0 w-full h-full object-cover object-top" />
+                      : <div className="absolute inset-0" style={{ background: '#E8D5C8' }} />}
+                    <div className="absolute inset-0 pointer-events-none"
+                      style={{ background: 'linear-gradient(to left, rgba(249,240,238,0.97) 0%, rgba(249,240,238,0.85) 30%, rgba(249,240,238,0.2) 65%, transparent 100%)' }} />
+                    <div className="absolute inset-y-0 right-0 flex flex-col justify-center px-4" dir="rtl" style={{ width: '50%' }}>
                       <p className="text-[8px] mb-0.5" style={{ color: '#9A7A82' }}>{b.subtitle}</p>
                       <p className="font-black text-[10px] leading-tight mb-1.5" style={{ color: '#2C1810', whiteSpace: 'pre-line' }}>{b.title}</p>
                       <div className="px-2 py-1 rounded text-[8px] font-bold inline-block self-start" style={{ background: '#C4607A', color: 'white' }}>تسوقي الآن</div>
