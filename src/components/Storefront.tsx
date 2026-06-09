@@ -478,27 +478,28 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             const img = slide.image || '';
             return (
               <section className="select-none relative overflow-hidden" style={{ background: '#F9F0EE' }}>
-                {/* Desktop layout */}
-                <div className="hidden md:flex" dir="ltr" style={{ height: 420 }}>
-                  {/* LEFT: image */}
-                  <div className="relative overflow-hidden" style={{ width: '55%', background: 'linear-gradient(135deg, #F5E0E8 0%, #EDD5DC 50%, #E8C8D4 100%)' }}>
-                    {img ? (
-                      <img src={img} alt="hero" referrerPolicy="no-referrer"
-                        className="absolute inset-0 w-full h-full object-cover object-top" />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center opacity-30">
-                          <div className="text-8xl font-black" style={{ color: '#9A2D55', fontFamily: 'serif' }}>◆</div>
-                          <p className="text-sm font-bold mt-2" style={{ color: '#9A2D55' }}>ألماسة</p>
-                        </div>
+                {/* Full-width background image with text overlay */}
+                <div className="relative" style={{ height: 'clamp(380px, 55vw, 560px)' }}>
+                  {/* Background image */}
+                  {img ? (
+                    <img src={img} alt="hero" referrerPolicy="no-referrer"
+                      className="absolute inset-0 w-full h-full object-cover object-top" />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center"
+                      style={{ background: 'linear-gradient(135deg, #F5E0E8 0%, #EDD5DC 50%, #E8C8D4 100%)' }}>
+                      <div className="text-center opacity-30">
+                        <div className="text-8xl font-black" style={{ color: '#9A2D55', fontFamily: 'serif' }}>◆</div>
+                        <p className="text-sm font-bold mt-2" style={{ color: '#9A2D55' }}>ألماسة</p>
                       </div>
-                    )}
-                    <div className="absolute inset-y-0 right-0 w-32 pointer-events-none"
-                      style={{ background: 'linear-gradient(to right, transparent, #F9F0EE)' }} />
-                  </div>
+                    </div>
+                  )}
+                  {/* Dark gradient overlay on right side for text readability */}
+                  <div className="absolute inset-0 pointer-events-none"
+                    style={{ background: 'linear-gradient(to left, rgba(249,240,238,0.97) 0%, rgba(249,240,238,0.88) 30%, rgba(249,240,238,0.3) 60%, transparent 100%)' }} />
 
-                  {/* RIGHT: text */}
-                  <div className="flex items-center px-12 xl:px-20" dir="rtl" style={{ width: '45%' }}>
+                  {/* Text overlay — right side */}
+                  <div className="absolute inset-y-0 right-0 flex items-center px-10 md:px-16 xl:px-24" dir="rtl"
+                    style={{ width: 'clamp(300px, 45%, 520px)' }}>
                     <div>
                       <p className="text-sm font-medium mb-3" style={{ color: '#9A7A82' }}>{slide.subtitle}</p>
                       <h1 className="font-black leading-tight mb-4" style={{ fontSize: 'clamp(1.8rem,3vw,2.8rem)', color: '#2C1810', whiteSpace: 'pre-line' }}>
@@ -511,29 +512,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                         تسوقي الآن
                       </button>
                     </div>
-                  </div>
-                </div>
-
-                {/* Mobile layout */}
-                <div className="md:hidden">
-                  {img ? (
-                    <img src={img} alt="hero" referrerPolicy="no-referrer" className="w-full h-64 object-cover object-top" />
-                  ) : (
-                    <div className="w-full h-48 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F5E0E8, #E8C8D4)' }}>
-                      <div className="text-center opacity-30">
-                        <div className="text-6xl font-black" style={{ color: '#9A2D55' }}>◆</div>
-                      </div>
-                    </div>
-                  )}
-                  <div className="px-5 py-8 text-right" dir="rtl">
-                    <p className="text-xs font-medium mb-2" style={{ color: '#9A7A82' }}>{slide.subtitle}</p>
-                    <h1 className="font-black leading-tight mb-3 text-2xl" style={{ color: '#2C1810', whiteSpace: 'pre-line' }}>{slide.title}</h1>
-                    <p className="text-sm leading-relaxed mb-6" style={{ color: '#9A7A82' }}>{slide.desc}</p>
-                    <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                      className="font-bold px-7 py-3 rounded-lg text-sm"
-                      style={{ background: '#C4607A', color: 'white' }}>
-                      تسوقي الآن
-                    </button>
                   </div>
                 </div>
 
