@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /home/user/almaasa-store && npx tsc --noEmit 2>&1 | head -20 | jq -Rs '{systemMessage: (\"🔍 فحص TypeScript: \" + if . == \"\" then \"✅ لا أخطاء\" else . end)}'  2>/dev/null || echo '{\"systemMessage\": \"🔍 TypeScript check skipped\"}'",
+            "statusMessage": "فحص أخطاء الموقع...",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}
