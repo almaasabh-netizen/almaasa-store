@@ -25,7 +25,7 @@ export default function OrdersTable({ orders, limit, showViewAll }: Props) {
             {shown.length === 0 ? (
               <tr><td colSpan={6} className="px-4 py-10 text-center text-sm" style={{ color: '#D79AA8' }}>لا توجد طلبات</td></tr>
             ) : shown.map(order => {
-              const sc = statusColors[order.status] ?? statusColors.new;
+              const sc = statusColors[(order as any).shippingStatus || (order as any).status] ?? statusColors.new;
               return (
                 <tr key={order.id} className="border-t hover:bg-[#FFF8F8] transition-colors cursor-pointer"
                   style={{ borderColor: '#F0DDE0' }}
@@ -37,11 +37,11 @@ export default function OrdersTable({ orders, limit, showViewAll }: Props) {
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0"
                         style={{ background: 'linear-gradient(135deg,#D79AA8,#C77D8A)' }}>
-                        {order.customerName?.charAt(0)}
+                        {(order.customer?.name || (order as any).customerName || '?').charAt(0)}
                       </div>
                       <div>
-                        <p className="text-xs font-bold" style={{ color: '#5A4047' }}>{order.customerName}</p>
-                        <p className="text-[10px]" style={{ color: '#D79AA8' }}>{order.customerPhone}</p>
+                        <p className="text-xs font-bold" style={{ color: '#5A4047' }}>{order.customer?.name || (order as any).customerName || '—'}</p>
+                        <p className="text-[10px]" style={{ color: '#D79AA8' }}>{order.customer?.phone || (order as any).customerPhone || ''}</p>
                       </div>
                     </div>
                   </td>

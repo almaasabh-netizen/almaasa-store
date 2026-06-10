@@ -235,7 +235,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         customer: { name: customerName, email: customerEmail || 'guest@almaasa.bh', phone: customerPhone, address: customerAddress, city: customerCity, country: customerCountry },
         items: cart, subtotal: calculatedSubtotal, discount: calculatedDiscount,
         shippingFee: shippingCharge, total: totalCost, paymentMethod,
-        status: 'new', paymentStatus: 'paid', shippingStatus: 'pending',
+        paymentStatus: 'paid', shippingStatus: 'pending',
         date: new Date().toISOString(), notes: customerNotes,
         timeline: [
           { title: 'تم استلام الطلب', description: 'تم تسجيل الطلبية في نظام ألماسة بنجاح.', date: new Date().toISOString().replace('T', ' ').substring(0, 16), status: 'pending' },
