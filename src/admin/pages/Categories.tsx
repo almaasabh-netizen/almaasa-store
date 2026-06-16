@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Plus, Edit2, Trash2, Save, X, Image as ImageIcon } from 'lucide-react';
 import { getStoredData, saveStoredData } from '../../data';
+import ConfirmModal from '../components/ConfirmModal';
+import Toast, { useToast } from '../components/Toast';
 
 type Category = { id: string; name: string; nameEn: string; image: string; order: number };
 
@@ -9,6 +11,8 @@ export default function Categories() {
   const [editing, setEditing] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: '', nameEn: '', image: '', order: 0 });
+  const [confirmDel, setConfirmDel] = useState<string | null>(null);
+  const { toasts, toast, removeToast } = useToast();
 
   const categories: Category[] = data.categories || [];
 
@@ -27,10 +31,10 @@ export default function Categories() {
   };
 
   const del = (id: string) => {
-    if (!confirm('هل أنت متأكد؟')) return;
     const updated = { ...data, categories: categories.filter(c => c.id !== id) };
     saveStoredData(updated);
     setData(updated);
+    toast('تم حذف التصنيف', 'success');
   };
 
   const startEdit = (c: Category) => {
@@ -40,6 +44,15 @@ export default function Categories() {
 
   return (
     <div className="max-w-3xl space-y-4" dir="rtl">
+      <Toast toasts={toasts} onRemove={removeToast} />
+      <ConfirmModal
+        open={!!confirmDel}
+        title="حذف التصنيف"
+        message="هل أنتِ متأكدة من حذف هذا التصنيف؟"
+        confirmText="حذف"
+        onConfirm={() => { if (confirmDel) del(confirmDel); }}
+        onCancel={() => setConfirmDel(null)}
+      />
       <div className="flex items-center justify-between">
         <h2 className="font-black text-lg" style={{ color: '#5A4047' }}>التصنيفات</h2>
         <button onClick={() => { setAdding(true); setForm({ name: '', nameEn: '', image: '', order: 0 }); }}
@@ -78,7 +91,7 @@ export default function Categories() {
                 <button onClick={() => startEdit(c)} className="p-1.5 rounded-lg hover:bg-[#F3E6E8]">
                   <Edit2 className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />
                 </button>
-                <button onClick={() => del(c.id)} className="p-1.5 rounded-lg hover:bg-[#FEF2F2]">
+                <button onClick={() => setConfirmDel(c.id)} className="p-1.5 rounded-lg hover:bg-[#FEF2F2]">
                   <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
                 </button>
               </div>

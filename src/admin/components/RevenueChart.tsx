@@ -1,16 +1,24 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { getStoredData } from '../../data';
 
-const generateData = () => {
-  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-  return months.map((m, i) => ({
-    name: m,
-    revenue: Math.round(15000 + Math.random() * 25000 + i * 1500),
-    orders: Math.round(80 + Math.random() * 120 + i * 8),
-  }));
-};
+const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
-const data = generateData();
+function buildChartData() {
+  const orders = getStoredData().orders || [];
+  const now = new Date();
+  return MONTHS.map((name, i) => {
+    const monthOrders = orders.filter((o: any) => {
+      const d = new Date(o.date || o.createdAt || '');
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === i;
+    });
+    return {
+      name,
+      revenue: monthOrders.reduce((s: number, o: any) => s + (o.total || 0), 0),
+      orders: monthOrders.length,
+    };
+  });
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
@@ -30,6 +38,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function RevenueChart({ type = 'area' }: { type?: 'area' | 'bar' }) {
+  const data = buildChartData();
   return (
     <ResponsiveContainer width="100%" height={240}>
       {type === 'area' ? (
@@ -42,7 +51,7 @@ export default function RevenueChart({ type = 'area' }: { type?: 'area' | 'bar' 
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#F0DDE0" vertical={false} />
           <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#D79AA8' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: '#D79AA8' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
+          <YAxis tick={{ fontSize: 11, fill: '#D79AA8' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)} />
           <Tooltip content={<CustomTooltip />} />
           <Area type="monotone" dataKey="revenue" stroke="#D79AA8" strokeWidth={2.5} fill="url(#revGrad)" dot={false} activeDot={{ r: 5, fill: '#C77D8A' }} />
         </AreaChart>

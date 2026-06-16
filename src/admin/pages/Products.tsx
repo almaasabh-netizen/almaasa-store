@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Search, Plus, Edit2, Trash2, Eye, EyeOff, Package, Instagram } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getStoredData, saveStoredData } from '../../data';
+import Toast, { useToast } from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function Products() {
   const navigate = useNavigate();
@@ -9,12 +11,14 @@ export default function Products() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('الكل');
   const [isImporting, setIsImporting] = useState(false);
+  const { toasts, toast, removeToast } = useToast();
+  const [confirm, setConfirm] = useState<{ title: string; message: string; onConfirm: () => void } | null>(null);
 
   const importFromInstagram = async () => {
     setIsImporting(true);
     try {
       const res = await fetch('/api/instagram-feed');
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const posts = json.posts || json.feed || json;
       const newProducts = (Array.isArray(posts) ? posts : []).map((p: any) => ({
@@ -24,13 +28,13 @@ export default function Products() {
         image: p.perm_url || p.media_url || p.thumbnail_url || '',
         isDraft: true,
       }));
-      if (newProducts.length === 0) { alert('لم يتم العثور على منشورات'); return; }
+      if (newProducts.length === 0) { toast('لم يتم العثور على منشورات', 'info'); return; }
       const updated = { ...data, products: [...(data.products || []), ...newProducts] };
       saveStoredData(updated);
       setData(updated);
-      alert(`تم استيراد ${newProducts.length} منتج بنجاح`);
+      toast(`تم استيراد ${newProducts.length} منتج بنجاح`, 'success');
     } catch {
-      alert('فشل الاستيراد — تأكد من إعداد Behold API');
+      toast('فشل الاستيراد — تأكد من إعداد Behold API', 'error');
     } finally {
       setIsImporting(false);
     }
@@ -51,24 +55,46 @@ export default function Products() {
     setData(updated);
   };
 
-  const deleteProduct = (id: string) => {
-    if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
-    const updated = { ...data, products: data.products.filter((p: any) => p.id !== id) };
-    saveStoredData(updated);
-    setData(updated);
+  const deleteProduct = (id: string, name: string) => {
+    setConfirm({
+      title: 'حذف المنتج',
+      message: `هل أنتِ متأكدة من حذف "${name}"؟ لا يمكن التراجع عن هذا الإجراء.`,
+      onConfirm: () => {
+        const updated = { ...data, products: data.products.filter((p: any) => p.id !== id) };
+        saveStoredData(updated);
+        setData(updated);
+        toast('تم حذف المنتج', 'success');
+      },
+    });
   };
 
   const deleteWithoutImages = () => {
     const count = (data.products || []).filter((p: any) => !p.image).length;
-    if (count === 0) { alert('لا توجد منتجات بدون صور'); return; }
-    if (!confirm(`سيتم حذف ${count} منتج بدون صورة. متأكدة؟`)) return;
-    const updated = { ...data, products: data.products.filter((p: any) => p.image) };
-    saveStoredData(updated);
-    setData(updated);
+    if (count === 0) { toast('لا توجد منتجات بدون صور', 'info'); return; }
+    setConfirm({
+      title: 'حذف المنتجات بدون صور',
+      message: `سيتم حذف ${count} منتج بدون صورة نهائياً. هل أنتِ متأكدة؟`,
+      onConfirm: () => {
+        const updated = { ...data, products: data.products.filter((p: any) => p.image) };
+        saveStoredData(updated);
+        setData(updated);
+        toast(`تم حذف ${count} منتج بدون صورة`, 'success');
+      },
+    });
   };
 
   return (
     <div className="space-y-4" dir="rtl">
+      <Toast toasts={toasts} onRemove={removeToast} />
+      <ConfirmModal
+        open={!!confirm}
+        title={confirm?.title || ''}
+        message={confirm?.message || ''}
+        confirmText="حذف"
+        onConfirm={confirm?.onConfirm || (() => {})}
+        onCancel={() => setConfirm(null)}
+      />
+
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 flex-1 min-w-48" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
           <Search className="w-4 h-4 shrink-0" style={{ color: '#D79AA8' }} />
@@ -143,7 +169,7 @@ export default function Products() {
                   className="p-2 rounded-xl shadow-lg" style={{ background: 'white' }}>
                   {p.isDraft ? <Eye className="w-3.5 h-3.5" style={{ color: '#22C55E' }} /> : <EyeOff className="w-3.5 h-3.5" style={{ color: '#F59E0B' }} />}
                 </button>
-                <button onClick={() => deleteProduct(p.id)}
+                <button onClick={() => deleteProduct(p.id, p.name)}
                   className="p-2 rounded-xl shadow-lg" style={{ background: 'white' }}>
                   <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
                 </button>
@@ -168,7 +194,7 @@ export default function Products() {
                   style={{ background: '#F3E6E8' }}>
                   {p.isDraft ? <Eye className="w-3.5 h-3.5" style={{ color: '#22C55E' }} /> : <EyeOff className="w-3.5 h-3.5" style={{ color: '#F59E0B' }} />}
                 </button>
-                <button onClick={() => deleteProduct(p.id)}
+                <button onClick={() => deleteProduct(p.id, p.name)}
                   className="p-1.5 rounded-xl transition-colors hover:opacity-80"
                   style={{ background: '#FEF2F2' }}>
                   <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />

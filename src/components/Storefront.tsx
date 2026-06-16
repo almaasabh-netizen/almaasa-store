@@ -732,7 +732,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             <div className="relative max-w-5xl mx-auto" dir="ltr" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '4rem' }}>
               {/* Buttons on the LEFT */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '0.75rem', flexShrink: 0, width: '220px' }}>
-                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                <a href={`https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g,'')}`} target="_blank" rel="noreferrer"
                   className="inline-flex items-center justify-center gap-2.5 bg-white text-[#9A2D55] font-black px-7 py-3.5 rounded-xl shadow-xl transition-all hover:-translate-y-0.5 text-sm">
                   <Phone className="w-4 h-4" />
                   تواصلي على واتساب الآن
@@ -930,7 +930,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
                   <div className="mt-6 text-center bg-[#F8EDE8] border border-dashed border-[#F2E4DC] rounded-2xl p-4 text-xs font-semibold text-[#8B7B78]">
                     استفسار؟ تواصلي معنا على{' '}
-                    <a href="https://wa.me/97337037697" className="text-emerald-600 underline">+973 37037697</a>
+                    <a href={`https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g,'')}`} className="text-emerald-600 underline">{settings?.whatsappNumber ? `+${settings.whatsappNumber}` : '+973 37037697'}</a>
                   </div>
                 </motion.div>
               ) : (
@@ -959,11 +959,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <p className="text-[13px] leading-relaxed text-[#8B7B78] font-medium">
                 متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.              </p>
               <div className="flex gap-2.5 mt-5">
-                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
+                <a href={`https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g,'')}`} target="_blank" rel="noreferrer"
                   className="w-9 h-9 bg-white/5 hover:bg-emerald-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
                   <Phone className="w-4 h-4" />
                 </a>
-                <a href="https://instagram.com/almaasa_store" target="_blank" rel="noreferrer"
+                <a href={`https://instagram.com/${settings?.instagramUsername || 'almaasa.bh'}`} target="_blank" rel="noreferrer"
                   className="w-9 h-9 bg-white/5 hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
                   <Instagram className="w-4 h-4" />
                 </a>
@@ -998,7 +998,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 {[
                   { label: 'تتبع طلبي ✈️', action: () => setActiveTab('tracking') },
                   { label: 'آراء الزبائن ⭐', action: () => setShowReviewsPopup(true) },
-                  { label: 'تواصلي معنا', action: () => window.open('https://wa.me/97337037697','_blank') },
+                  { label: 'تواصلي معنا', action: () => window.open(`https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g,'')}`, '_blank') },
                   { label: 'سياسة الإرجاع', action: () => {} },
                 ].map(item => (
                   <li key={item.label}>
@@ -1035,7 +1035,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </div>
 
           <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[#8B7B78]/60 font-medium">
-            <p>© 2026 مخاوير ألماسة — almaasa.bh — جميع الحقوق محفوظة</p>
+            <p>© {new Date().getFullYear()} مخاوير ألماسة — almaasa.bh — جميع الحقوق محفوظة</p>
             <div className="flex items-center gap-4">
               <button className="hover:text-[#8B7B78] transition-colors">سياسة الخصوصية</button>
               <button className="hover:text-[#8B7B78] transition-colors">الشروط والأحكام</button>

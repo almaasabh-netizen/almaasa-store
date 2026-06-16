@@ -34,7 +34,7 @@ const navGroups = [
   {
     label: 'التسويق',
     items: [
-      { to: '/admin/hero-banners', icon: Image,      label: 'Hero Banners' },
+      { to: '/admin/hero-banners', icon: Image,      label: 'البانرات الرئيسية' },
       { to: '/admin/marketing', icon: Megaphone,    label: 'التسويق' },
       { to: '/admin/coupons',   icon: Percent,      label: 'الكوبونات' },
     ]

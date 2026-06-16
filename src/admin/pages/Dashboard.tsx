@@ -17,12 +17,12 @@ export default function Dashboard() {
   const products: any[] = data.products || [];
   const reviews: any[] = data.reviews || [];
 
-  const totalRevenue = orders.filter(o => o.status !== 'cancelled').reduce((s: number, o: any) => s + (o.total || 0), 0);
-  const uniqueCustomers = new Set(orders.map((o: any) => o.customerPhone)).size;
+  const totalRevenue = orders.filter(o => o.shippingStatus !== 'cancelled' && o.shippingStatus !== 'returned').reduce((s: number, o: any) => s + (o.total || 0), 0);
+  const uniqueCustomers = new Set(orders.map((o: any) => o.customer?.phone || o.customerPhone).filter(Boolean)).size;
   const avgOrder = orders.length > 0 ? totalRevenue / orders.length : 0;
 
   const statusDist = Object.entries(
-    orders.reduce((acc: any, o: any) => { acc[o.status] = (acc[o.status] || 0) + 1; return acc; }, {})
+    orders.reduce((acc: any, o: any) => { const s = o.shippingStatus || o.status || 'pending'; acc[s] = (acc[s] || 0) + 1; return acc; }, {})
   ).map(([status, count]) => ({
     name: statusColors[status]?.label ?? status,
     value: count as number,
@@ -73,21 +73,21 @@ export default function Dashboard() {
           title="إجمالي المبيعات"
           value={totalRevenue.toFixed(0)}
           suffix=" د.ب"
-          change={16.8}
+          change={undefined}
           iconBg="#F3E6E8"
           icon={<DollarSign className="w-5 h-5" style={{ color: '#C77D8A' }} />}
         />
         <StatCard
           title="إجمالي الطلبات"
           value={orders.length}
-          change={12.5}
+          change={undefined}
           iconBg="#EBF5FF"
           icon={<ShoppingBag className="w-5 h-5" style={{ color: '#3B82F6' }} />}
         />
         <StatCard
           title="العملاء الجدد"
           value={uniqueCustomers}
-          change={8.2}
+          change={undefined}
           iconBg="#F0FDF4"
           icon={<Users className="w-5 h-5" style={{ color: '#22C55E' }} />}
         />
@@ -95,7 +95,7 @@ export default function Dashboard() {
           title="متوسط قيمة الطلب"
           value={avgOrder.toFixed(2)}
           suffix=" د.ب"
-          change={18.6}
+          change={undefined}
           iconBg="#FFF7ED"
           icon={<TrendingUp className="w-5 h-5" style={{ color: '#F59E0B' }} />}
         />

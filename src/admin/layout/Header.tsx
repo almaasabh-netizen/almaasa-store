@@ -18,8 +18,6 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
   const notifs = [
     ...(newOrders > 0 ? [{ icon: '🛍️', text: `${newOrders} طلب جديد بانتظار المعالجة`, time: 'الآن', color: '#3B82F6' }] : []),
     ...(lowStock > 0 ? [{ icon: '📦', text: `${lowStock} منتج على وشك النفاد`, time: 'منذ 5 دقائق', color: '#F59E0B' }] : []),
-    { icon: '⭐', text: 'تقييم جديد من عميل', time: 'منذ 1 ساعة', color: '#D79AA8' },
-    { icon: '💰', text: 'تم إتمام طلب بقيمة 349 د.ب', time: 'منذ 2 ساعة', color: '#4CAF82' },
   ];
 
   return (
