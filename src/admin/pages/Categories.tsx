@@ -86,7 +86,7 @@ export default function Categories() {
                   {c.nameEn && <p className="text-xs" style={{ color: '#D79AA8' }}>{c.nameEn}</p>}
                 </div>
                 <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#F3E6E8', color: '#C77D8A' }}>
-                  {(data.products || []).filter((p: any) => p.category === c.name).length} منتج
+                  {(data.products || []).filter((p: any) => p.category === c.id || p.category === c.name).length} منتج
                 </span>
                 <button onClick={() => startEdit(c)} className="p-1.5 rounded-lg hover:bg-[#F3E6E8]">
                   <Edit2 className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />

@@ -15,7 +15,7 @@ export default function Orders() {
 
   const orders = useMemo(() => {
     let list = [...(data.orders || [])].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    if (statusFilter !== 'الكل') list = list.filter((o: any) => o.status === statusFilter);
+    if (statusFilter !== 'الكل') list = list.filter((o: any) => (o.shippingStatus || o.status) === statusFilter);
     if (search) list = list.filter((o: any) => {
       const name = o.customer?.name || o.customerName || '';
       const phone = o.customer?.phone || o.customerPhone || '';
@@ -25,7 +25,7 @@ export default function Orders() {
   }, [data.orders, statusFilter, search]);
 
   const updateStatus = (id: string, status: string) => {
-    const updated = { ...data, orders: data.orders.map((o: any) => o.id === id ? { ...o, status } : o) };
+    const updated = { ...data, orders: data.orders.map((o: any) => o.id === id ? { ...o, status, shippingStatus: status } : o) };
     saveStoredData(updated);
     setData(updated);
   };
@@ -63,7 +63,7 @@ export default function Orders() {
       {/* Summary badges */}
       <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
         {Object.entries(statusColors).map(([k, v]) => {
-          const count = (data.orders || []).filter((o: any) => o.status === k).length;
+          const count = (data.orders || []).filter((o: any) => (o.shippingStatus || o.status) === k).length;
           return (
             <div key={k} className="rounded-xl p-3 text-center cursor-pointer hover:shadow-sm transition-shadow"
               style={{ background: v.bg, border: `1px solid ${v.text}22` }}
@@ -95,7 +95,7 @@ export default function Orders() {
               </thead>
               <tbody>
                 {orders.map((order: any) => {
-                  const sc = statusColors[order.status] ?? statusColors.new;
+                  const sc = statusColors[(order.shippingStatus || order.status)] ?? statusColors.new;
                   return (
                     <tr key={order.id} className="border-t hover:bg-[#FFF8F8] transition-colors cursor-pointer"
                       style={{ borderColor: '#F0DDE0' }}

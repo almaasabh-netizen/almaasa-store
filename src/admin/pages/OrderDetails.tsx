@@ -205,7 +205,7 @@ export default function OrderDetails() {
   <div class="footer">
     <div class="footer-brand">ألماسة 🌸</div>
     <div class="footer-note">شكراً لثقتكم — نسعد بخدمتكم دائماً</div>
-    <div class="footer-site">almaasa-store.onrender.com</div>
+    <div class="footer-site">almaasa.bh</div>
   </div>
   <div class="bottom-band"></div>
 </div>
@@ -216,12 +216,13 @@ export default function OrderDetails() {
     if (w) { w.document.write(html); w.document.close(); }
   };
 
-  const sc = statusColors[order.status] ?? statusColors.new;
-  const stepIdx = STEPS.findIndex(s => s.key === order.status);
+  const orderStatus = order.shippingStatus || order.status;
+  const sc = statusColors[orderStatus] ?? statusColors.new;
+  const stepIdx = STEPS.findIndex(s => s.key === orderStatus);
   const products = data.products || [];
 
   const updateStatus = (status: string) => {
-    const updated = { ...data, orders: data.orders.map((o: any) => o.id === id ? { ...o, status } : o) };
+    const updated = { ...data, orders: data.orders.map((o: any) => o.id === id ? { ...o, status, shippingStatus: status } : o) };
     saveStoredData(updated);
     setData(updated);
   };
@@ -333,16 +334,16 @@ export default function OrderDetails() {
             <div className="mt-4 pt-4 border-t space-y-1.5" style={{ borderColor: '#F0DDE0' }}>
               <div className="flex justify-between text-xs" style={{ color: '#D79AA8' }}>
                 <span>المجموع الفرعي</span>
-                <span>{((order.total || 0) - (order.shippingCost || 0) + (order.discountAmount || 0)).toFixed(2)} د.ب</span>
+                <span>{((order.total || 0) - (order.shippingFee || order.shippingCost || 0) + (order.discount || order.discountAmount || 0)).toFixed(2)} د.ب</span>
               </div>
-              {order.shippingCost > 0 && (
+              {(order.shippingFee || order.shippingCost) > 0 && (
                 <div className="flex justify-between text-xs" style={{ color: '#D79AA8' }}>
-                  <span>الشحن</span><span>{order.shippingCost?.toFixed(2)} د.ب</span>
+                  <span>الشحن</span><span>{(order.shippingFee || order.shippingCost)?.toFixed(2)} د.ب</span>
                 </div>
               )}
-              {order.discountAmount > 0 && (
+              {(order.discount || order.discountAmount) > 0 && (
                 <div className="flex justify-between text-xs" style={{ color: '#4CAF82' }}>
-                  <span>الخصم</span><span>-{order.discountAmount?.toFixed(2)} د.ب</span>
+                  <span>الخصم</span><span>-{(order.discount || order.discountAmount)?.toFixed(2)} د.ب</span>
                 </div>
               )}
               <div className="flex justify-between font-black text-sm pt-1.5 border-t" style={{ borderColor: '#F0DDE0', color: '#5A4047' }}>

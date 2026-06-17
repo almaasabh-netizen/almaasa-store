@@ -13,7 +13,17 @@ export default function Coupons() {
 
   const save = () => {
     if (!form.code) return;
-    const updated = { ...data, coupons: [...coupons, { ...form, id: `coup_${Date.now()}`, uses: 0 }] };
+    const newCoupon = {
+      ...form,
+      id: `coup_${Date.now()}`,
+      uses: 0,
+      // storefront-compatible fields
+      discount: form.value,
+      isActive: form.active,
+      type: form.type === 'percent' ? 'percentage' : 'fixed',
+      usageCount: 0,
+    };
+    const updated = { ...data, coupons: [...coupons, newCoupon] };
     saveStoredData(updated);
     setData(updated);
     setAdding(false);
@@ -27,7 +37,7 @@ export default function Coupons() {
   };
 
   const toggle = (id: string) => {
-    const updated = { ...data, coupons: coupons.map(c => c.id === id ? { ...c, active: !c.active } : c) };
+    const updated = { ...data, coupons: coupons.map(c => c.id === id ? { ...c, active: !c.active, isActive: !c.active } : c) };
     saveStoredData(updated);
     setData(updated);
   };

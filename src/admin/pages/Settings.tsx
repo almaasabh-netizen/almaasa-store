@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import { Save } from 'lucide-react';
 
 const KEY = 'almaasa_settings';
-const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; } };
+const load = () => {
+  try {
+    const a = JSON.parse(localStorage.getItem('almaasa_settings') || '{}');
+    const b = JSON.parse(localStorage.getItem('ama_settings') || '{}');
+    // merge both sources; almaasa_settings wins for its fields
+    return { whatsapp: b.whatsappNumber || '', instagram: b.instagramUsername ? `https://instagram.com/${b.instagramUsername}` : '', ...a };
+  } catch { return {}; }
+};
 
 const DEFAULTS = {
   storeName: 'ألماسة', storeNameEn: 'Almaasa', storeEmail: '', storePhone: '',
@@ -44,7 +51,19 @@ export default function SettingsPage() {
     setS(prev => ({ ...prev, [key]: Number(e.target.value) }));
 
   const save = () => {
+    // Save to almaasa_settings (read by announcement bar + social links in Storefront)
     localStorage.setItem(KEY, JSON.stringify(s));
+    // Also save mapped fields to ama_settings (read by getStoredData())
+    const existing = (() => { try { return JSON.parse(localStorage.getItem('ama_settings') || '{}'); } catch { return {}; } })();
+    const igHandle = s.instagram.replace(/.*instagram\.com\//i, '').replace(/\//g, '');
+    localStorage.setItem('ama_settings', JSON.stringify({
+      ...existing,
+      storeName: s.storeName,
+      whatsappNumber: s.whatsapp,
+      instagramUsername: igHandle || existing.instagramUsername,
+      shippingCost: s.shippingCost,
+      freeShippingThreshold: s.freeShippingMin,
+    }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };

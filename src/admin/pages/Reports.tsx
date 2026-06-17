@@ -20,14 +20,14 @@ export default function Reports() {
 
   const revenueByMonth = MONTHS.map((m, i) => ({
     name: m.slice(0,3),
-    revenue: orders.filter((o: any) => new Date(o.date).getMonth() === i && o.status !== 'cancelled')
+    revenue: orders.filter((o: any) => new Date(o.date).getMonth() === i && (o.shippingStatus || o.status) !== 'cancelled')
       .reduce((s: number, o: any) => s + (o.total || 0), 0),
     orders: orders.filter((o: any) => new Date(o.date).getMonth() === i).length,
   }));
 
   // Count actual sold units per product from orders
   const salesByProduct: Record<string, number> = {};
-  orders.filter((o: any) => o.status !== 'cancelled').forEach((o: any) => {
+  orders.filter((o: any) => (o.shippingStatus || o.status) !== 'cancelled').forEach((o: any) => {
     (o.items || []).forEach((item: any) => {
       const pid = item.product?.id || item.productId;
       if (pid) salesByProduct[pid] = (salesByProduct[pid] || 0) + (item.quantity || 1);
@@ -41,18 +41,18 @@ export default function Reports() {
 
   const statusDist = ['new','processing','shipping','delivered','cancelled','returned'].map(s => ({
     name: { new:'جديد', processing:'تجهيز', shipping:'شحن', delivered:'تسليم', cancelled:'ملغي', returned:'مُرتجع' }[s],
-    value: orders.filter((o: any) => o.status === s).length,
+    value: orders.filter((o: any) => (o.shippingStatus || o.status) === s).length,
   })).filter(x => x.value > 0);
 
-  const totalRevenue = orders.filter((o: any) => o.status !== 'cancelled').reduce((s: number, o: any) => s + (o.total || 0), 0);
-  const deliveredOrders = orders.filter((o: any) => o.status === 'delivered').length;
+  const totalRevenue = orders.filter((o: any) => (o.shippingStatus || o.status) !== 'cancelled').reduce((s: number, o: any) => s + (o.total || 0), 0);
+  const deliveredOrders = orders.filter((o: any) => (o.shippingStatus || o.status) === 'delivered').length;
   const conversionRate = orders.length > 0 ? ((deliveredOrders / orders.length) * 100).toFixed(1) : '0';
 
   const productsWithCost = products.filter((p: any) => p.originalPrice && p.price > 0);
   const avgMargin = productsWithCost.length > 0
     ? productsWithCost.reduce((s: number, p: any) => s + ((p.price - p.originalPrice) / p.price) * 100, 0) / productsWithCost.length
     : 0;
-  const estimatedProfit = orders.filter((o: any) => o.status === 'delivered').reduce((sum: number, o: any) => {
+  const estimatedProfit = orders.filter((o: any) => (o.shippingStatus || o.status) === 'delivered').reduce((sum: number, o: any) => {
     return sum + (o.items || []).reduce((s: number, item: any) => {
       const pid = item.product?.id || item.productId;
       const prod = products.find((p: any) => p.id === pid) || item.product;
