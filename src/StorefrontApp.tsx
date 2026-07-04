@@ -7,7 +7,7 @@ export default function StorefrontApp() {
   const [view, setView] = useState<'customer' | 'admin'>(() => {
     return window.location.hash === '#admin' ? 'admin' : 'customer';
   });
-  const [customerTab, setCustomerTab] = useState<'shop' | 'tracking'>('shop');
+  const [customerTab, setCustomerTab] = useState<'home' | 'shop' | 'product' | 'cart' | 'about' | 'contact' | 'tracking'>('home');
 
   useEffect(() => {
     const handleHashChange = () => {

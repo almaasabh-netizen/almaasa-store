@@ -1,27 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   ShoppingBag, Search, Truck, Heart, ArrowRight, CheckCircle,
-  Clock, Check, BookOpen, X, Phone, MapPin, Tag, Plus, Minus,
-  Star, ExternalLink, ShieldCheck, CreditCard, ChevronRight,
-  Share2, Home, Grid3X3, User, Menu, ChevronDown, ChevronLeft,
-  Instagram, Sparkles, Package, Gift, Zap, Globe2, BadgeCheck,
-  Eye, ZoomIn
+  Clock, Check, X, Phone, MapPin, Tag, Plus, Minus,
+  Star, ShieldCheck, CreditCard, ChevronRight,
+  Home, Menu, Instagram, Package, Zap,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Order, Coupon, SizeGuide, Review, StoreSettings, OrderItem, Category } from '../types';
 import { getStoredData, saveStoredData, addOperationLog } from '../data';
 
+type Page = 'home' | 'shop' | 'cart' | 'about' | 'contact' | 'tracking';
+
 interface StorefrontProps {
   onNavigateToAdmin: () => void;
-  activeTab: 'shop' | 'tracking';
-  setActiveTab: (tab: 'shop' | 'tracking') => void;
+  activeTab: Page | 'shop' | 'tracking';
+  setActiveTab: (tab: Page) => void;
 }
 
-// ─── TOAST NOTIFICATION ───────────────────────────────────────────
 interface Toast { id: number; msg: string; type: 'success' | 'info' | 'error'; }
 
+// Placeholder image pattern
+const PH = 'repeating-linear-gradient(45deg,#ECD9DD,#ECD9DD 12px,#F6EAEC 12px,#F6EAEC 24px)';
+
 export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab }: StorefrontProps) {
-  /* ── DATA STATE ───────────────────────────────────────────────── */
+  /* ── DATA STATE ─────────────────────────────────────────────── */
   const [products, setProducts] = useState<Product[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [sizeGuides, setSizeGuides] = useState<SizeGuide[]>([]);
@@ -29,7 +31,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [settings, setSettings] = useState<StoreSettings | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
 
-  /* ── UI STATE ─────────────────────────────────────────────────── */
+  /* ── UI STATE ───────────────────────────────────────────────── */
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -38,24 +40,21 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
-  const [heroIdx, setHeroIdx] = useState(0);
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(0);
 
-  /* ── PRODUCT OPTIONS ─────────────────────────────────────────── */
+  /* ── PRODUCT OPTIONS ───────────────────────────────────────── */
   const [chosenSize, setChosenSize] = useState('');
   const [chosenColor, setChosenColor] = useState('');
   const [quantity, setQuantity] = useState(1);
 
-  /* ── CART STATE ──────────────────────────────────────────────── */
+  /* ── CART STATE ─────────────────────────────────────────────── */
   const [cart, setCart] = useState<OrderItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState('');
 
-  /* ── CHECKOUT ────────────────────────────────────────────────── */
+  /* ── CHECKOUT ───────────────────────────────────────────────── */
   const [checkoutStep, setCheckoutStep] = useState<'cart' | 'details' | 'payment' | 'success'>('cart');
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
@@ -68,7 +67,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [shippingZones, setShippingZones] = useState<any[]>([]);
   const [selectedShippingMethod, setSelectedShippingMethod] = useState<any>(null);
   const [benefitPhone, setBenefitPhone] = useState('');
-  const [benefitStep, setBenefitStep] = useState<'input' | 'processing' | 'approved'>('input');
   const [knetCardNum, setKnetCardNum] = useState('');
   const [knetPin, setKnetPin] = useState('');
   const [cardName, setCardName] = useState('');
@@ -78,12 +76,19 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [isPaying, setIsPaying] = useState(false);
   const [newOrder, setNewOrder] = useState<Order | null>(null);
 
-  /* ── TRACKING ────────────────────────────────────────────────── */
+  /* ── TRACKING ───────────────────────────────────────────────── */
   const [trackSearchQuery, setTrackSearchQuery] = useState('');
   const [trackedOrder, setTrackedOrder] = useState<Order | null>(null);
   const [trackError, setTrackError] = useState('');
 
-  /* ── EFFECTS ─────────────────────────────────────────────────── */
+  /* ── CONTACT FORM ───────────────────────────────────────────── */
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactMsg, setContactMsg] = useState('');
+  const [contactSent, setContactSent] = useState(false);
+
+  /* ── EFFECTS ────────────────────────────────────────────────── */
   useEffect(() => {
     const data = getStoredData();
     setProducts(data.products);
@@ -129,19 +134,16 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       localStorage.setItem('ama_shipping_zones', JSON.stringify(defaultZones));
     }
 
-    // wishlist
     const saved = localStorage.getItem('ama_wishlist');
     if (saved) { try { setWishlist(JSON.parse(saved)); } catch (e) {} }
-  }, [activeTab]);
+  }, []);
 
-  // scroll detection
   useEffect(() => {
-    const fn = () => setIsScrolled(window.scrollY > 60);
+    const fn = () => setIsScrolled(window.scrollY > 40);
     window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  // shipping method sync
   const matchingZone = shippingZones.find(z =>
     z.countries.some((c: string) => c.includes(customerCountry) || customerCountry.includes(c))
   ) || shippingZones[0];
@@ -152,29 +154,29 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     else setSelectedShippingMethod(null);
   }, [customerCountry, shippingZones]);
 
-  /* ── TOAST HELPER ────────────────────────────────────────────── */
+  /* ── TOAST ──────────────────────────────────────────────────── */
   const addToast = (msg: string, type: Toast['type'] = 'success') => {
     const id = ++toastId.current;
     setToasts(p => [...p, { id, msg, type }]);
     setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3200);
   };
 
-  /* ── WISHLIST ────────────────────────────────────────────────── */
+  /* ── WISHLIST ───────────────────────────────────────────────── */
   const toggleWishlist = (productId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
     setWishlist(prev => {
       const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
       localStorage.setItem('ama_wishlist', JSON.stringify(next));
-      addToast(prev.includes(productId) ? 'تمت الإزالة من المفضلة' : 'أُضيف إلى المفضلة ❤️', 'info');
+      addToast(prev.includes(productId) ? 'تمت الإزالة من المفضلة' : 'أُضيف إلى المفضلة', 'info');
       return next;
     });
   };
 
-  /* ── PRODUCT HANDLERS ───────────────────────────────────────── */
+  /* ── PRODUCT HANDLERS ──────────────────────────────────────── */
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setChosenSize(product.sizes[0] || 'M');
-    setChosenColor(product.colors[0] || 'وردي فاتح');
+    setChosenColor(product.colors[0] || 'وردي');
     setQuantity(1);
   };
 
@@ -191,9 +193,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     } else {
       setCart([...cart, newItem]);
     }
-    setIsCartOpen(true);
     setSelectedProduct(null);
-    addToast(`تمت إضافة "${selectedProduct.name}" للسلة 🛍️`);
+    addToast(`تمت إضافة "${selectedProduct.name}" للسلة`);
   };
 
   const updateCartQty = (index: number, newQty: number) => {
@@ -209,11 +210,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     setCouponError('');
     if (!couponCode.trim()) return;
     const found = coupons.find(c => c.code.toUpperCase() === couponCode.trim().toUpperCase() && c.isActive);
-    if (found) { setActiveCoupon(found); addToast(`✓ كوبون ${found.code} مفعّل!`); }
+    if (found) { setActiveCoupon(found); addToast(`كوبون ${found.code} مفعّل`); }
     else { setCouponError('الكوبون غير فعال أو غير صحيح.'); setActiveCoupon(null); }
   };
 
-  /* ── CALCULATIONS ────────────────────────────────────────────── */
+  /* ── CALCULATIONS ───────────────────────────────────────────── */
   const calculatedSubtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const calculatedDiscount = activeCoupon
     ? activeCoupon.type === 'percentage' ? calculatedSubtotal * activeCoupon.discount / 100 : activeCoupon.discount
@@ -223,7 +224,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     : settings ? (calculatedSubtotal >= settings.freeShippingThreshold ? 0 : settings.shippingCost) : 2.5;
   const totalCost = Math.max(0, calculatedSubtotal - calculatedDiscount + shippingCharge);
 
-  /* ── PAYMENT ─────────────────────────────────────────────────── */
+  /* ── PAYMENT ────────────────────────────────────────────────── */
   const triggerPayment = () => {
     setIsPaying(true);
     setTimeout(() => {
@@ -259,7 +260,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     }, 2000);
   };
 
-  /* ── TRACKING ────────────────────────────────────────────────── */
+  /* ── TRACKING ───────────────────────────────────────────────── */
   const handleTrackSearch = () => {
     setTrackError(''); setTrackedOrder(null);
     if (!trackSearchQuery.trim()) return;
@@ -268,182 +269,118 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     const matched = orders.find((o: Order) =>
       o.trackingCode.toLowerCase() === q || o.customer.phone.replace(/[\s+]/g, '').includes(q.replace(/[\s+]/g, ''))
     );
-    matched ? setTrackedOrder(matched) : setTrackError('لم نجد طلبًا بهذا الرقم أو الهاتف. يرجى التحقق والمحاولة مجدداً.');
+    matched ? setTrackedOrder(matched) : setTrackError('لم نجد طلبًا بهذا الرقم أو الهاتف.');
   };
 
-  /* ── FILTER ──────────────────────────────────────────────────── */
+  /* ── FILTER ─────────────────────────────────────────────────── */
   const filteredProducts = products.filter(p => {
     const cat = selectedCategory === 'all' || p.category === selectedCategory;
     const q = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.description.toLowerCase().includes(searchQuery.toLowerCase());
     return cat && q;
   });
 
-  /* ══════════════════════════════════════════════════════════════
-     RENDER
-  ══════════════════════════════════════════════════════════════ */
-  return (
-    <div className="bg-[#FDF8F5] min-h-screen text-[#2C1810] font-sans has-bottom-nav" dir="rtl" id="almaasa-storefront">
+  const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
+  const wa = `https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g, '')}`;
+  const ig = `https://instagram.com/${settings?.instagramUsername || 'almaasa.bh'}`;
 
-      {/* ── TOASTS ──────────────────────────────────────────────── */}
-      <div className="fixed top-4 left-4 z-[100] space-y-2 pointer-events-none">
+  /* ═══════════════════════════════════════════════════════════════
+     RENDER
+  ═══════════════════════════════════════════════════════════════ */
+  return (
+    <div style={{ background: '#FBF7F2', fontFamily: "'Cairo', sans-serif", color: '#241419', minHeight: '100vh' }} dir="rtl">
+
+      {/* ── TOASTS ────────────────────────────────────────────── */}
+      <div className="fixed top-5 left-5 z-[100] space-y-2 pointer-events-none">
         <AnimatePresence>
           {toasts.map(t => (
             <motion.div key={t.id}
-              initial={{ x: -80, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -80, opacity: 0 }}
-              className={`toast-enter px-4 py-3 rounded-2xl shadow-xl text-white text-xs font-bold max-w-xs pointer-events-auto ${
-                t.type === 'success' ? 'bg-[#9A2D55]' : t.type === 'info' ? 'bg-[#C4956A]' : 'bg-red-500'
-              }`}
+              initial={{ x: -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -60, opacity: 0 }}
+              className="pointer-events-auto px-4 py-3 rounded text-white text-xs font-semibold shadow-xl"
+              style={{
+                background: t.type === 'success' ? '#9A2D55' : t.type === 'error' ? '#c0392b' : '#B08D57',
+                borderRadius: 2,
+              }}
             >{t.msg}</motion.div>
           ))}
         </AnimatePresence>
       </div>
 
-      {/* ── 1. ANNOUNCEMENT BAR ──────────────────────────────────── */}
-      {(() => {
-        const s = (() => { try { return JSON.parse(localStorage.getItem('almaasa_settings') || '{}'); } catch { return {}; } })();
-        const annText = s.announcementText || 'شحن مجاني للطلبات فوق 300 ريال';
-        const igLink = s.instagram || 'https://instagram.com/almaasa.bh';
-        const ttLink = s.tiktok || '';
-        return (
-      <div className="text-white py-2 px-4 md:px-8" style={{ background: '#C4607A' }}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-[11px] font-semibold">
-          {/* Right: تتبع + تواصل */}
-          <div className="hidden sm:flex items-center gap-4">
-            <button onClick={() => setActiveTab('tracking')} className="flex items-center gap-1.5 hover:text-white/80 transition-colors">
-              <Truck className="w-3.5 h-3.5" />
-              تتبع طلبك
-            </button>
-            <span className="text-white/40">|</span>
-            <a href={`https://wa.me/${(s.whatsapp || '97337037697').replace(/\D/g,'')}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white/80 transition-colors">
-              <Phone className="w-3.5 h-3.5" />
-              تواصل معنا
-            </a>
-          </div>
-          {/* Center */}
-          <div className="flex items-center gap-1.5 mx-auto sm:mx-0">
-            <Truck className="w-3.5 h-3.5 shrink-0" />
-            <span>{annText}</span>
-          </div>
-          {/* Left: social icons */}
-          <div className="hidden sm:flex items-center gap-3">
-            <a href={igLink} target="_blank" rel="noreferrer" className="hover:text-white/70 transition-colors">
-              <Instagram className="w-3.5 h-3.5" />
-            </a>
-            {ttLink && (
-              <a href={ttLink} target="_blank" rel="noreferrer" className="hover:text-white/70 transition-colors">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
-              </a>
-            )}
-            <button onClick={() => window.location.href = '/admin'} className="opacity-0 hover:opacity-30 transition-opacity text-[9px]">·</button>
-          </div>
-        </div>
-      </div>
-        );
-      })()}
-
-      {/* ── 2. HEADER ────────────────────────────────────────────── */}
-      <header className={`sticky top-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white/98 backdrop-blur-lg shadow-md' : 'bg-white'} border-b border-[#F0E0E5]`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="flex items-center h-16 gap-3">
-
-            {/* Right: Logo */}
-            <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }} className="shrink-0 hidden md:block">
-              <img src="/logo.jpg" alt="ألماسة" className="h-12 w-auto object-contain" />
+      {/* ══════════════════════════════════════════════════════════
+          HEADER
+      ══════════════════════════════════════════════════════════ */}
+      <header style={{
+        background: '#FBF7F2',
+        position: 'sticky', top: 0, zIndex: 40,
+        boxShadow: isScrolled ? '0 2px 12px rgba(36,20,25,0.08)' : 'none',
+        transition: 'box-shadow 0.3s',
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {/* Desktop nav row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: 1240, padding: '20px 40px', boxSizing: 'border-box' }}>
+            {/* Logo */}
+            <button onClick={() => setActiveTab('home')} style={{ fontFamily: "'Amiri', serif", fontSize: 32, fontWeight: 700, color: '#9A2D55', textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>
+              ألماسة
             </button>
 
-            {/* Mobile: hamburger + logo */}
-            <div className="flex md:hidden items-center gap-2 mr-auto">
-              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}>
-                <img src="/logo.jpg" alt="ألماسة" className="h-10 w-auto object-contain" />
-              </button>
-            </div>
-
-            {/* Center: Nav links */}
-            <nav className="hidden md:flex items-center justify-center flex-1 gap-6 text-sm font-semibold" dir="rtl">
-              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}
-                className={`py-1 border-b-2 transition-colors ${activeTab === 'shop' && selectedCategory === 'all' ? 'border-[#C4607A] text-[#C4607A]' : 'border-transparent text-[#2d2d2d] hover:text-[#C4607A]'}`}>
-                الرئيسية
-              </button>
-              {categories.filter(c => c.id !== 'all').slice(0, 2).map(cat => (
-                <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className={`py-1 border-b-2 transition-colors ${selectedCategory === cat.id && activeTab === 'shop' ? 'border-[#C4607A] text-[#C4607A]' : 'border-transparent text-[#2d2d2d] hover:text-[#C4607A]'}`}>
-                  {cat.name}
+            {/* Desktop nav links - hidden on mobile */}
+            <nav className="hidden md:flex" style={{ gap: 34, fontSize: 15, fontWeight: 500 }}>
+              {[
+                { label: 'الرئيسية', page: 'home' as Page },
+                { label: 'المخاوير', page: 'shop' as Page },
+                { label: 'من نحن', page: 'about' as Page },
+                { label: 'تواصلي معنا', page: 'contact' as Page },
+              ].map(({ label, page }) => (
+                <button key={page} onClick={() => setActiveTab(page)} style={{
+                  color: activeTab === page ? '#9A2D55' : '#241419',
+                  textDecoration: 'none',
+                  borderBottom: activeTab === page ? '2px solid #B08D57' : '2px solid transparent',
+                  background: 'none', border: 'none', borderBottomWidth: 2,
+                  borderBottomStyle: 'solid',
+                  borderBottomColor: activeTab === page ? '#B08D57' : 'transparent',
+                  cursor: 'pointer', padding: '2px 0', fontSize: 15, fontWeight: 500,
+                  fontFamily: "'Cairo', sans-serif",
+                }}>
+                  {label}
                 </button>
               ))}
-              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                className="py-1 border-b-2 border-transparent text-[#2d2d2d] hover:text-[#C4607A] transition-colors">
-                وصل حديثاً
-              </button>
-              <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                className="py-1 border-b-2 border-transparent text-[#2d2d2d] hover:text-[#C4607A] transition-colors">
-                عروض
-              </button>
-              {categories.filter(c => c.id !== 'all').slice(2, 4).map(cat => (
-                <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className={`py-1 border-b-2 transition-colors ${selectedCategory === cat.id && activeTab === 'shop' ? 'border-[#C4607A] text-[#C4607A]' : 'border-transparent text-[#2d2d2d] hover:text-[#C4607A]'}`}>
-                  {cat.name}
-                </button>
-              ))}
-              <button className="py-1 border-b-2 border-transparent text-[#2d2d2d] hover:text-[#C4607A] transition-colors">
-                عن المتجر
-              </button>
             </nav>
 
-            {/* Left: Search + icons + جميع الأقسام */}
-            <div className="flex items-center gap-2 shrink-0 mr-auto md:mr-0">
-              {/* Search bar */}
-              <div className="hidden md:flex items-center gap-2 bg-[#F8F3F4] rounded-full px-3 py-2 text-sm" style={{ minWidth: 180 }}>
-                <Search className="w-3.5 h-3.5 shrink-0" style={{ color: '#9A7A82' }} />
-                <input placeholder="ابحث عن مخاوير..." className="bg-transparent outline-none text-[13px] w-full" style={{ color: '#2d2d2d' }} dir="rtl" />
-              </div>
+            {/* Cart + mobile menu */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {/* Cart */}
-              <button className="relative p-2 hover:text-[#C4607A] transition-colors" style={{ color: '#2d2d2d' }} onClick={() => setIsCartOpen(true)}>
-                <ShoppingBag className="w-5 h-5" />
-                {cart.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-[#C4607A] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                    {cart.reduce((s, i) => s + i.quantity, 0)}
-                  </span>
-                )}
+              <button onClick={() => setActiveTab('cart')} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#241419', textDecoration: 'none', fontSize: 15, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>
+                <span>السلة</span>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: '#9A2D55', color: '#fff', fontSize: 11, fontWeight: 700 }}>
+                  {cartCount}
+                </span>
               </button>
-              {/* Wishlist */}
-              <button className="relative p-2 hover:text-[#C4607A] transition-colors hidden md:block" style={{ color: '#2d2d2d' }} onClick={() => {}}>
-                <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-[#C4607A] text-[#C4607A]' : ''}`} />
-                {wishlist.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-[#C4956A] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                    {wishlist.length}
-                  </span>
-                )}
-              </button>
-              {/* User */}
-              <button className="p-2 hover:text-[#C4607A] transition-colors hidden md:block" style={{ color: '#2d2d2d' }}>
-                <User className="w-5 h-5" />
-              </button>
-              {/* Mobile hamburger */}
-              <button className="p-2 md:hidden" style={{ color: '#2d2d2d' }} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                <Menu className="w-5 h-5" />
+
+              {/* Mobile menu button */}
+              <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#241419', padding: 4 }}>
+                <Menu style={{ width: 22, height: 22 }} />
               </button>
             </div>
           </div>
 
-          {/* Mobile Nav Dropdown */}
+          {/* Divider */}
+          <div style={{ width: '100%', borderBottom: '1px solid rgba(154,45,85,.18)' }} />
+
+          {/* Mobile nav dropdown */}
           <AnimatePresence>
             {mobileMenuOpen && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-                className="border-t overflow-hidden bg-white" style={{ borderColor: '#F0E0E5' }}>
-                <div className="py-3 space-y-1 px-2">
+                style={{ width: '100%', background: '#FBF7F2', overflow: 'hidden' }}>
+                <div style={{ padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {[
-                    { label: 'الرئيسية', action: () => { setActiveTab('shop'); setSelectedCategory('all'); setMobileMenuOpen(false); } },
-                    ...categories.filter(c => c.id !== 'all').map(cat => ({
-                      label: cat.name,
-                      action: () => { setActiveTab('shop'); setSelectedCategory(cat.id); setMobileMenuOpen(false); }
-                    })),
-                    { label: 'وصل حديثاً', action: () => { setActiveTab('shop'); setMobileMenuOpen(false); } },
-                    { label: 'عروض', action: () => { setActiveTab('shop'); setMobileMenuOpen(false); } },
-                    { label: 'تتبع الطلب', action: () => { setActiveTab('tracking'); setMobileMenuOpen(false); } },
-                    { label: 'عن المتجر', action: () => setMobileMenuOpen(false) },
-                  ].map((item, i) => (
-                    <button key={i} onClick={item.action} className="w-full text-right py-2.5 px-4 rounded-xl text-sm font-semibold hover:bg-[#FDF0F3] hover:text-[#C4607A] transition-colors" style={{ color: '#2d2d2d' }}>
-                      {item.label}
+                    { label: 'الرئيسية', page: 'home' as Page },
+                    { label: 'المخاوير', page: 'shop' as Page },
+                    { label: 'من نحن', page: 'about' as Page },
+                    { label: 'تواصلي معنا', page: 'contact' as Page },
+                    { label: 'تتبع طلبي', page: 'tracking' as Page },
+                  ].map(({ label, page }) => (
+                    <button key={page} onClick={() => { setActiveTab(page); setMobileMenuOpen(false); }}
+                      style={{ textAlign: 'right', padding: '10px 12px', fontSize: 15, fontWeight: activeTab === page ? 600 : 400, color: activeTab === page ? '#9A2D55' : '#241419', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", borderRadius: 2 }}>
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -453,619 +390,762 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         </div>
       </header>
 
-      {/* ── MAIN CONTENT ─────────────────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════
+          MAIN CONTENT
+      ══════════════════════════════════════════════════════════ */}
+
+      {/* ── HOME PAGE ──────────────────────────────────────────── */}
+      {(activeTab === 'home' || activeTab === 'shop' && !searchQuery && selectedCategory === 'all' && false) && activeTab === 'home' && (
+        <main>
+          {/* Hero */}
+          <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 22, padding: '64px 60px 56px', boxSizing: 'border-box' }}>
+            <div style={{ fontSize: 13, letterSpacing: '0.25em', color: '#B08D57', fontWeight: 600 }}>مجموعة الخريف ٢٠٢٦</div>
+            <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(2rem,5vw,56px)', lineHeight: 1.25, color: '#241419', maxWidth: 640, margin: 0 }}>
+              فخامة تُروى بتفاصيل هادئة
+            </h1>
+            <p style={{ fontSize: 16, color: '#6b5a5f', maxWidth: 480, lineHeight: 1.9, margin: 0 }}>
+              مخاوير وأزياء نسائية مصممة بعناية فائقة، لإطلالة تجمع بين الرقي والبساطة
+            </p>
+            <button onClick={() => setActiveTab('shop')} style={{
+              marginTop: 8, padding: '15px 44px', border: '1.5px solid #B08D57',
+              color: '#9A2D55', fontSize: 14, fontWeight: 600, letterSpacing: '0.04em',
+              borderRadius: 2, background: 'transparent', cursor: 'pointer', fontFamily: "'Cairo', sans-serif",
+            }}
+              onMouseEnter={e => { (e.target as HTMLElement).style.background = 'rgba(176,141,87,0.08)'; }}
+              onMouseLeave={e => { (e.target as HTMLElement).style.background = 'transparent'; }}
+            >
+              تسوّقي المجموعة
+            </button>
+          </div>
+
+          {/* Hero image */}
+          <div style={{ width: '100%', maxWidth: 1240, height: 460, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: PH, color: '#9A2D55', font: '500 12px/1.4 ui-monospace,Menlo,monospace', boxSizing: 'border-box' }}>
+            {products[0]?.image ? (
+              <img src={products[0].image} alt="hero" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : 'صورة رئيسية — عارضة بمخور فاخر'}
+          </div>
+
+          {/* Categories */}
+          <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '70px 60px 20px', textAlign: 'center', boxSizing: 'border-box' }}>
+            <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#241419', marginBottom: 44 }}>تسوّقي حسب الفئة</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 32 }}>
+              {(categories.filter(c => c.id !== 'all').slice(0, 3).length > 0
+                ? categories.filter(c => c.id !== 'all').slice(0, 3)
+                : [{ id: 'cat1', name: 'مخاوير', image: '' }, { id: 'cat2', name: 'فساتين', image: '' }, { id: 'cat3', name: 'إكسسوارات', image: '' }]
+              ).map(cat => (
+                <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); }}
+                  style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 12, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'right' }}>
+                  <div style={{ height: 320, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: (cat as any).image ? `url(${(cat as any).image})` : PH, backgroundSize: 'cover', backgroundPosition: 'center', color: '#9A2D55', font: '500 12px/1.4 ui-monospace,Menlo,monospace' }}>
+                    {!(cat as any).image && 'صورة الفئة'}
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: '#241419', fontFamily: "'Cairo', sans-serif" }}>{cat.name}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Best sellers */}
+          <div style={{ width: '100%', background: '#F3EAE2', marginTop: 60 }}>
+            <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '60px 60px 70px', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 40 }}>
+                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#241419', margin: 0 }}>الأكثر مبيعاً</h2>
+                <button onClick={() => setActiveTab('shop')} style={{ fontSize: 13, color: '#9A2D55', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontFamily: "'Cairo', sans-serif" }}>
+                  عرض الكل
+                </button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 24 }}>
+                {products.slice(0, 4).map(p => (
+                  <button key={p.id} onClick={() => handleProductClick(p)}
+                    style={{ background: '#fff', border: 'none', cursor: 'pointer', textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 0 }}>
+                    <div style={{ height: 260, width: '100%', backgroundImage: p.image ? `url(${p.image})` : PH, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 10px ui-monospace,Menlo,monospace' }}>
+                      {!p.image && 'صورة المنتج'}
+                    </div>
+                    <div style={{ padding: '14px 16px' }}>
+                      <div style={{ fontFamily: "'Amiri', serif", fontSize: 16, color: '#241419', marginBottom: 4 }}>{p.name}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#9A2D55' }}>{p.price.toFixed(2)} د.ب</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* ── SHOP PAGE ──────────────────────────────────────────── */}
       {activeTab === 'shop' && (
         <main>
+          {/* Breadcrumb */}
+          <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '30px 60px 0', boxSizing: 'border-box', fontSize: 13, color: '#9a8a85' }}>
+            <button onClick={() => setActiveTab('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontFamily: "'Cairo', sans-serif", fontSize: 13 }}>الرئيسية</button>
+            {' / '}
+            <span style={{ color: '#241419' }}>المخاوير</span>
+          </div>
 
-          {/* ── 3. HERO SECTION ─────────────────────────────────── */}
-          {(() => {
-            // Load from admin-managed banners, fallback to product images
-            const savedBanners: Array<{ image: string; subtitle: string; title: string; desc: string; active: boolean }> = (() => {
-              try { return JSON.parse(localStorage.getItem('almaasa_hero_banners') || '[]'); } catch { return []; }
-            })();
-            const activeBanners = savedBanners.filter(b => b.active && b.image);
-            const fallbackImgs = [products[0]?.image, products[1]?.image, products[2]?.image, products[3]?.image].filter(Boolean) as string[];
-            const defaultSlides = [
-              { subtitle: 'أزياء تعكس ذوقك الرفيع',   title: 'ألماسة\nللمخاوير الراقية',             desc: 'تصاميم استثنائية تجمع بين الفخامة والراحة لتتألقي بإطلالة مميزة في كل وقت' },
-              { subtitle: 'أناقة تنبض بالأنوثة',        title: 'مخاوير راقية\nلتألقي في كل مناسبة',    desc: 'تصاميم فاخرة بأقمشة ناعمة وحالية' },
-              { subtitle: 'كولكشن 2026',                title: 'تشكيلة العيد\nوصلت الآن',              desc: 'أحدث تصاميم المخاوير الخليجية بأقمشة فاخرة وألوان رائعة' },
-              { subtitle: 'جودة لا تضاهى',              title: 'تفصيل على المقاس\nبأرقى الأقمشة',      desc: 'نصنع لكِ تفاصيل لا تُنسى — راسليننا على واتساب' },
-            ];
-            const heroSlides = activeBanners.length > 0 ? activeBanners : defaultSlides.map((s, i) => ({ ...s, image: fallbackImgs[i] || '', active: true }));
-            const total = heroSlides.filter(s => s.image).length || heroSlides.length;
-            const idx = heroIdx % (total || 1);
-            const slide = heroSlides[idx];
-            const img = slide.image || '';
-            return (
-              <section className="select-none relative overflow-hidden" style={{ background: '#F9F0EE' }}>
-                {/* Full-width background image with text overlay */}
-                <div className="relative" style={{ height: 'clamp(380px, 55vw, 560px)' }}>
-                  {/* Background image */}
-                  {img ? (
-                    <img src={img} alt="hero" referrerPolicy="no-referrer"
-                      className="absolute inset-0 w-full h-full object-cover object-top" />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center"
-                      style={{ background: 'linear-gradient(135deg, #F5E0E8 0%, #EDD5DC 50%, #E8C8D4 100%)' }}>
-                      <div className="text-center opacity-30">
-                        <div className="text-8xl font-black" style={{ color: '#9A2D55', fontFamily: 'serif' }}>◆</div>
-                        <p className="text-sm font-bold mt-2" style={{ color: '#9A2D55' }}>ألماسة</p>
-                      </div>
-                    </div>
-                  )}
-                  {/* Dark gradient overlay on right side for text readability */}
-                  <div className="absolute inset-0 pointer-events-none"
-                    style={{ background: 'linear-gradient(to left, rgba(249,240,238,0.97) 0%, rgba(249,240,238,0.88) 30%, rgba(249,240,238,0.3) 60%, transparent 100%)' }} />
+          {/* Title */}
+          <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '20px 60px 0', boxSizing: 'border-box', textAlign: 'center' }}>
+            <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 38, color: '#241419', margin: 0 }}>
+              {selectedCategory === 'all' ? 'مجموعة المخاوير' : categories.find(c => c.id === selectedCategory)?.name || 'المنتجات'}
+            </h1>
+            <div style={{ fontSize: 14, color: '#6b5a5f', marginTop: 10 }}>{filteredProducts.length} منتج</div>
+          </div>
 
-                  {/* Text overlay — right side */}
-                  <div className="absolute inset-y-0 right-0 flex items-center px-10 md:px-16 xl:px-24" dir="rtl"
-                    style={{ width: 'clamp(300px, 45%, 520px)' }}>
-                    <div>
-                      <p className="text-sm font-medium mb-3" style={{ color: '#9A7A82' }}>{slide.subtitle}</p>
-                      <h1 className="font-black leading-tight mb-4" style={{ fontSize: 'clamp(1.8rem,3vw,2.8rem)', color: '#2C1810', whiteSpace: 'pre-line' }}>
-                        {slide.title}
-                      </h1>
-                      <p className="text-sm leading-relaxed mb-8 max-w-sm" style={{ color: '#9A7A82' }}>{slide.desc}</p>
-                      <button onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="font-bold px-8 py-3.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
-                        style={{ background: '#C4607A', color: 'white' }}>
-                        تسوقي الآن
-                      </button>
-                    </div>
+          {/* Layout: sidebar + grid */}
+          <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '44px 60px 80px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: '240px 1fr', gap: 40 }}
+            className="md:grid block">
+
+            {/* Sidebar Filters */}
+            <aside className="hidden md:block">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+                {/* Search */}
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: '#241419', marginBottom: 14 }}>البحث</div>
+                  <div style={{ position: 'relative' }}>
+                    <Search style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, color: '#9a8a85' }} />
+                    <input type="text" placeholder="ابحثي..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                      style={{ width: '100%', padding: '10px 36px 10px 12px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
                   </div>
                 </div>
 
-                {/* Controls */}
-                {total > 1 && (
-                  <>
-                    <button onClick={() => setHeroIdx((idx - 1 + total) % total)}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center hidden md:flex"
-                      style={{ color: '#2C1810' }}>
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setHeroIdx((idx + 1) % total)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white shadow flex items-center justify-center hidden md:flex"
-                      style={{ color: '#2C1810' }}>
-                      <ChevronLeft className="w-4 h-4 rotate-180" />
-                    </button>
-                    <div className="flex justify-center gap-2 py-4">
-                      {Array.from({ length: total }).map((_, i) => (
-                        <button key={i} onClick={() => setHeroIdx(i)}
-                          className="rounded-full transition-all"
-                          style={{ width: i === idx ? 20 : 8, height: 8, background: i === idx ? '#C4607A' : '#D9B8C0' }} />
-                      ))}
-                    </div>
-                  </>
-                )}
-              </section>
-            );
-          })()}
+                {/* Category filter */}
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: '#241419', marginBottom: 14 }}>الفئة</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: '#4a3d40' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                      <input type="radio" name="cat" checked={selectedCategory === 'all'} onChange={() => setSelectedCategory('all')} style={{ accentColor: '#9A2D55' }} />
+                      الكل ({products.length})
+                    </label>
+                    {categories.filter(c => c.id !== 'all').map(cat => (
+                      <label key={cat.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                        <input type="radio" name="cat" checked={selectedCategory === cat.id} onChange={() => setSelectedCategory(cat.id)} style={{ accentColor: '#9A2D55' }} />
+                        {cat.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-
-          {/* ── 5. SEARCH + FILTER BAR ──────────────────────────── */}
-          <div className="max-w-7xl mx-auto px-4 pb-6">
-            <div className="bg-white rounded-2xl border border-[#F2E4DC] shadow-sm p-3 flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute right-3.5 top-3 w-4 h-4 text-[#C4956A]" />
-                <input type="text" placeholder="ابحثي عن مخورك المفضل..."
-                  value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#FDF8F5] border border-[#F2E4DC] text-[#2C1810] rounded-xl pr-10 pl-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#9A2D55] focus:bg-white transition-all"
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute left-3 top-3 text-[#8B7B78] hover:text-[#9A2D55]">
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
+                {/* WhatsApp CTA */}
+                <div style={{ padding: '16px', background: '#F3EAE2', borderRadius: 2 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#241419', marginBottom: 8 }}>تحتاجين مساعدة؟</div>
+                  <a href={wa} target="_blank" rel="noreferrer"
+                    style={{ fontSize: 13, color: '#9A2D55', textDecoration: 'underline' }}>تواصلي معنا عبر واتساب</a>
+                </div>
               </div>
-              {/* Category filter tabs */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            </aside>
+
+            {/* Product Grid */}
+            <div>
+              {/* Mobile search + filter */}
+              <div className="md:hidden" style={{ marginBottom: 20, display: 'flex', gap: 10 }}>
+                <div style={{ position: 'relative', flex: 1 }}>
+                  <Search style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, color: '#9a8a85' }} />
+                  <input type="text" placeholder="ابحثي..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                    style={{ width: '100%', padding: '10px 32px 10px 10px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+
+              {/* Mobile category tabs */}
+              <div className="md:hidden" style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 20, paddingBottom: 4 }}>
                 <button onClick={() => setSelectedCategory('all')}
-                  className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${selectedCategory === 'all' ? 'bg-[#9A2D55] text-white' : 'bg-[#F8EDE8] text-[#8B7B78] hover:text-[#9A2D55]'}`}>
-                  الكل ({products.length})
+                  style={{ flexShrink: 0, padding: '6px 14px', border: '1px solid', borderRadius: 2, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", background: selectedCategory === 'all' ? '#9A2D55' : 'transparent', color: selectedCategory === 'all' ? '#fff' : '#241419', borderColor: selectedCategory === 'all' ? '#9A2D55' : 'rgba(154,45,85,.3)' }}>
+                  الكل
                 </button>
                 {categories.filter(c => c.id !== 'all').map(cat => (
                   <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
-                    className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${selectedCategory === cat.id ? 'bg-[#9A2D55] text-white' : 'bg-[#F8EDE8] text-[#8B7B78] hover:text-[#9A2D55]'}`}>
+                    style={{ flexShrink: 0, padding: '6px 14px', border: '1px solid', borderRadius: 2, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", background: selectedCategory === cat.id ? '#9A2D55' : 'transparent', color: selectedCategory === cat.id ? '#fff' : '#241419', borderColor: selectedCategory === cat.id ? '#9A2D55' : 'rgba(154,45,85,.3)' }}>
                     {cat.name}
                   </button>
                 ))}
               </div>
-            </div>
-          </div>
 
-          {/* ── 6. PRODUCTS SECTION ─────────────────────────────── */}
-          <section id="products-section" className="max-w-7xl mx-auto px-4 pb-16">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <p className="text-[#C4956A] text-xs font-bold tracking-widest uppercase mb-1">كولكشن 2026</p>
-                <h2 className="text-2xl font-black text-[#2C1810]">
-                  {selectedCategory === 'all' ? 'الأكثر مبيعاً' : categories.find(c => c.id === selectedCategory)?.name}
-                </h2>
-              </div>
-              <span className="text-xs text-[#8B7B78] font-medium bg-[#F8EDE8] px-3 py-1.5 rounded-xl">
-                {filteredProducts.length} منتج
-              </span>
-            </div>
-
-            {filteredProducts.length === 0 ? (
-              <div className="bg-white border border-[#F2E4DC] rounded-3xl p-16 text-center">
-                <ShoppingBag className="w-12 h-12 text-[#F2E4DC] mx-auto mb-4" />
-                <p className="text-lg font-bold text-[#2C1810] mb-2">لا توجد منتجات مطابقة</p>
-                <p className="text-[#8B7B78] text-sm mb-5">جربي البحث بكلمات مختلفة أو تصفحي جميع الأقسام</p>
-                <button onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-                  className="bg-[#9A2D55] text-white font-bold px-6 py-2.5 rounded-full text-sm hover:bg-[#802446] transition-all">
-                  عرض جميع المخاوير
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                {filteredProducts.map((product, idx) => (
-                  <div key={product.id} className="bg-white rounded-xl border border-[#F2E4DC] overflow-hidden luxury-card group cursor-pointer flex flex-col shadow-sm hover:shadow-lg hover:shadow-[#9A2D55]/10 hover:border-[#E8D5C4] transition-all"
-                    style={{ animationDelay: `${idx * 0.05}s` }}>
-
-                    {/* Image */}
-                    <div className="relative overflow-hidden bg-[#F8EDE8]" style={{ aspectRatio: '1/1' }}>
-                      <img src={product.image} alt={product.name} referrerPolicy="no-referrer"
-                        onClick={() => handleProductClick(product)}
-                        className="w-full h-full object-cover product-img"
-                      />
-
-                      {/* Badges top-right */}
-                      <div className="absolute top-2.5 right-2.5 flex flex-col gap-1">
-                        {product.hasSheilah && (
-                          <span className="bg-[#2C1810]/80 text-[#E8D5C4] text-[8px] font-bold px-2 py-0.5 rounded-full">+ شيلة</span>
-                        )}
-                        {idx < 3 && (
-                          <span className="bg-[#C4956A] text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-sm">جديد</span>
-                        )}
-                      </div>
-
-                      {/* Wishlist */}
-                      <button
-                        onClick={e => toggleWishlist(product.id, e)}
-                        className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 ${
-                          wishlist.includes(product.id) ? 'bg-[#9A2D55]' : 'bg-white/90 hover:bg-white'
-                        }`}
-                      >
-                        <Heart className={`w-3.5 h-3.5 transition-all ${wishlist.includes(product.id) ? 'fill-white text-white' : 'text-[#8B7B78]'}`} />
-                      </button>
-
-                      {/* Out of stock overlay */}
-                      {product.stock === 0 && (
-                        <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center">
-                          <span className="text-[#9A2D55] font-black text-sm bg-white border border-[#F2E4DC] px-4 py-2 rounded-full shadow-sm">نفدت الكمية</span>
-                        </div>
-                      )}
-
-                      {/* Low stock */}
-                      {product.stock > 0 && product.stock <= 5 && (
-                        <div className="absolute bottom-3 right-2.5">
-                          <span className="bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                            {product.stock} فقط!
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                        <button
-                          onClick={() => handleProductClick(product)}
-                          className="w-full bg-white text-[#9A2D55] font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          عرض التفاصيل
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Info */}
-                    <div className="p-2.5 flex-1 flex flex-col justify-between" onClick={() => handleProductClick(product)}>
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-0.5">
-                            <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-                            <span className="text-[9px] font-bold text-[#5C3830]">{product.rating}</span>
-                            <span className="text-[8px] text-[#8B7B78]">({product.reviewCount})</span>
-                          </div>
-                          <span className="text-[8px] bg-[#F8EDE8] text-[#9A2D55] font-bold px-1.5 py-0.5 rounded-full">
-                            {categories.find(c => c.id === product.category)?.name || 'مخور'}
-                          </span>
-                        </div>
-                        <h3 className="font-bold text-[#2C1810] text-[11px] leading-snug line-clamp-2 group-hover:text-[#9A2D55] transition-colors">
-                          {product.name}
-                        </h3>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#F8EDE8]">
-                        <div className="leading-tight">
-                          <span className="text-[#9A2D55] font-black text-sm">{product.price.toFixed(2)}</span>
-                          <span className="text-[#9A2D55] text-[9px] font-semibold mr-0.5">د.ب</span>
-                        </div>
-                        <button
-                          onClick={e => { e.stopPropagation(); handleProductClick(product); setIsCartOpen(true); }}
-                          className="w-7 h-7 bg-[#9A2D55] hover:bg-[#802446] text-white rounded-full flex items-center justify-center shadow-sm transition-all hover:scale-110 disabled:bg-[#F2E4DC]"
-                          disabled={product.stock === 0}
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* ── 8. FEATURES BAR ─────────────────────────────────── */}
-          <section className="py-10 px-4 bg-white border-y border-[#F2E4DC]">
-            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-5">
-              {[
-                { icon: Globe2,     title: 'شحن دولي سريع',    desc: 'لجميع دول الخليج والعالم',   color: 'bg-blue-50 text-blue-600' },
-                { icon: BadgeCheck, title: 'جودة مضمونة',      desc: 'أقمشة فاخرة مختارة بعناية', color: 'bg-emerald-50 text-emerald-600' },
-                { icon: ShieldCheck,title: 'دفع آمن 100%',     desc: 'BenefitPay, KNet, Visa',    color: 'bg-amber-50 text-amber-600' },
-                { icon: Gift,       title: 'تغليف هدايا',      desc: 'مجاني مع كل طلب',           color: 'bg-[#F8EDE8] text-[#9A2D55]' },
-              ].map(({ icon: Icon, title, desc, color }) => (
-                <div key={title} className="flex items-center gap-3 p-4 rounded-2xl bg-[#FDF8F5] border border-[#F2E4DC] hover:border-[#9A2D55]/20 transition-all">
-                  <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center shrink-0`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-black text-[#2C1810] text-sm">{title}</p>
-                    <p className="text-[#8B7B78] text-[11px] mt-0.5">{desc}</p>
-                  </div>
+              {filteredProducts.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9a8a85' }}>
+                  <ShoppingBag style={{ width: 40, height: 40, margin: '0 auto 16px', color: '#ECD9DD' }} />
+                  <p style={{ fontSize: 16, fontWeight: 600, color: '#241419', marginBottom: 8 }}>لا توجد منتجات مطابقة</p>
+                  <button onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
+                    style={{ padding: '10px 24px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, cursor: 'pointer', fontSize: 13, fontFamily: "'Cairo', sans-serif" }}>
+                    عرض الكل
+                  </button>
                 </div>
-              ))}
-            </div>
-          </section>
-
-
-
-          {/* ── 10. FINAL CTA ──────────────────────────────────── */}
-          <section className="py-14 px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #2C1810 0%, #4A1228 40%, #9A2D55 100%)' }}>
-            {/* Decorative diamonds */}
-            <div className="absolute inset-0 opacity-5">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="absolute border border-white rotate-45"
-                  style={{ width: `${40 + i*20}px`, height: `${40 + i*20}px`, top: `${Math.random()*80}%`, left: `${Math.random()*100}%` }} />
-              ))}
-            </div>
-            <div className="relative max-w-5xl mx-auto" dir="ltr" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '4rem' }}>
-              {/* Buttons on the LEFT */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '0.75rem', flexShrink: 0, width: '220px' }}>
-                <a href={`https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g,'')}`} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2.5 bg-white text-[#9A2D55] font-black px-7 py-3.5 rounded-xl shadow-xl transition-all hover:-translate-y-0.5 text-sm">
-                  <Phone className="w-4 h-4" />
-                  تواصلي على واتساب الآن
-                </a>
-                <button
-                  onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="inline-flex items-center justify-center gap-2 border-2 border-white/30 text-white font-bold px-7 py-3.5 rounded-xl hover:bg-white/10 transition-all text-sm">
-                  تصفحي التشكيلة
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-              </div>
-              {/* Text on the RIGHT */}
-              <div className="flex-1 text-right" dir="rtl">
-                <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-[#E8D5C4] text-xs font-bold px-4 py-2 rounded-full mb-5">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  طلبات خاصة ومخصصة
-                </div>
-                <h2 className="text-3xl md:text-4xl font-black text-white mb-3 leading-tight">
-                  أناقتك تبدأ من هنا
-                </h2>
-                <p className="text-[#E8D5C4] text-lg md:text-xl font-bold mb-3">نصنع لكِ تفاصيل لا تُنسى</p>
-                <p className="text-white/60 text-sm leading-relaxed">
-                  للطلبات الخاصة والتفصيل المخصص والاستفسارات — فريقنا جاهز للخدمة 24/7
-                </p>
-              </div>
-            </div>
-          </section>
-
-        </main>
-      )}
-
-      {/* ── FOOTER REMOVED ── */}
-      {false && (() => {
-        const fs = (() => { try { return JSON.parse(localStorage.getItem('almaasa_settings') || '{}'); } catch { return {}; } })();
-        return (
-      <footer dir="rtl" style={{ background: '#1A0F12', color: '#B89AA4' }}>
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {/* Brand */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-black" style={{ background: '#9A2D55' }}>◆</div>
-                <span className="font-black text-lg text-white">ألماسة</span>
-              </div>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: '#8A7080' }}>
-                متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.
-              </p>
-              <div className="flex gap-3">
-                {(fs.instagram || 'https://instagram.com/almaasa.bh') && (
-                  <a href={fs.instagram || 'https://instagram.com/almaasa.bh'} target="_blank" rel="noreferrer"
-                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:opacity-80"
-                    style={{ background: '#2A1520' }}>
-                    <Instagram className="w-4 h-4" style={{ color: '#E1306C' }} />
-                  </a>
-                )}
-                {(fs.whatsapp || '97337037697') && (
-                  <a href={`https://wa.me/${fs.whatsapp || '97337037697'}`} target="_blank" rel="noreferrer"
-                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:opacity-80"
-                    style={{ background: '#2A1520' }}>
-                    <Phone className="w-4 h-4" style={{ color: '#25D366' }} />
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* Quick links */}
-            <div>
-              <h4 className="text-white font-black text-sm mb-4">روابط سريعة</h4>
-              <ul className="space-y-2.5 text-sm">
-                {[
-                  { label: 'المنتجات', action: () => { setActiveTab('shop'); document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }); } },
-                  { label: 'تتبع الطلب', action: () => setActiveTab('tracking') },
-                  { label: 'تواصلي معنا', action: () => window.open(`https://wa.me/${fs.whatsapp || '97337037697'}`) },
-                ].map(l => (
-                  <li key={l.label}>
-                    <button onClick={l.action} className="hover:text-white transition-colors" style={{ color: '#8A7080' }}>
-                      {l.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h4 className="text-white font-black text-sm mb-4">تواصلي معنا</h4>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-2" style={{ color: '#8A7080' }}>
-                    <Phone className="w-4 h-4 shrink-0" />
-                    <span dir="ltr">+{fs.whatsapp || '97337037697'}</span>
-                  </div>
-                {fs.storeEmail && (
-                  <div className="flex items-center gap-2" style={{ color: '#8A7080' }}>
-                    <Globe2 className="w-4 h-4 shrink-0" />
-                    <span>{fs.storeEmail}</span>
-                  </div>
-                )}
-                {fs.storeAddress && (
-                  <div className="flex items-center gap-2" style={{ color: '#8A7080' }}>
-                    <MapPin className="w-4 h-4 shrink-0" />
-                    <span>{fs.storeAddress}</span>
-                  </div>
-                )}
-                {!fs.storeAddress && (
-                  <div className="flex items-center gap-2" style={{ color: '#8A7080' }}>
-                    <MapPin className="w-4 h-4 shrink-0" />
-                    <span>البحرين 🇧🇭</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs" style={{ borderTop: '1px solid #2A1520', color: '#5A4050' }}>
-            <p>© {new Date().getFullYear()} ألماسة — جميع الحقوق محفوظة</p>
-            <p>مصنوع بـ ❤️ في البحرين</p>
-          </div>
-        </div>
-      </footer>
-        );
-      })()}
-
-      {/* ── ORDER TRACKING TAB ──────────────────────────────────── */}
-      {activeTab === 'tracking' && (
-        <main className="min-h-[60vh] bg-[#FDF8F5] px-4 py-10">
-          <div className="max-w-2xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-[#9A2D55] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#9A2D55]/20">
-              <Truck className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-2xl font-black text-[#2C1810] mb-2">تتبع شحنتك</h2>
-            <p className="text-[#8B7B78] text-sm">أدخلي رقم التتبع أو رقم الهاتف لمتابعة شحنتكِ</p>
-          </div>
-          <div className="bg-white rounded-3xl border border-[#F2E4DC] p-6 md:p-8 shadow-sm">
-            <div>
-
-            <div className="bg-[#FDF8F5] p-4 rounded-2xl border border-[#F2E4DC] flex gap-2 mb-4">
-              <input type="text" placeholder="رقم التتبع (AL-XXXXX-BH) أو الهاتف..."
-                value={trackSearchQuery} onChange={e => setTrackSearchQuery(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleTrackSearch(); }}
-                className="flex-1 bg-white border border-[#F2E4DC] text-[#2C1810] font-medium rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
-              />
-              <button onClick={handleTrackSearch}
-                className="bg-[#9A2D55] hover:bg-[#802446] text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer">
-                تتبع
-              </button>
-            </div>
-
-            {trackError && (
-              <div className="mb-4 p-3 bg-red-50 text-red-600 border border-red-100 text-xs rounded-xl flex items-center gap-2">
-                <span>⚠️</span><p className="font-semibold">{trackError}</p>
-              </div>
-            )}
-
-            <AnimatePresence mode="wait">
-              {trackedOrder ? (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="border-t border-[#F2E4DC] pt-6 mt-4">
-                  {/* Status badge */}
-                  <div className="flex items-center justify-between bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC] mb-6">
-                    <div>
-                      <span className="text-[10px] text-[#8B7B78] font-bold block">رقم التتبع</span>
-                      <span className="font-mono font-black text-[#9A2D55] text-lg">{trackedOrder.trackingCode}</span>
-                    </div>
-                    <span className={`text-xs font-bold px-4 py-2 rounded-full ${
-                      trackedOrder.shippingStatus === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
-                      trackedOrder.shippingStatus === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                      trackedOrder.shippingStatus === 'processing' ? 'bg-amber-100 text-amber-800' :
-                      'bg-[#F8EDE8] text-[#9A2D55]'
-                    }`}>
-                      {trackedOrder.shippingStatus === 'delivered' ? 'تم التسليم ✓' :
-                       trackedOrder.shippingStatus === 'shipped' ? 'قيد الشحن ✈️' :
-                       trackedOrder.shippingStatus === 'processing' ? 'جاري التجهيز ⚜️' : 'طلب معلّق'}
-                    </span>
-                  </div>
-
-                  {/* Timeline */}
-                  <div className="relative pr-6 space-y-6 before:absolute before:top-2 before:bottom-2 before:right-2 before:w-0.5 before:bg-[#F2E4DC]">
-                    {trackedOrder.timeline.map((event, idx) => (
-                      <div key={idx} className="relative flex items-start gap-4 pr-6">
-                        <div className={`absolute right-[-5px] w-5 h-5 rounded-full border-4 bg-white flex items-center justify-center ${
-                          idx === trackedOrder.timeline.length - 1 ? 'border-[#9A2D55]' : 'border-[#F2E4DC]'
-                        }`}>
-                          {idx === trackedOrder.timeline.length - 1 && <div className="w-2 h-2 bg-[#9A2D55] rounded-full" />}
-                        </div>
-                        <div className="flex-1 bg-[#FDF8F5] rounded-2xl px-4 py-3 border border-[#F2E4DC]">
-                          <span className="text-[10px] text-[#8B7B78] font-mono">{event.date}</span>
-                          <h4 className="font-bold text-sm text-[#2C1810] mt-0.5">{event.title}</h4>
-                          <p className="text-xs text-[#8B7B78] leading-relaxed font-medium mt-0.5">{event.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-6 text-center bg-[#F8EDE8] border border-dashed border-[#F2E4DC] rounded-2xl p-4 text-xs font-semibold text-[#8B7B78]">
-                    استفسار؟ تواصلي معنا على{' '}
-                    <a href={`https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g,'')}`} className="text-emerald-600 underline">{settings?.whatsappNumber ? `+${settings.whatsappNumber}` : '+973 37037697'}</a>
-                  </div>
-                </motion.div>
               ) : (
-                <div className="mt-6 text-center text-[#8B7B78] py-8 border border-dashed border-[#F2E4DC] rounded-2xl">
-                  <Clock className="w-8 h-8 text-[#F2E4DC] mx-auto mb-2" />
-                  <p className="text-sm font-semibold">أدخلي رقم الطلب أو الهاتف للبدء</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(190px,1fr))', gap: 24 }}>
+                  {filteredProducts.map(product => (
+                    <div key={product.id} onClick={() => handleProductClick(product)}
+                      style={{ background: '#fff', cursor: 'pointer', border: '1px solid rgba(154,45,85,.12)', display: 'flex', flexDirection: 'column' }}>
+                      {/* Image */}
+                      <div style={{ position: 'relative', aspectRatio: '1/1', width: '100%', overflow: 'hidden' }}>
+                        {product.image ? (
+                          <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 10px ui-monospace,Menlo,monospace' }}>صورة المنتج</div>
+                        )}
+                        {product.stock === 0 && (
+                          <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#9A2D55', background: '#fff', padding: '6px 14px', border: '1px solid rgba(154,45,85,.3)' }}>نفدت الكمية</span>
+                          </div>
+                        )}
+                        {product.originalPrice && (
+                          <span style={{ position: 'absolute', top: 8, right: 8, background: '#9A2D55', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 2 }}>
+                            -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                          </span>
+                        )}
+                        <button onClick={e => toggleWishlist(product.id, e)}
+                          style={{ position: 'absolute', top: 8, left: 8, width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                          <Heart style={{ width: 14, height: 14, color: wishlist.includes(product.id) ? '#9A2D55' : '#9a8a85', fill: wishlist.includes(product.id) ? '#9A2D55' : 'transparent' }} />
+                        </button>
+                      </div>
+                      {/* Info */}
+                      <div style={{ padding: '14px 14px 16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} style={{ width: 11, height: 11, fill: i < Math.round(product.rating) ? '#B08D57' : 'transparent', color: '#B08D57' }} />
+                          ))}
+                          <span style={{ fontSize: 11, color: '#9a8a85', marginRight: 4 }}>({product.reviewCount})</span>
+                        </div>
+                        <div style={{ fontFamily: "'Amiri', serif", fontSize: 17, color: '#241419', marginBottom: 8, lineHeight: 1.3 }}>{product.name}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div>
+                            <span style={{ fontSize: 15, fontWeight: 700, color: '#9A2D55' }}>{product.price.toFixed(2)}</span>
+                            <span style={{ fontSize: 11, color: '#9A2D55', marginRight: 2 }}>د.ب</span>
+                            {product.originalPrice && (
+                              <div style={{ fontSize: 11, color: '#9a8a85', textDecoration: 'line-through' }}>{product.originalPrice.toFixed(2)} د.ب</div>
+                            )}
+                          </div>
+                          <button onClick={e => { e.stopPropagation(); handleProductClick(product); }}
+                            disabled={product.stock === 0}
+                            style={{ width: 32, height: 32, background: product.stock === 0 ? '#F3EAE2' : '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: product.stock === 0 ? 'not-allowed' : 'pointer' }}>
+                            <Plus style={{ width: 16, height: 16 }} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
-            </AnimatePresence>
-            </div>{/* end inner div */}
-          </div>{/* end bg-white card */}
-          </div>{/* end max-w-2xl */}
+            </div>
+          </div>
         </main>
       )}
 
-      {/* ── FOOTER ──────────────────────────────────────────────── */}
-      <footer className="bg-[#1a0d08] text-[#8B7B78]">
-        <div className="max-w-7xl mx-auto px-4 pt-14 pb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+      {/* ── CART PAGE ──────────────────────────────────────────── */}
+      {activeTab === 'cart' && (
+        <main style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '36px 60px', boxSizing: 'border-box' }}>
+          <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 34, color: '#241419', marginBottom: 40, textAlign: 'center' }}>سلة التسوّق</h1>
 
-            {/* Brand */}
-            <div className="sm:col-span-2 md:col-span-1">
-              <div className="mb-4">
-                <img src="/logo.jpg" alt="ألماسة" className="h-16 w-auto object-contain brightness-[1.1] contrast-[0.9] opacity-90" />
+          {checkoutStep === 'success' && newOrder ? (
+            <div style={{ textAlign: 'center', padding: '40px 20px', maxWidth: 480, margin: '0 auto' }}>
+              <CheckCircle style={{ width: 56, height: 56, color: '#4CAF50', margin: '0 auto 20px' }} />
+              <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#241419', marginBottom: 12 }}>تم الطلب بنجاح!</h2>
+              <p style={{ fontSize: 14, color: '#6b5a5f', marginBottom: 24 }}>سيتم التواصل معكِ قريباً لتأكيد الطلب</p>
+              <div style={{ background: '#F3EAE2', padding: 20, marginBottom: 24, textAlign: 'right' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
+                  <span style={{ color: '#6b5a5f' }}>رقم التتبع:</span>
+                  <strong style={{ color: '#9A2D55', fontFamily: 'monospace' }}>{newOrder.trackingCode}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+                  <span style={{ color: '#6b5a5f' }}>الإجمالي:</span>
+                  <strong style={{ color: '#241419' }}>{newOrder.total.toFixed(2)} د.ب</strong>
+                </div>
               </div>
-              <p className="text-[13px] leading-relaxed text-[#8B7B78] font-medium">
-                متجرك الأول للحصول على أرقى تصاميم المخاوير الخليجية بجودة استثنائية وتفاصيل تخطف الأنظار.              </p>
-              <div className="flex gap-2.5 mt-5">
-                <a href={`https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g,'')}`} target="_blank" rel="noreferrer"
-                  className="w-9 h-9 bg-white/5 hover:bg-emerald-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
-                  <Phone className="w-4 h-4" />
-                </a>
-                <a href={`https://instagram.com/${settings?.instagramUsername || 'almaasa.bh'}`} target="_blank" rel="noreferrer"
-                  className="w-9 h-9 bg-white/5 hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-600 border border-white/10 rounded-xl flex items-center justify-center hover:text-white transition-all">
-                  <Instagram className="w-4 h-4" />
-                </a>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <button onClick={() => { setTrackSearchQuery(newOrder.trackingCode); setTrackedOrder(newOrder); setActiveTab('tracking'); setCheckoutStep('cart'); }}
+                  style={{ padding: '14px 24px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                  تتبع شحنتي
+                </button>
+                <button onClick={() => { setActiveTab('home'); setCheckoutStep('cart'); setNewOrder(null); }}
+                  style={{ padding: '14px 24px', background: 'transparent', color: '#241419', border: '1px solid rgba(154,45,85,.3)', borderRadius: 2, fontSize: 14, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                  متابعة التسوق
+                </button>
               </div>
             </div>
+          ) : cart.length === 0 && checkoutStep !== 'success' ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9a8a85' }}>
+              <ShoppingBag style={{ width: 48, height: 48, margin: '0 auto 16px', color: '#ECD9DD' }} />
+              <p style={{ fontSize: 16, fontWeight: 600, color: '#241419', marginBottom: 8 }}>سلتك فارغة</p>
+              <button onClick={() => setActiveTab('shop')}
+                style={{ padding: '12px 28px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, fontSize: 14, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                تصفحي المخاوير
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Steps */}
+              {checkoutStep !== 'success' && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 32, fontSize: 13, fontWeight: 600 }}>
+                  {[['cart', 'السلة'], ['details', 'بيانات الشحن'], ['payment', 'الدفع']].map(([step, label], i) => (
+                    <React.Fragment key={step}>
+                      <span style={{ color: checkoutStep === step ? '#9A2D55' : '#9a8a85' }}>{i + 1}. {label}</span>
+                      {i < 2 && <span style={{ color: '#ECD9DD' }}>—</span>}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
 
-            {/* Shop links */}
-            <div>
-              <p className="text-white font-black text-sm mb-4">التسوق</p>
-              <ul className="space-y-2.5">
-                {[
-                  { label: 'جميع المنتجات', action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
-                  ...categories.filter(c=>c.id!=='all').slice(0,3).map(c => ({
-                    label: c.name,
-                    action: () => { setActiveTab('shop'); setSelectedCategory(c.id); }
-                  })),
-                  { label: 'العروض والتخفيضات', action: () => setActiveTab('shop') },
-                ].map(item => (
-                  <li key={item.label}>
-                    <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium text-right">
-                      {item.label}
+              <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 50 }} className="md:grid block">
+
+                {/* Left: items / form */}
+                <div>
+                  {/* CART STEP */}
+                  {checkoutStep === 'cart' && (
+                    <div>
+                      {cart.map((item, index) => (
+                        <div key={index} style={{ display: 'flex', gap: 22, padding: '24px 0', borderBottom: '1px solid rgba(154,45,85,.14)' }}>
+                          <div style={{ width: 120, height: 140, flexShrink: 0, backgroundImage: item.product.image ? `url(${item.product.image})` : PH, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 10px ui-monospace,Menlo,monospace' }}>
+                            {!item.product.image && 'صورة'}
+                          </div>
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
+                            <div style={{ fontSize: 15, fontWeight: 600, color: '#241419' }}>{item.product.name}</div>
+                            <div style={{ fontSize: 13, color: '#9a8a85' }}>المقاس: {item.selectedSize} · اللون: {item.selectedColor}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(154,45,85,.3)', borderRadius: 2 }}>
+                                <button onClick={() => updateCartQty(index, item.quantity - 1)} style={{ width: 32, height: 34, border: 'none', background: 'none', fontSize: 14, color: '#9A2D55', cursor: 'pointer' }}>−</button>
+                                <div style={{ width: 32, textAlign: 'center', fontSize: 13 }}>{item.quantity}</div>
+                                <button onClick={() => updateCartQty(index, item.quantity + 1)} style={{ width: 32, height: 34, border: 'none', background: 'none', fontSize: 14, color: '#9A2D55', cursor: 'pointer' }}>+</button>
+                              </div>
+                              <button onClick={() => removeFromCart(index)} style={{ border: 'none', background: 'none', color: '#9a8a85', fontSize: 13, textDecoration: 'underline', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>إزالة</button>
+                            </div>
+                          </div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: '#9A2D55', alignSelf: 'center', flexShrink: 0 }}>{(item.product.price * item.quantity).toFixed(2)} د.ب</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* DETAILS STEP */}
+                  {checkoutStep === 'details' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      <h3 style={{ fontFamily: "'Amiri', serif", fontSize: 22, color: '#241419', marginBottom: 8 }}>بيانات الشحن</h3>
+                      {[
+                        { label: 'الاسم الكامل *', type: 'text', val: customerName, set: setCustomerName, ph: 'فاطمة البوعينين' },
+                        { label: 'رقم الواتساب *', type: 'tel', val: customerPhone, set: setCustomerPhone, ph: '97337037697' },
+                        { label: 'البريد الإلكتروني', type: 'email', val: customerEmail, set: setCustomerEmail, ph: 'aisha@example.com' },
+                      ].map(f => (
+                        <div key={f.label}>
+                          <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 6 }}>{f.label}</label>
+                          <input type={f.type} placeholder={f.ph} value={f.val} onChange={e => f.set(e.target.value)}
+                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                      ))}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 6 }}>الدولة *</label>
+                          <select value={customerCountry} onChange={e => setCustomerCountry(e.target.value)}
+                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: '#fff', boxSizing: 'border-box' }}>
+                            {['البحرين', 'السعودية', 'الكويت', 'الإمارات', 'قطر', 'عمان'].map(c => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 6 }}>المدينة *</label>
+                          <input type="text" placeholder="المنامة" value={customerCity} onChange={e => setCustomerCity(e.target.value)}
+                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 6 }}>العنوان الكامل *</label>
+                        <textarea rows={2} placeholder="طريق 1221، فيلا 93" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)}
+                          style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
+                      </div>
+                      {/* Shipping methods */}
+                      {availableShippingMethods.length > 0 && (
+                        <div>
+                          <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 10, fontWeight: 600 }}>طريقة التوصيل</label>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {availableShippingMethods.map((method: any) => (
+                              <label key={method.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', border: `1px solid ${selectedShippingMethod?.id === method.id ? '#9A2D55' : 'rgba(154,45,85,.2)'}`, borderRadius: 2, cursor: 'pointer', background: selectedShippingMethod?.id === method.id ? '#F3EAE2' : '#fff' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                  <input type="radio" name="shipping" checked={selectedShippingMethod?.id === method.id} onChange={() => setSelectedShippingMethod(method)} style={{ accentColor: '#9A2D55' }} />
+                                  <div>
+                                    <div style={{ fontSize: 14, fontWeight: 600, color: '#241419' }}>{method.name}</div>
+                                    {method.description && <div style={{ fontSize: 12, color: '#9a8a85' }}>{method.description}</div>}
+                                  </div>
+                                </div>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: '#9A2D55' }}>{method.priceType === 'free' ? 'مجاني' : `${parseFloat(method.price).toFixed(3)} د.ب`}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* PAYMENT STEP */}
+                  {checkoutStep === 'payment' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      <h3 style={{ fontFamily: "'Amiri', serif", fontSize: 22, color: '#241419', marginBottom: 8 }}>الدفع الآمن</h3>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                        {[
+                          { id: 'benefit', label: 'BenefitPay', sub: 'البحرين' },
+                          { id: 'knet', label: 'KNet', sub: 'الكويت' },
+                          { id: 'card', label: 'بطاقة بنكية', sub: 'Visa / Mastercard' },
+                          { id: 'applepay', label: 'Apple Pay', sub: 'المحفظة' },
+                        ].map(m => (
+                          <button key={m.id} onClick={() => setPaymentMethod(m.id as any)}
+                            style={{ padding: '12px', border: `1px solid ${paymentMethod === m.id ? '#9A2D55' : 'rgba(154,45,85,.2)'}`, borderRadius: 2, background: paymentMethod === m.id ? '#F3EAE2' : '#fff', cursor: 'pointer', textAlign: 'center', fontFamily: "'Cairo', sans-serif" }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: paymentMethod === m.id ? '#9A2D55' : '#241419' }}>{m.label}</div>
+                            <div style={{ fontSize: 11, color: '#9a8a85' }}>{m.sub}</div>
+                          </button>
+                        ))}
+                      </div>
+                      <div style={{ padding: 16, background: '#F3EAE2', borderRadius: 2 }}>
+                        {paymentMethod === 'benefit' && (
+                          <div>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: '#9A2D55', marginBottom: 10 }}>أدخلي رقم الهاتف لـ BenefitPay</p>
+                            <input type="tel" placeholder="37037697" value={benefitPhone} onChange={e => setBenefitPhone(e.target.value)}
+                              style={{ width: '100%', padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: 'none', textAlign: 'center', boxSizing: 'border-box' }} />
+                          </div>
+                        )}
+                        {paymentMethod === 'knet' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <input type="text" placeholder="رقم البطاقة" value={knetCardNum} onChange={e => setKnetCardNum(e.target.value)}
+                              style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
+                            <input type="password" placeholder="الرقم السري (PIN)" value={knetPin} onChange={e => setKnetPin(e.target.value)} maxLength={4}
+                              style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
+                          </div>
+                        )}
+                        {paymentMethod === 'card' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <input type="text" placeholder="الاسم على البطاقة" value={cardName} onChange={e => setCardName(e.target.value)}
+                              style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
+                            <input type="text" placeholder="رقم البطاقة" value={cardNumber} onChange={e => setCardNumber(e.target.value)}
+                              style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: 'monospace', outline: 'none', textAlign: 'center' }} />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                              <input type="text" placeholder="MM/YY" value={cardExpiry} onChange={e => setCardExpiry(e.target.value)}
+                                style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: 'monospace', outline: 'none', textAlign: 'center' }} />
+                              <input type="password" placeholder="CVV" value={cardCvv} onChange={e => setCardCvv(e.target.value)} maxLength={3}
+                                style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: 'monospace', outline: 'none', textAlign: 'center' }} />
+                            </div>
+                          </div>
+                        )}
+                        {paymentMethod === 'applepay' && (
+                          <p style={{ fontSize: 13, color: '#9a8a85', textAlign: 'center', padding: '12px 0' }}>جاري الاتصال بـ Face ID / Touch ID...</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right: order summary */}
+                <div style={{ background: '#F3EAE2', padding: 30, height: 'fit-content', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <h3 style={{ fontFamily: "'Amiri', serif", fontSize: 20, color: '#241419', margin: 0 }}>ملخص الطلب</h3>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderBottom: '1px solid rgba(154,45,85,.14)', paddingBottom: 16 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#4a3d40' }}>
+                      <span>المجموع الفرعي</span>
+                      <span>{calculatedSubtotal.toFixed(2)} د.ب</span>
+                    </div>
+                    {calculatedDiscount > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#27ae60' }}>
+                        <span>الخصم</span>
+                        <span>-{calculatedDiscount.toFixed(2)} د.ب</span>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#4a3d40' }}>
+                      <span>الشحن</span>
+                      <span>{shippingCharge === 0 ? 'مجاني' : `${shippingCharge.toFixed(2)} د.ب`}</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 700 }}>
+                    <span style={{ color: '#241419' }}>الإجمالي</span>
+                    <span style={{ color: '#9A2D55' }}>{totalCost.toFixed(2)} د.ب</span>
+                  </div>
+
+                  {/* Coupon (only on cart step) */}
+                  {checkoutStep === 'cart' && (
+                    <div>
+                      <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 8 }}>كوبون الخصم</label>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <input type="text" placeholder="ALMAASA10" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                          style={{ flex: 1, padding: '10px 12px', border: '1px solid rgba(154,45,85,.3)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: '#fff' }} />
+                        <button onClick={applyCoupon}
+                          style={{ padding: '10px 16px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                          تفعيل
+                        </button>
+                      </div>
+                      {activeCoupon && <p style={{ fontSize: 12, color: '#27ae60', marginTop: 6 }}>✓ خصم {activeCoupon.type === 'percentage' ? `${activeCoupon.discount}%` : `${activeCoupon.discount.toFixed(2)} د.ب`} مطبّق</p>}
+                      {couponError && <p style={{ fontSize: 12, color: '#c0392b', marginTop: 6 }}>{couponError}</p>}
+                    </div>
+                  )}
+
+                  {/* Action buttons */}
+                  {checkoutStep === 'cart' && (
+                    <button onClick={() => setCheckoutStep('details')}
+                      style={{ padding: '15px 0', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                      متابعة الطلب
                     </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Help links */}
-            <div>
-              <p className="text-white font-black text-sm mb-4">المساعدة</p>
-              <ul className="space-y-2.5">
-                {[
-                  { label: 'تتبع طلبي ✈️', action: () => setActiveTab('tracking') },
-                  { label: 'آراء الزبائن ⭐', action: () => setShowReviewsPopup(true) },
-                  { label: 'تواصلي معنا', action: () => window.open(`https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g,'')}`, '_blank') },
-                  { label: 'سياسة الإرجاع', action: () => {} },
-                ].map(item => (
-                  <li key={item.label}>
-                    <button onClick={item.action} className="text-[13px] hover:text-[#C4956A] transition-colors font-medium">
-                      {item.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Payment + contact */}
-            <div>
-              <p className="text-white font-black text-sm mb-4">وسائل الدفع</p>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {['BenefitPay', 'KNet', 'Visa', 'Mastercard', 'Apple Pay'].map(p => (
-                  <span key={p} className="bg-white/5 border border-white/10 text-[#8B7B78] text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                    {p}
-                  </span>
-                ))}
+                  )}
+                  {checkoutStep === 'details' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <button onClick={() => {
+                        if (!customerName || !customerPhone || !customerAddress) { addToast('يرجى تعبئة الحقول الأساسية', 'error'); return; }
+                        setCheckoutStep('payment');
+                      }}
+                        style={{ padding: '15px 0', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                        إلى الدفع
+                      </button>
+                      <button onClick={() => setCheckoutStep('cart')}
+                        style={{ padding: '12px 0', background: 'transparent', color: '#241419', border: '1px solid rgba(154,45,85,.3)', borderRadius: 2, fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                        رجوع
+                      </button>
+                    </div>
+                  )}
+                  {checkoutStep === 'payment' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <button onClick={triggerPayment} disabled={isPaying}
+                        style={{ padding: '15px 0', background: isPaying ? '#9a8a85' : '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, fontSize: 15, fontWeight: 600, cursor: isPaying ? 'wait' : 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                        {isPaying ? 'جاري الدفع...' : 'تأكيد الطلب والدفع'}
+                      </button>
+                      <button onClick={() => setCheckoutStep('details')}
+                        style={{ padding: '12px 0', background: 'transparent', color: '#241419', border: '1px solid rgba(154,45,85,.3)', borderRadius: 2, fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                        رجوع
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="space-y-2 text-[12px]">
-                <p className="flex items-center gap-1.5 text-[#8B7B78]">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  جميع المدفوعات مشفّرة وآمنة
-                </p>
-                <p className="flex items-center gap-1.5 text-[#8B7B78]">
-                  <MapPin className="w-3.5 h-3.5 text-[#C4956A] shrink-0" />
-                  المنامة، مملكة البحرين
-                </p>
-              </div>
-            </div>
+            </>
+          )}
+        </main>
+      )}
 
+      {/* ── ABOUT PAGE ─────────────────────────────────────────── */}
+      {activeTab === 'about' && (
+        <main>
+          {/* Story section */}
+          <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '64px 60px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}
+            className="md:grid block">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ fontSize: 13, letterSpacing: '0.25em', color: '#B08D57', fontWeight: 600 }}>قصتنا</div>
+              <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(1.8rem,4vw,42px)', lineHeight: 1.3, color: '#241419', margin: 0 }}>فخامة تحمل بصمة هوية أصيلة</h1>
+              <p style={{ fontSize: 15, lineHeight: 2, color: '#4a3d40' }}>
+                ولدت ألماسة من شغف بالتفاصيل التراثية الخليجية، لنقدّم لكِ مخاوير وأزياء نسائية تجمع بين الأصالة والحداثة. كل قطعة نصممها تحمل حكاية من الحرفية اليدوية والخامات الفاخرة، لنمنحكِ إطلالة تليق بلحظاتكِ المميزة.
+              </p>
+            </div>
+            <div style={{ height: 420, backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 12px/1.4 ui-monospace,Menlo,monospace' }}>
+              صورة — ورشة التصميم
+            </div>
           </div>
 
-          <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[11px] text-[#8B7B78]/60 font-medium">
-            <p>© {new Date().getFullYear()} مخاوير ألماسة — almaasa.bh — جميع الحقوق محفوظة</p>
-            <div className="flex items-center gap-4">
-              <button className="hover:text-[#8B7B78] transition-colors">سياسة الخصوصية</button>
-              <button className="hover:text-[#8B7B78] transition-colors">الشروط والأحكام</button>
-              <button onClick={() => window.location.href = '/admin'} className="opacity-20 hover:opacity-60 transition-opacity">
-                إدارة المتجر
+          {/* Values section */}
+          <div style={{ width: '100%', background: '#F3EAE2' }}>
+            <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '70px 60px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 40, textAlign: 'center' }}
+              className="md:grid block">
+              {[
+                { title: 'حرفية يدوية', desc: 'تطريز دقيق بأيدٍ ماهرة يبرز جمال كل قطعة' },
+                { title: 'خامات فاخرة', desc: 'حرير وأقمشة مختارة بعناية لراحة تدوم طوال اليوم' },
+                { title: 'توصيل سريع', desc: 'تصلك طلباتك أينما كنتِ خلال أيام معدودة' },
+              ].map((v, i) => (
+                <div key={i} style={{ padding: '20px 10px' }}>
+                  <div style={{ fontFamily: "'Amiri', serif", fontSize: 26, color: '#9A2D55', marginBottom: 12 }}>{v.title}</div>
+                  <div style={{ fontSize: 14, lineHeight: 1.9, color: '#4a3d40' }}>{v.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* ── CONTACT PAGE ───────────────────────────────────────── */}
+      {activeTab === 'contact' && (
+        <main>
+          <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '64px 60px', boxSizing: 'border-box', textAlign: 'center' }}>
+            <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 38, color: '#241419', marginBottom: 12 }}>تواصلي معنا</h1>
+            <p style={{ fontSize: 15, color: '#6b5a5f' }}>يسعدنا استقبال استفساراتكِ — فريقنا يرد خلال ساعات العمل</p>
+          </div>
+
+          <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '0 60px 80px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60 }}
+            className="md:grid block">
+            {/* Form */}
+            {contactSent ? (
+              <div style={{ textAlign: 'center', padding: '60px 20px', display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
+                <CheckCircle style={{ width: 48, height: 48, color: '#4CAF50' }} />
+                <div style={{ fontFamily: "'Amiri', serif", fontSize: 24, color: '#241419' }}>شكراً لتواصلكِ!</div>
+                <p style={{ fontSize: 14, color: '#6b5a5f' }}>سيتم الرد عليكِ قريباً</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                <input placeholder="الاسم الكامل" value={contactName} onChange={e => setContactName(e.target.value)}
+                  style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
+                <input placeholder="رقم الجوال" value={contactPhone} onChange={e => setContactPhone(e.target.value)}
+                  style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
+                <input placeholder="البريد الإلكتروني" value={contactEmail} onChange={e => setContactEmail(e.target.value)}
+                  style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
+                <textarea placeholder="رسالتكِ" rows={5} value={contactMsg} onChange={e => setContactMsg(e.target.value)}
+                  style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none', resize: 'vertical' }} />
+                <button onClick={() => { if (contactName && contactMsg) setContactSent(true); }}
+                  style={{ padding: 16, background: '#9A2D55', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, borderRadius: 2, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                  إرسال الرسالة
+                </button>
+              </div>
+            )}
+
+            {/* Info */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
+              {[
+                { label: 'واتساب', value: settings?.whatsappNumber || '05xxxxxxxx' },
+                { label: 'إنستغرام', value: settings?.instagramUsername || 'almaasa.bh' },
+                { label: 'أوقات العمل', value: 'السبت – الخميس: ٩ص – ١١م' },
+              ].map((info, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid rgba(154,45,85,.14)', fontSize: 14 }}>
+                  <span style={{ fontWeight: 600, color: '#241419' }}>{info.label}</span>
+                  <span style={{ color: '#4a3d40' }}>{info.value}</span>
+                </div>
+              ))}
+              <a href={wa} target="_blank" rel="noreferrer"
+                style={{ display: 'block', textAlign: 'center', padding: '14px 0', background: '#9A2D55', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 600, borderRadius: 2, fontFamily: "'Cairo', sans-serif" }}>
+                تواصلي عبر واتساب
+              </a>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* ── TRACKING PAGE ──────────────────────────────────────── */}
+      {activeTab === 'tracking' && (
+        <main style={{ minHeight: '60vh', background: '#FBF7F2', padding: '60px 20px' }}>
+          <div style={{ maxWidth: 600, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <div style={{ width: 60, height: 60, background: '#9A2D55', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <Truck style={{ width: 28, height: 28, color: '#fff' }} />
+              </div>
+              <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 32, color: '#241419', marginBottom: 8 }}>تتبع شحنتكِ</h1>
+              <p style={{ fontSize: 14, color: '#6b5a5f' }}>أدخلي رقم التتبع أو رقم الهاتف لمتابعة شحنتكِ</p>
+            </div>
+
+            <div style={{ background: '#fff', border: '1px solid rgba(154,45,85,.14)', padding: 32 }}>
+              <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+                <input type="text" placeholder="رقم التتبع (AL-XXXXX-BH) أو الهاتف..."
+                  value={trackSearchQuery} onChange={e => setTrackSearchQuery(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleTrackSearch(); }}
+                  style={{ flex: 1, padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
+                <button onClick={handleTrackSearch}
+                  style={{ padding: '12px 20px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                  تتبع
+                </button>
+              </div>
+
+              {trackError && (
+                <div style={{ marginBottom: 16, padding: 12, background: '#fdecea', color: '#c0392b', border: '1px solid #f5c6cb', fontSize: 13, borderRadius: 2 }}>
+                  {trackError}
+                </div>
+              )}
+
+              <AnimatePresence mode="wait">
+                {trackedOrder ? (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#F3EAE2', padding: '16px 20px', marginBottom: 24 }}>
+                      <div>
+                        <div style={{ fontSize: 11, color: '#9a8a85', fontWeight: 600 }}>رقم التتبع</div>
+                        <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#9A2D55', fontSize: 18 }}>{trackedOrder.trackingCode}</div>
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', background: trackedOrder.shippingStatus === 'delivered' ? '#d4edda' : trackedOrder.shippingStatus === 'shipped' ? '#d1ecf1' : '#F3EAE2', color: trackedOrder.shippingStatus === 'delivered' ? '#155724' : trackedOrder.shippingStatus === 'shipped' ? '#0c5460' : '#9A2D55', borderRadius: 2 }}>
+                        {trackedOrder.shippingStatus === 'delivered' ? 'تم التسليم ✓' : trackedOrder.shippingStatus === 'shipped' ? 'قيد الشحن' : trackedOrder.shippingStatus === 'processing' ? 'جاري التجهيز' : 'قيد الانتظار'}
+                      </span>
+                    </div>
+
+                    <div style={{ position: 'relative', paddingRight: 24 }}>
+                      {trackedOrder.timeline.map((event, idx) => (
+                        <div key={idx} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: 24 }}>
+                          <div style={{ position: 'absolute', right: -12, top: 4, width: 16, height: 16, borderRadius: '50%', border: `3px solid ${idx === trackedOrder.timeline.length - 1 ? '#9A2D55' : '#ECD9DD'}`, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {idx === trackedOrder.timeline.length - 1 && <div style={{ width: 6, height: 6, background: '#9A2D55', borderRadius: '50%' }} />}
+                          </div>
+                          <div style={{ background: '#F3EAE2', padding: '12px 16px', flex: 1 }}>
+                            <div style={{ fontSize: 11, color: '#9a8a85', fontFamily: 'monospace' }}>{event.date}</div>
+                            <div style={{ fontWeight: 600, fontSize: 14, color: '#241419', marginTop: 2 }}>{event.title}</div>
+                            <div style={{ fontSize: 13, color: '#6b5a5f', marginTop: 2 }}>{event.description}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ marginTop: 16, padding: 14, background: '#F3EAE2', fontSize: 13, color: '#6b5a5f', textAlign: 'center' }}>
+                      استفسار؟ تواصلي معنا على{' '}
+                      <a href={wa} style={{ color: '#9A2D55', textDecoration: 'underline' }}>واتساب</a>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '40px 0', color: '#9a8a85', border: '1px dashed rgba(154,45,85,.2)', borderRadius: 2 }}>
+                    <Clock style={{ width: 32, height: 32, color: '#ECD9DD', margin: '0 auto 10px' }} />
+                    <p style={{ fontSize: 13, fontWeight: 600 }}>أدخلي رقم الطلب أو الهاتف للبدء</p>
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════
+          FOOTER
+      ══════════════════════════════════════════════════════════ */}
+      <footer style={{ background: '#241419', color: '#EADFD8', display: 'flex', justifyContent: 'center', fontFamily: "'Cairo', sans-serif" }}>
+        <div style={{ width: '100%', maxWidth: 1240, padding: '50px 40px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 30, textAlign: 'right' }}
+          className="md:grid block">
+          {/* Brand */}
+          <div>
+            <div style={{ fontFamily: "'Amiri', serif", fontSize: 24, color: '#fff', marginBottom: 10 }}>ألماسة</div>
+            <div style={{ fontSize: 13, lineHeight: 1.9, color: '#b8a9a2' }}>وجهتك الأولى للأزياء الراقية والمخاوير الفاخرة</div>
+          </div>
+
+          {/* Quick links */}
+          <div style={{ fontSize: 13, lineHeight: 2.4, color: '#d8c9c2' }}>
+            <div style={{ color: '#B08D57', fontWeight: 600, marginBottom: 6 }}>روابط سريعة</div>
+            {[
+              { label: 'المخاوير', page: 'shop' as Page },
+              { label: 'من نحن', page: 'about' as Page },
+              { label: 'تواصل معنا', page: 'contact' as Page },
+              { label: 'تتبع الطلب', page: 'tracking' as Page },
+            ].map(({ label, page }) => (
+              <button key={page} onClick={() => setActiveTab(page)}
+                style={{ color: 'inherit', background: 'none', border: 'none', cursor: 'pointer', display: 'block', fontSize: 13, fontFamily: "'Cairo', sans-serif", padding: 0, lineHeight: 2.4 }}>
+                {label}
               </button>
+            ))}
+          </div>
+
+          {/* Contact */}
+          <div style={{ fontSize: 13, lineHeight: 2.4, color: '#d8c9c2' }}>
+            <div style={{ color: '#B08D57', fontWeight: 600, marginBottom: 6 }}>تواصلي معنا</div>
+            <div>واتساب: {settings?.whatsappNumber || '05xxxxxxxx'}</div>
+            <div>إنستغرام: {settings?.instagramUsername || 'almaasa.bh'}</div>
+            <div style={{ marginTop: 12, display: 'flex', gap: 10 }}>
+              <a href={wa} target="_blank" rel="noreferrer" style={{ color: '#d8c9c2', textDecoration: 'none' }}>
+                <Phone style={{ width: 16, height: 16 }} />
+              </a>
+              <a href={ig} target="_blank" rel="noreferrer" style={{ color: '#d8c9c2', textDecoration: 'none' }}>
+                <Instagram style={{ width: 16, height: 16 }} />
+              </a>
             </div>
           </div>
         </div>
+
+        {/* Copyright */}
+        <div style={{ display: 'none' }} /> {/* spacer for ts */}
       </footer>
 
-      {/* ── MOBILE BOTTOM NAV ───────────────────────────────────── */}
-      <div className="md:hidden fixed bottom-0 right-0 left-0 z-50 bg-white border-t border-[#F2E4DC] shadow-xl">
-        <div className="flex items-center justify-around py-2 px-2">
+      {/* Copyright bar */}
+      <div style={{ background: '#1a100d', color: '#6b5a5f', padding: '12px 40px', textAlign: 'center', fontSize: 12, fontFamily: "'Cairo', sans-serif" }}>
+        <span>© {new Date().getFullYear()} مخاوير ألماسة — جميع الحقوق محفوظة</span>
+        <button onClick={onNavigateToAdmin} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'transparent', fontSize: 1, marginRight: 8 }}>·</button>
+      </div>
+
+      {/* ── MOBILE BOTTOM NAV ──────────────────────────────────── */}
+      <div className="md:hidden" style={{ position: 'fixed', bottom: 0, right: 0, left: 0, zIndex: 50, background: '#FBF7F2', borderTop: '1px solid rgba(154,45,85,.18)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '8px 4px' }}>
           {[
-            { icon: Home,        label: 'الرئيسية',   action: () => { setActiveTab('shop'); setSelectedCategory('all'); } },
-            { icon: Grid3X3,     label: 'الأقسام',    action: () => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' }) },
-            { icon: ShoppingBag, label: 'السلة',      action: () => setIsCartOpen(true), badge: cart.reduce((s, i) => s + i.quantity, 0) },
-            { icon: Heart,       label: 'المفضلة',   action: () => {}, badge: wishlist.length },
-            { icon: Truck,       label: 'تتبع طلبي', action: () => setActiveTab('tracking') },
-          ].map(({ icon: Icon, label, action, badge }) => (
-            <button key={label} onClick={action}
-              className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all relative ${
-                (label === 'الرئيسية' && activeTab === 'shop') || (label === 'تتبع طلبي' && activeTab === 'tracking')
-                  ? 'text-[#9A2D55]' : 'text-[#8B7B78]'
-              }`}>
-              <Icon className="w-5 h-5" />
-              <span className="text-[9px] font-semibold">{label}</span>
+            { icon: Home, label: 'الرئيسية', page: 'home' as Page },
+            { icon: ShoppingBag, label: 'المخاوير', page: 'shop' as Page },
+            { icon: Package, label: 'السلة', page: 'cart' as Page, badge: cartCount },
+            { icon: Truck, label: 'تتبع', page: 'tracking' as Page },
+          ].map(({ icon: Icon, label, page, badge }) => (
+            <button key={page} onClick={() => setActiveTab(page)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 12px', background: 'none', border: 'none', cursor: 'pointer', position: 'relative', color: activeTab === page ? '#9A2D55' : '#9a8a85' }}>
+              <Icon style={{ width: 20, height: 20 }} />
+              <span style={{ fontSize: 10, fontFamily: "'Cairo', sans-serif", fontWeight: activeTab === page ? 600 : 400 }}>{label}</span>
               {badge != null && badge > 0 && (
-                <span className="absolute -top-0.5 right-1.5 bg-[#9A2D55] text-white text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                <span style={{ position: 'absolute', top: 0, right: 8, background: '#9A2D55', color: '#fff', fontSize: 9, fontWeight: 700, width: 14, height: 14, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {badge}
                 </span>
               )}
@@ -1074,543 +1154,189 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
         </div>
       </div>
 
-      {/* ════════════════════════════════════════════════════════
+      {/* ═══════════════════════════════════════════════════════════
           MODALS
-      ════════════════════════════════════════════════════════ */}
+      ═══════════════════════════════════════════════════════════ */}
 
-      {/* ── MODAL: Product Detail ────────────────────────────── */}
+      {/* ── Product Detail Modal ───────────────────────────────── */}
       <AnimatePresence>
         {selectedProduct && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-[#F2E4DC] flex flex-col md:flex-row shadow-2xl">
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(36,20,25,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 20 }}
+            onClick={() => setSelectedProduct(null)}>
+            <motion.div initial={{ opacity: 0, scale: 0.97, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97 }}
+              style={{ background: '#FBF7F2', width: '100%', maxWidth: 760, maxHeight: '90vh', overflowY: 'auto', display: 'grid', gridTemplateColumns: '1fr 1fr' }}
+              className="md:grid block"
+              onClick={e => e.stopPropagation()}>
 
               {/* Image */}
-              <div className="md:w-1/2 relative bg-[#F8EDE8] min-h-[300px] md:rounded-r-3xl overflow-hidden">
-                <img src={selectedProduct.image} alt={selectedProduct.name} referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover" />
+              <div style={{ position: 'relative', minHeight: 320 }}>
+                {selectedProduct.image ? (
+                  <img src={selectedProduct.image} alt={selectedProduct.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', minHeight: 320, backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 12px/1.4 ui-monospace,Menlo,monospace' }}>صورة المنتج</div>
+                )}
                 <button onClick={() => setSelectedProduct(null)}
-                  className="absolute top-4 right-4 bg-white/90 hover:bg-white text-[#2C1810] p-2 rounded-full shadow-md cursor-pointer transition-all">
-                  <X className="w-4 h-4" />
+                  style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <X style={{ width: 16, height: 16, color: '#241419' }} />
                 </button>
                 <button onClick={e => toggleWishlist(selectedProduct.id, e)}
-                  className="absolute top-4 left-4 bg-white/90 hover:bg-white p-2 rounded-full shadow-md cursor-pointer transition-all">
-                  <Heart className={`w-4 h-4 ${wishlist.includes(selectedProduct.id) ? 'fill-[#9A2D55] text-[#9A2D55]' : 'text-[#8B7B78]'}`} />
+                  style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <Heart style={{ width: 14, height: 14, color: '#9A2D55', fill: wishlist.includes(selectedProduct.id) ? '#9A2D55' : 'transparent' }} />
                 </button>
               </div>
 
               {/* Details */}
-              <div className="p-6 md:p-8 flex-1 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-[#9A2D55] bg-[#F8EDE8] px-3 py-1 rounded-full">
-                      {categories.find(c => c.id === selectedProduct.category)?.name || 'مخور'}
-                    </span>
-                    <button onClick={() => { const g = selectedProduct.category === 'kids' ? 'g-2' : 'g-1'; setShowSizeGuide(g); }}
-                      className="text-xs text-[#9A2D55] underline font-bold hover:text-[#802446] transition-colors">
-                      📏 دليل المقاسات
-                    </button>
-                  </div>
-
-                  <h2 className="text-xl font-black text-[#2C1810] mb-3 leading-tight">{selectedProduct.name}</h2>
-
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-3xl font-black text-[#9A2D55]">{selectedProduct.price.toFixed(2)}</span>
-                    <span className="text-[#9A2D55] font-semibold">د.ب</span>
-                  </div>
-
-                  <p className="text-[#8B7B78] text-sm leading-relaxed mb-5 font-medium">{selectedProduct.description}</p>
-
-                  {/* Size selector */}
-                  <div className="mb-4">
-                    <span className="text-xs font-bold text-[#5C3830] block mb-2">المقاس:</span>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProduct.sizes.map(size => (
-                        <button key={size} onClick={() => setChosenSize(size)}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                            chosenSize === size
-                              ? 'bg-[#9A2D55] text-white border-[#9A2D55] shadow-sm'
-                              : 'bg-white hover:bg-[#F8EDE8] text-[#5C3830] border-[#F2E4DC]'
-                          }`}>{size}</button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Color selector */}
-                  <div className="mb-5">
-                    <span className="text-xs font-bold text-[#5C3830] block mb-2">اللون:</span>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProduct.colors.map(color => (
-                        <button key={color} onClick={() => setChosenColor(color)}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                            chosenColor === color
-                              ? 'bg-[#F8EDE8] text-[#9A2D55] border-[#9A2D55] border-2'
-                              : 'bg-white hover:bg-[#F8EDE8] text-[#5C3830] border-[#F2E4DC]'
-                          }`}>{color}</button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Properties */}
-                  <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      {selectedProduct.properties.map((prop, idx) => (
-                        <div key={idx} className="bg-white p-2.5 rounded-xl border border-[#F2E4DC]">
-                          <span className="text-[#8B7B78] font-semibold block text-[10px]">{prop.label}</span>
-                          <span className="text-[#2C1810] font-bold">{prop.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+              <div style={{ padding: '28px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                {/* Breadcrumb */}
+                <div style={{ fontSize: 12, color: '#9a8a85' }}>
+                  {categories.find(c => c.id === selectedProduct.category)?.name || 'مخور'}
                 </div>
 
-                {/* Add to cart */}
-                <div className="pt-5 border-t border-[#F2E4DC] flex items-center gap-3 mt-4">
-                  <div className="flex items-center gap-2 bg-[#FDF8F5] rounded-xl px-3 py-2 border border-[#F2E4DC]">
-                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="text-[#8B7B78] hover:text-[#9A2D55] transition-colors">
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="w-6 text-center text-sm font-black text-[#2C1810]">{quantity}</span>
-                    <button onClick={() => setQuantity(q => q + 1)} className="text-[#8B7B78] hover:text-[#9A2D55] transition-colors">
-                      <Plus className="w-4 h-4" />
-                    </button>
+                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#241419', margin: 0, lineHeight: 1.2 }}>{selectedProduct.name}</h2>
+
+                {/* Stars */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} style={{ width: 14, height: 14, fill: i < Math.round(selectedProduct.rating) ? '#B08D57' : 'transparent', color: '#B08D57' }} />
+                  ))}
+                  <span style={{ fontSize: 12, color: '#9a8a85' }}>({selectedProduct.reviewCount} تقييم)</span>
+                </div>
+
+                {/* Price */}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 28, fontWeight: 700, color: '#9A2D55' }}>{selectedProduct.price.toFixed(2)}</span>
+                  <span style={{ fontSize: 14, color: '#9A2D55' }}>د.ب</span>
+                  {selectedProduct.originalPrice && (
+                    <span style={{ fontSize: 14, color: '#9a8a85', textDecoration: 'line-through' }}>{selectedProduct.originalPrice.toFixed(2)} د.ب</span>
+                  )}
+                </div>
+
+                <p style={{ fontSize: 14, lineHeight: 1.8, color: '#6b5a5f', margin: 0 }}>{selectedProduct.description}</p>
+
+                {/* Size */}
+                {selectedProduct.sizes.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#241419', marginBottom: 10 }}>المقاس</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {selectedProduct.sizes.map(size => (
+                        <button key={size} onClick={() => setChosenSize(size)}
+                          style={{ padding: '8px 18px', border: `1px solid ${chosenSize === size ? '#9A2D55' : 'rgba(154,45,85,.25)'}`, borderRadius: 2, background: chosenSize === size ? '#9A2D55' : 'transparent', color: chosenSize === size ? '#fff' : '#241419', fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Color */}
+                {selectedProduct.colors.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#241419', marginBottom: 10 }}>اللون: {chosenColor}</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {selectedProduct.colors.map(color => (
+                        <button key={color} onClick={() => setChosenColor(color)}
+                          style={{ padding: '8px 18px', border: `1px solid ${chosenColor === color ? '#9A2D55' : 'rgba(154,45,85,.25)'}`, borderRadius: 2, background: chosenColor === color ? '#F3EAE2' : 'transparent', color: '#241419', fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                          {color}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Qty + Add to cart */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(154,45,85,.3)', borderRadius: 2 }}>
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: 36, height: 42, border: 'none', background: 'none', fontSize: 16, color: '#9A2D55', cursor: 'pointer' }}>−</button>
+                    <span style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 600 }}>{quantity}</span>
+                    <button onClick={() => setQuantity(q => q + 1)} style={{ width: 36, height: 42, border: 'none', background: 'none', fontSize: 16, color: '#9A2D55', cursor: 'pointer' }}>+</button>
                   </div>
                   <button onClick={handleAddToCart} disabled={selectedProduct.stock === 0}
-                    className="flex-1 bg-[#9A2D55] hover:bg-[#802446] disabled:bg-[#F2E4DC] disabled:text-[#8B7B78] text-white font-black py-3 px-6 rounded-xl shadow-md transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer">
-                    <ShoppingBag className="w-4 h-4" />
+                    style={{ flex: 1, padding: '14px 20px', background: selectedProduct.stock === 0 ? '#9a8a85' : '#9A2D55', color: '#fff', border: 'none', borderRadius: 2, fontSize: 14, fontWeight: 600, cursor: selectedProduct.stock === 0 ? 'not-allowed' : 'pointer', fontFamily: "'Cairo', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <ShoppingBag style={{ width: 16, height: 16 }} />
                     {selectedProduct.stock === 0 ? 'نفدت الكمية' : 'أضيفي للسلة'}
                   </button>
                 </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
-      {/* ── MODAL: Cart Drawer ───────────────────────────────── */}
-      <AnimatePresence>
-        {isCartOpen && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-end">
-            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="bg-white w-full max-w-md h-full flex flex-col shadow-2xl">
-
-              {/* Header */}
-              <div className="p-4 border-b border-[#F2E4DC] flex items-center justify-between bg-[#FDF8F5]">
-                <div className="flex items-center gap-2 text-[#9A2D55]">
-                  <ShoppingBag className="w-5 h-5" />
-                  <span className="font-black text-base text-[#2C1810]">سلة المشتريات</span>
-                  {cart.length > 0 && (
-                    <span className="bg-[#9A2D55] text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center">
-                      {cart.reduce((s, i) => s + i.quantity, 0)}
-                    </span>
-                  )}
-                </div>
-                <button onClick={() => setIsCartOpen(false)} className="p-1.5 bg-white hover:bg-[#F8EDE8] rounded-lg text-[#8B7B78] border border-[#F2E4DC] cursor-pointer transition-all">
-                  <X className="w-4 h-4" />
+                {/* Size guide link */}
+                <button onClick={() => setShowSizeGuide('g-1')}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A2D55', fontSize: 12, textDecoration: 'underline', textAlign: 'right', fontFamily: "'Cairo', sans-serif" }}>
+                  📏 دليل المقاسات
                 </button>
               </div>
-
-              {/* Stepper */}
-              {checkoutStep !== 'success' && (
-                <div className="flex items-center justify-around px-4 py-3 border-b border-[#F2E4DC] bg-white text-[10px] font-bold">
-                  {[['cart', 'السلة'], ['details', 'بيانات الشحن'], ['payment', 'الدفع']].map(([step, label], i) => (
-                    <React.Fragment key={step}>
-                      <span className={checkoutStep === step ? 'text-[#9A2D55] font-black' : 'text-[#8B7B78]'}>
-                        {i + 1}. {label}
-                      </span>
-                      {i < 2 && <ChevronRight className="w-3 h-3 text-[#F2E4DC]" />}
-                    </React.Fragment>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex-1 overflow-y-auto p-4">
-
-                {/* CART STEP */}
-                {checkoutStep === 'cart' && (
-                  <div>
-                    {cart.length === 0 ? (
-                      <div className="text-center py-14">
-                        <ShoppingBag className="w-12 h-12 text-[#F2E4DC] mx-auto mb-4" />
-                        <p className="text-sm font-bold text-[#2C1810] mb-2">حقيبتكِ فارغة</p>
-                        <button onClick={() => { setIsCartOpen(false); setActiveTab('shop'); }}
-                          className="mt-3 bg-[#9A2D55] text-white font-bold py-2.5 px-6 rounded-xl text-xs hover:bg-[#802446] transition-all">
-                          تصفحي المخاوير
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {cart.map((item, index) => (
-                          <div key={index} className="flex gap-3 bg-[#FDF8F5] p-3 rounded-2xl border border-[#F2E4DC]">
-                            <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#F8EDE8]">
-                              <img src={item.product.image} alt={item.product.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-xs font-black text-[#2C1810] line-clamp-1">{item.product.name}</h4>
-                              <span className="text-[10px] text-[#8B7B78] font-medium">{item.selectedSize} | {item.selectedColor}</span>
-                              <div className="flex items-center justify-between mt-2">
-                                <div className="flex items-center gap-1 bg-white border border-[#F2E4DC] rounded-lg py-0.5 px-2">
-                                  <button onClick={() => updateCartQty(index, item.quantity - 1)} className="text-[#8B7B78] hover:text-[#9A2D55]"><Minus className="w-3 h-3" /></button>
-                                  <span className="text-xs font-black w-5 text-center text-[#2C1810]">{item.quantity}</span>
-                                  <button onClick={() => updateCartQty(index, item.quantity + 1)} className="text-[#8B7B78] hover:text-[#9A2D55]"><Plus className="w-3 h-3" /></button>
-                                </div>
-                                <span className="text-xs font-black text-[#9A2D55]">{(item.product.price * item.quantity).toFixed(2)} د.ب</span>
-                              </div>
-                            </div>
-                            <button onClick={() => removeFromCart(index)} className="text-[#F2E4DC] hover:text-red-400 shrink-0 p-1 cursor-pointer">
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-
-                        {/* Coupon */}
-                        <div className="bg-[#F8EDE8] border border-[#F2E4DC] rounded-2xl p-4 mt-4">
-                          <label className="text-xs font-bold text-[#5C3830] block mb-2">كوبون الخصم 🎟️</label>
-                          <div className="flex gap-2">
-                            <input type="text" placeholder="ALMAASA10..."
-                              value={couponCode} onChange={e => setCouponCode(e.target.value)}
-                              className="flex-1 bg-white border border-[#F2E4DC] rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55] uppercase"
-                            />
-                            <button onClick={applyCoupon} className="bg-[#9A2D55] hover:bg-[#802446] text-white text-xs font-bold rounded-xl px-4 py-1.5 transition-all">
-                              تفعيل
-                            </button>
-                          </div>
-                          {activeCoupon && (
-                            <p className="text-[10px] text-emerald-600 font-bold mt-1.5 flex items-center gap-1">
-                              <Check className="w-3 h-3" />
-                              خصم {activeCoupon.type === 'percentage' ? `${activeCoupon.discount}%` : `${activeCoupon.discount.toFixed(2)} د.ب`} مطبّق
-                            </p>
-                          )}
-                          {couponError && <p className="text-[10px] text-red-500 font-bold mt-1.5">{couponError}</p>}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* DETAILS STEP */}
-                {checkoutStep === 'details' && (
-                  <div className="space-y-3 font-medium text-xs">
-                    <h3 className="font-black text-sm text-[#2C1810] border-b border-[#F2E4DC] pb-2 mb-3">بيانات الشحن</h3>
-                    {[
-                      { label: 'الاسم الكامل *', type: 'text', val: customerName, set: setCustomerName, ph: 'فاطمة البوعينين' },
-                      { label: 'رقم الواتساب *', type: 'tel', val: customerPhone, set: setCustomerPhone, ph: '97337037697' },
-                      { label: 'البريد الإلكتروني', type: 'email', val: customerEmail, set: setCustomerEmail, ph: 'aisha@example.com' },
-                    ].map(f => (
-                      <div key={f.label}>
-                        <label className="text-[#8B7B78] block mb-1">{f.label}</label>
-                        <input type={f.type} placeholder={f.ph} value={f.val} onChange={e => f.set(e.target.value)}
-                          className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810]"
-                        />
-                      </div>
-                    ))}
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[#8B7B78] block mb-1">الدولة *</label>
-                        <select value={customerCountry} onChange={e => setCustomerCountry(e.target.value)}
-                          className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810] font-medium">
-                          {['البحرين 🇧🇭', 'السعودية 🇸🇦', 'الكويت 🇰🇼', 'الإمارات 🇦🇪', 'قطر 🇶🇦', 'عمان 🇴🇲'].map(c => (
-                            <option key={c} value={c.split(' ')[0]}>{c}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-[#8B7B78] block mb-1">المدينة *</label>
-                        <input type="text" placeholder="المنامة" value={customerCity} onChange={e => setCustomerCity(e.target.value)}
-                          className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810] font-medium"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-[#8B7B78] block mb-1">العنوان الكامل *</label>
-                      <textarea rows={2} placeholder="طريق 1221، فيلا 93، مجمع البديع" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)}
-                        className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810] font-medium resize-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[#8B7B78] block mb-1">ملاحظات للمخيط (اختياري)</label>
-                      <textarea rows={2} placeholder="تطريز خاص، مقاس مخصص..." value={customerNotes} onChange={e => setCustomerNotes(e.target.value)}
-                        className="w-full bg-[#FDF8F5] border border-[#F2E4DC] rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-[#9A2D55] text-[#2C1810] font-medium resize-none"
-                      />
-                    </div>
-
-                    {/* Shipping methods */}
-                    <div>
-                      <label className="text-[#8B7B78] block mb-2 font-bold">طريقة التوصيل</label>
-                      {availableShippingMethods.length === 0 ? (
-                        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-[11px] font-medium">
-                          ⚠️ سيقوم فريق الدعم بالتنسيق معكِ لتحديد سعر الشحن.
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          {availableShippingMethods.map((method: any) => (
-                            <label key={method.id}
-                              className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-                                selectedShippingMethod?.id === method.id
-                                  ? 'bg-[#F8EDE8] border-[#9A2D55] ring-1 ring-[#9A2D55]/20'
-                                  : 'bg-white border-[#F2E4DC] hover:bg-[#FDF8F5]'
-                              }`}>
-                              <div className="flex items-center gap-2">
-                                <input type="radio" name="shipping" checked={selectedShippingMethod?.id === method.id}
-                                  onChange={() => setSelectedShippingMethod(method)} className="accent-[#9A2D55]" />
-                                <div>
-                                  <span className="font-bold text-xs text-[#2C1810] block">{method.name}</span>
-                                  {method.description && <span className="text-[10px] text-[#8B7B78]">{method.description}</span>}
-                                </div>
-                              </div>
-                              <span className="text-xs font-black text-[#9A2D55]">
-                                {method.priceType === 'free' ? 'مجاني' : `${parseFloat(method.price).toFixed(3)} د.ب`}
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* PAYMENT STEP */}
-                {checkoutStep === 'payment' && (
-                  <div className="space-y-4 text-xs font-medium">
-                    <h3 className="font-black text-sm text-[#2C1810] flex items-center gap-2 border-b border-[#F2E4DC] pb-2">
-                      <ShieldCheck className="w-4 h-4 text-emerald-500" /> الدفع الآمن
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { id: 'benefit', label: 'BenefitPay 🇧🇭', sub: 'البحرين' },
-                        { id: 'knet', label: 'KNet 🇰🇼', sub: 'الكويت' },
-                        { id: 'card', label: 'بطاقة بنكية', sub: 'Visa / Mastercard' },
-                        { id: 'applepay', label: ' Pay', sub: 'تطبيق المحفظة' },
-                      ].map(m => (
-                        <button key={m.id} onClick={() => { setPaymentMethod(m.id as any); setBenefitStep('input'); }}
-                          className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
-                            paymentMethod === m.id ? 'bg-[#F8EDE8] border-[#9A2D55] text-[#9A2D55]' : 'bg-white border-[#F2E4DC] text-[#5C3830] hover:bg-[#FDF8F5]'
-                          }`}>
-                          <span className="text-[11px] font-black block">{m.label}</span>
-                          <span className="text-[9px] text-[#8B7B78]">{m.sub}</span>
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                      {paymentMethod === 'benefit' && (
-                        <div className="space-y-3">
-                          <p className="font-bold text-[#9A2D55]">BenefitPay — أدخلي رقم الهاتف:</p>
-                          <input type="tel" placeholder="37037697" value={benefitPhone} onChange={e => setBenefitPhone(e.target.value)}
-                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-sm text-center font-black text-[#2C1810]" />
-                          <p className="text-[9px] text-[#9A2D55] text-center font-semibold">سيتم فتح طلب الدفع بالبصمة في جهازكِ</p>
-                        </div>
-                      )}
-                      {paymentMethod === 'knet' && (
-                        <div className="space-y-2">
-                          <p className="font-bold text-blue-700">شبكة KNet الكويتية:</p>
-                          <input type="text" placeholder="رقم البطاقة" value={knetCardNum} onChange={e => setKnetCardNum(e.target.value)}
-                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs text-center font-medium text-[#2C1810]" />
-                          <input type="password" placeholder="الرقم السري (PIN)" value={knetPin} onChange={e => setKnetPin(e.target.value)} maxLength={4}
-                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs text-center font-medium text-[#2C1810]" />
-                        </div>
-                      )}
-                      {paymentMethod === 'card' && (
-                        <div className="space-y-2">
-                          <input type="text" placeholder="الاسم على البطاقة" value={cardName} onChange={e => setCardName(e.target.value)}
-                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs font-medium text-[#2C1810]" />
-                          <input type="text" placeholder="رقم البطاقة" value={cardNumber} onChange={e => setCardNumber(e.target.value)}
-                            className="w-full bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs font-mono text-center text-[#2C1810]" />
-                          <div className="grid grid-cols-2 gap-2">
-                            <input type="text" placeholder="MM/YY" value={cardExpiry} onChange={e => setCardExpiry(e.target.value)}
-                              className="bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs text-center text-[#2C1810]" />
-                            <input type="password" placeholder="CVV" value={cardCvv} onChange={e => setCardCvv(e.target.value)} maxLength={3}
-                              className="bg-white border border-[#F2E4DC] rounded-xl px-3 py-2 text-xs text-center text-[#2C1810]" />
-                          </div>
-                        </div>
-                      )}
-                      {paymentMethod === 'applepay' && (
-                        <div className="text-center py-4">
-                          <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-lg shadow"></div>
-                          <p className="text-[10px] text-[#8B7B78] font-medium">جاري الاتصال بـ Face ID / Touch ID...</p>
-                          <div className="w-24 h-1.5 bg-[#F2E4DC] rounded-full mx-auto mt-3 overflow-hidden">
-                            <div className="h-full bg-[#9A2D55] rounded-full animate-pulse" style={{ width: '65%' }} />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* SUCCESS STEP */}
-                {checkoutStep === 'success' && newOrder && (
-                  <div className="text-center py-8 space-y-5">
-                    <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-100">
-                      <CheckCircle className="w-10 h-10 text-emerald-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-black text-xl text-[#2C1810]">مبروك! تم الطلب بنجاح ✨</h3>
-                      <p className="text-[#8B7B78] text-xs mt-1">تم تسجيل طلبكِ وجاري التجهيز</p>
-                    </div>
-                    <div className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC] text-right space-y-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-[#8B7B78]">كود التتبع:</span>
-                        <strong className="text-[#9A2D55] font-mono font-black">{newOrder.trackingCode}</strong>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#8B7B78]">الإجمالي:</span>
-                        <strong className="text-[#2C1810]">{newOrder.total.toFixed(2)} د.ب</strong>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-[#8B7B78]">الوجهة:</span>
-                        <strong className="text-[#2C1810]">{newOrder.customer.city}، {newOrder.customer.country}</strong>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <button onClick={() => { setTrackSearchQuery(newOrder.trackingCode); setTrackedOrder(newOrder); setIsCartOpen(false); setActiveTab('tracking'); setCheckoutStep('cart'); }}
-                        className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white py-3 rounded-xl text-xs font-black transition-all">
-                        تتبع شحنتي ✈️
-                      </button>
-                      <button onClick={() => { setIsCartOpen(false); setCheckoutStep('cart'); setNewOrder(null); }}
-                        className="w-full bg-[#F8EDE8] hover:bg-[#F2E4DC] text-[#5C3830] py-3 rounded-xl text-xs font-bold transition-all">
-                        متابعة التسوق
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Cart Footer */}
-              {checkoutStep !== 'success' && cart.length > 0 && (
-                <div className="p-4 border-t border-[#F2E4DC] bg-[#FDF8F5]">
-                  <div className="space-y-1.5 text-xs mb-4">
-                    <div className="flex justify-between text-[#8B7B78]">
-                      <span>المجموع الفرعي</span>
-                      <span className="font-semibold text-[#2C1810]">{calculatedSubtotal.toFixed(2)} د.ب</span>
-                    </div>
-                    {calculatedDiscount > 0 && (
-                      <div className="flex justify-between text-emerald-600 font-semibold">
-                        <span>الخصم</span><span>-{calculatedDiscount.toFixed(2)} د.ب</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between text-[#8B7B78]">
-                      <span>الشحن</span>
-                      <span className="font-semibold text-[#2C1810]">{shippingCharge === 0 ? 'مجاني ✓' : `${shippingCharge.toFixed(2)} د.ب`}</span>
-                    </div>
-                    <div className="border-t border-[#F2E4DC] pt-2 flex justify-between">
-                      <span className="font-black text-[#9A2D55]">الإجمالي</span>
-                      <span className="font-black text-[#9A2D55] text-lg">{totalCost.toFixed(2)} د.ب</span>
-                    </div>
-                  </div>
-
-                  {checkoutStep === 'cart' && (
-                    <button onClick={() => setCheckoutStep('details')}
-                      className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white font-black py-3.5 px-4 rounded-xl shadow-md transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer">
-                      بيانات الشحن <ArrowRight className="w-4 h-4" />
-                    </button>
-                  )}
-                  {checkoutStep === 'details' && (
-                    <div className="flex gap-2">
-                      <button onClick={() => setCheckoutStep('cart')} className="bg-[#F8EDE8] hover:bg-[#F2E4DC] text-[#5C3830] font-bold py-3 px-4 rounded-xl transition-all">رجوع</button>
-                      <button onClick={() => { if (!customerName || !customerPhone || !customerAddress) { addToast('يرجى تعبئة الحقول الأساسية', 'error'); return; } setCheckoutStep('payment'); }}
-                        className="flex-1 bg-[#9A2D55] hover:bg-[#802446] text-white font-black py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
-                        إلى الدفع <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                  {checkoutStep === 'payment' && (
-                    <div className="flex gap-2">
-                      <button onClick={() => setCheckoutStep('details')} className="bg-[#F8EDE8] hover:bg-[#F2E4DC] text-[#5C3830] font-bold py-3 px-4 rounded-xl transition-all">رجوع</button>
-                      <button onClick={triggerPayment} disabled={isPaying}
-                        className="flex-1 bg-[#9A2D55] hover:bg-[#802446] disabled:bg-[#F2E4DC] disabled:text-[#8B7B78] text-white font-black py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
-                        {isPaying ? <span className="flex items-center gap-2"><Zap className="w-4 h-4 animate-pulse" />جاري الدفع...</span> : <><span>تأكيد الطلب والدفع</span><ArrowRight className="w-4 h-4" /></>}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* ── MODAL: Reviews ──────────────────────────────────── */}
+      {/* ── Reviews Modal ─────────────────────────────────────── */}
       <AnimatePresence>
         {showReviewsPopup && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(36,20,25,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 20 }}
+            onClick={() => setShowReviewsPopup(false)}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-lg p-6 border border-[#F2E4DC] shadow-2xl max-h-[80vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-6 pb-3 border-b border-[#F2E4DC]">
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-                  <span className="font-black text-[#2C1810]">آراء زبائن ألماسة</span>
-                </div>
-                <button onClick={() => setShowReviewsPopup(false)} className="p-1.5 bg-[#FDF8F5] hover:bg-[#F8EDE8] rounded-lg text-[#8B7B78] border border-[#F2E4DC] cursor-pointer">
-                  <X className="w-4 h-4" />
+              style={{ background: '#FBF7F2', width: '100%', maxWidth: 480, padding: 28, maxHeight: '80vh', overflowY: 'auto' }}
+              onClick={e => e.stopPropagation()}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid rgba(154,45,85,.14)' }}>
+                <div style={{ fontFamily: "'Amiri', serif", fontSize: 22, color: '#241419' }}>آراء زبائن ألماسة</div>
+                <button onClick={() => setShowReviewsPopup(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9a8a85' }}>
+                  <X style={{ width: 18, height: 18 }} />
                 </button>
               </div>
-              <div className="space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {reviews.map(rev => (
-                  <div key={rev.id} className="bg-[#FDF8F5] rounded-2xl p-4 border border-[#F2E4DC]">
-                    <div className="flex justify-between mb-2">
-                      <strong className="text-[#2C1810] text-sm">{rev.customerName}</strong>
-                      <div className="flex gap-0.5">
-                        {Array.from({ length: rev.rating }).map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        ))}
+                  <div key={rev.id} style={{ background: '#F3EAE2', padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <strong style={{ fontSize: 14, color: '#241419' }}>{rev.customerName}</strong>
+                      <div style={{ display: 'flex', gap: 2 }}>
+                        {Array.from({ length: rev.rating }).map((_, i) => <Star key={i} style={{ width: 12, height: 12, fill: '#B08D57', color: '#B08D57' }} />)}
                       </div>
                     </div>
-                    <span className="text-[10px] text-[#8B7B78] font-medium block mb-2">{rev.productName}</span>
-                    <p className="text-[#5C3830] text-xs leading-relaxed font-medium italic">"{rev.comment}"</p>
+                    <p style={{ fontSize: 13, color: '#4a3d40', lineHeight: 1.7, margin: 0, fontStyle: 'italic' }}>"{rev.comment}"</p>
                   </div>
                 ))}
               </div>
-              <div className="mt-6 text-center">
-                <a href="https://wa.me/97337037697" target="_blank" rel="noreferrer"
-                  className="inline-block bg-[#9A2D55] text-white font-bold text-xs py-3 px-6 rounded-xl shadow-md hover:bg-[#802446] transition-all">
-                  شاركينا رأيك على واتساب 🎙️
-                </a>
-              </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* ── MODAL: Size Guide ────────────────────────────────── */}
+      {/* ── Size Guide Modal ──────────────────────────────────── */}
       <AnimatePresence>
         {showSizeGuide && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-3xl w-full max-w-xl p-6 border border-[#F2E4DC] shadow-2xl">
-              <div className="flex justify-between items-center mb-4 pb-3 border-b border-[#F2E4DC]">
-                <span className="font-black text-[#9A2D55]">{sizeGuides.find(g => g.id === showSizeGuide)?.name || 'دليل المقاسات'}</span>
-                <button onClick={() => setShowSizeGuide(null)} className="p-1.5 bg-[#FDF8F5] hover:bg-[#F8EDE8] rounded-lg text-[#8B7B78] border border-[#F2E4DC] cursor-pointer">
-                  <X className="w-4 h-4" />
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(36,20,25,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 20 }}
+            onClick={() => setShowSizeGuide(null)}>
+            <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+              style={{ background: '#FBF7F2', width: '100%', maxWidth: 520, padding: 28 }}
+              onClick={e => e.stopPropagation()}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid rgba(154,45,85,.14)' }}>
+                <span style={{ fontFamily: "'Amiri', serif", fontSize: 20, color: '#9A2D55' }}>{sizeGuides.find(g => g.id === showSizeGuide)?.name || 'دليل المقاسات'}</span>
+                <button onClick={() => setShowSizeGuide(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9a8a85' }}>
+                  <X style={{ width: 18, height: 18 }} />
                 </button>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs text-right border-collapse">
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', fontSize: 12, textAlign: 'right', borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr className="bg-[#F8EDE8] text-[#9A2D55]">
+                    <tr style={{ background: '#F3EAE2', color: '#9A2D55' }}>
                       {['المقاس', 'الصدر', 'الطول', 'الخصر', 'الكم'].map(h => (
-                        <th key={h} className="p-2.5 border border-[#F2E4DC] font-black">{h}</th>
+                        <th key={h} style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', fontWeight: 700 }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {sizeGuides.find(g => g.id === showSizeGuide)?.sizes.map((row, idx) => (
-                      <tr key={idx} className="odd:bg-[#FDF8F5] hover:bg-[#F8EDE8] transition-colors">
-                        <td className="p-2.5 border border-[#F2E4DC] font-black text-[#9A2D55]">{row.label}</td>
-                        <td className="p-2.5 border border-[#F2E4DC] font-medium text-[#5C3830]">{row.chest}</td>
-                        <td className="p-2.5 border border-[#F2E4DC] font-medium text-[#5C3830]">{row.length}</td>
-                        <td className="p-2.5 border border-[#F2E4DC] font-medium text-[#5C3830]">{row.waist}</td>
-                        <td className="p-2.5 border border-[#F2E4DC] font-medium text-[#5C3830]">{row.sleeve}</td>
+                      <tr key={idx} style={{ background: idx % 2 === 0 ? '#FBF7F2' : '#F3EAE2' }}>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', fontWeight: 700, color: '#9A2D55' }}>{row.label}</td>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', color: '#4a3d40' }}>{row.chest}</td>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', color: '#4a3d40' }}>{row.length}</td>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', color: '#4a3d40' }}>{row.waist}</td>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', color: '#4a3d40' }}>{row.sleeve}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              <p className="text-[10px] text-[#8B7B78] mt-4 leading-relaxed font-medium">
-                * القياسات بالبوصة (Inches). للتفصيل بمقاسات خاصة راسليننا على واتساب.
-              </p>
+              <p style={{ fontSize: 11, color: '#9a8a85', marginTop: 14, lineHeight: 1.6 }}>* القياسات بالبوصة (Inches). للتفصيل بمقاسات خاصة راسليننا على واتساب.</p>
             </motion.div>
           </div>
         )}
