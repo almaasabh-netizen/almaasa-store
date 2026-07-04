@@ -1,14 +1,32 @@
-import React, { useMemo } from 'react';
-import { ShoppingBag, Users, DollarSign, TrendingUp, Package, AlertTriangle, ArrowLeft } from 'lucide-react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import StatCard from '../components/StatCard';
-import RevenueChart from '../components/RevenueChart';
-import OrdersTable from '../components/OrdersTable';
 import { getStoredData } from '../../data';
 import { statusColors } from '../theme';
 
-const PIE_COLORS = ['#D79AA8','#C77D8A','#F3E6E8','#B86070','#E8B4BE'];
+const CARD_BORDER = '1px solid rgba(154,45,85,.12)';
+
+function StatCard({ title, value, suffix = '', bg, icon }: { title: string; value: string | number; suffix?: string; bg: string; icon: React.ReactNode }) {
+  return (
+    <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ width: 42, height: 42, borderRadius: 10, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        {icon}
+      </div>
+      <div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: '#241419', lineHeight: 1.2 }}>{value}{suffix}</div>
+        <div style={{ fontSize: 11, color: '#9a8a85', marginTop: 3 }}>{title}</div>
+      </div>
+    </div>
+  );
+}
+
+function MiniBar({ value, max, color }: { value: number; max: number; color: string }) {
+  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
+  return (
+    <div style={{ height: 6, background: '#F3EAE2', borderRadius: 3, overflow: 'hidden', marginTop: 4 }}>
+      <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 3, transition: 'width .4s' }} />
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -21,218 +39,181 @@ export default function Dashboard() {
   const uniqueCustomers = new Set(orders.map((o: any) => o.customer?.phone || o.customerPhone).filter(Boolean)).size;
   const avgOrder = orders.length > 0 ? totalRevenue / orders.length : 0;
 
+  const topProducts = [...products].filter(p => !p.isDraft).sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 5);
+  const lowStock = products.filter(p => p.stock > 0 && p.stock <= 5);
+  const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6);
+  const isEmpty = orders.length === 0 && products.length === 0;
+
   const statusDist = Object.entries(
     orders.reduce((acc: any, o: any) => { const s = o.shippingStatus || o.status || 'pending'; acc[s] = (acc[s] || 0) + 1; return acc; }, {})
   ).map(([status, count]) => ({
-    name: statusColors[status]?.label ?? status,
+    label: statusColors[status]?.label ?? status,
     value: count as number,
-    color: statusColors[status]?.text ?? '#D79AA8',
+    color: statusColors[status]?.text ?? '#9A2D55',
+    bg: statusColors[status]?.bg ?? '#F6DCE4',
   }));
 
-  const topProducts = [...products]
-    .filter(p => !p.isDraft)
-    .sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0))
-    .slice(0, 5);
+  const maxStatus = Math.max(...statusDist.map(s => s.value), 1);
 
-  const lowStock = products.filter(p => p.stock > 0 && p.stock <= 5);
-
-  const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
-
-  const isEmpty = orders.length === 0 && products.length === 0;
+  const statusBadgeStyle = (status: string) => {
+    const c = statusColors[status] || { bg: '#F6DCE4', text: '#9A2D55', label: status };
+    return { background: c.bg, color: c.text, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' as const };
+  };
 
   return (
-    <div className="space-y-6" dir="rtl">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }} dir="rtl">
 
-      {/* Welcome banner when store is empty */}
       {isEmpty && (
-        <div className="rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6"
-          style={{ background: 'linear-gradient(135deg, #FFF0F4, #F3E6E8)', border: '1px solid #F0DDE0' }}>
-          <div className="text-4xl shrink-0">✨</div>
-          <div className="flex-1 text-right">
-            <p className="font-black text-base mb-1" style={{ color: '#5A4047' }}>مرحباً بكِ في لوحة تحكم ألماسة!</p>
-            <p className="text-sm" style={{ color: '#9A7A82' }}>ابدئي بإضافة منتجاتك وتهيئة المتجر</p>
+        <div style={{
+          borderRadius: 12, padding: '24px 20px', display: 'flex', alignItems: 'center', gap: 16,
+          background: '#FFF0F4', border: CARD_BORDER,
+        }}>
+          <span style={{ fontSize: 36, flexShrink: 0 }}>✨</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#241419', margin: 0 }}>مرحباً بكِ في لوحة تحكم ألماسة!</p>
+            <p style={{ fontSize: 12, color: '#9a8a85', marginTop: 4 }}>ابدئي بإضافة منتجاتك وتهيئة المتجر</p>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => navigate('/admin/products/new')}
-              className="px-4 py-2 rounded-xl text-sm font-bold text-white"
-              style={{ background: '#D79AA8' }}>
-              أضف منتج
-            </button>
-            <button onClick={() => navigate('/admin/settings')}
-              className="px-4 py-2 rounded-xl text-sm font-bold"
-              style={{ background: '#FFFFFF', color: '#5A4047', border: '1px solid #F0DDE0' }}>
-              الإعدادات
-            </button>
+          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+            <button onClick={() => navigate('/admin/products/new')} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#9A2D55', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>أضف منتج</button>
+            <button onClick={() => navigate('/admin/settings')} style={{ padding: '8px 16px', borderRadius: 8, border: CARD_BORDER, background: '#FFFFFF', color: '#241419', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>الإعدادات</button>
           </div>
         </div>
       )}
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="إجمالي المبيعات"
-          value={totalRevenue.toFixed(0)}
-          suffix=" د.ب"
-          change={undefined}
-          iconBg="#F3E6E8"
-          icon={<DollarSign className="w-5 h-5" style={{ color: '#C77D8A' }} />}
-        />
-        <StatCard
-          title="إجمالي الطلبات"
-          value={orders.length}
-          change={undefined}
-          iconBg="#EBF5FF"
-          icon={<ShoppingBag className="w-5 h-5" style={{ color: '#3B82F6' }} />}
-        />
-        <StatCard
-          title="العملاء الجدد"
-          value={uniqueCustomers}
-          change={undefined}
-          iconBg="#F0FDF4"
-          icon={<Users className="w-5 h-5" style={{ color: '#22C55E' }} />}
-        />
-        <StatCard
-          title="متوسط قيمة الطلب"
-          value={avgOrder.toFixed(2)}
-          suffix=" د.ب"
-          change={undefined}
-          iconBg="#FFF7ED"
-          icon={<TrendingUp className="w-5 h-5" style={{ color: '#F59E0B' }} />}
-        />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+        <StatCard title="إجمالي المبيعات" value={totalRevenue.toFixed(0)} suffix=" د.ب" bg="#F6DCE4" icon={<span style={{ fontSize: 18 }}>💰</span>} />
+        <StatCard title="إجمالي الطلبات" value={orders.length} bg="#EBF5FF" icon={<span style={{ fontSize: 18 }}>🛍️</span>} />
+        <StatCard title="العملاء" value={uniqueCustomers} bg="#F0FDF4" icon={<span style={{ fontSize: 18 }}>👥</span>} />
+        <StatCard title="متوسط الطلب" value={avgOrder.toFixed(2)} suffix=" د.ب" bg="#FFF7ED" icon={<span style={{ fontSize: 18 }}>📈</span>} />
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Revenue chart */}
-        <div className="lg:col-span-2 rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>المبيعات</h3>
-            <div className="flex gap-1">
-              {['اليوم','الأسبوع','الشهر','السنة'].map((t,i) => (
-                <button key={t} className={`text-[11px] font-bold px-2.5 py-1 rounded-lg transition-colors ${i===2?'text-white':''}`}
-                  style={{ background: i===2?'#D79AA8':'transparent', color: i===2?'white':'#D79AA8' }}>
-                  {t}
-                </button>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 14 }} className="dashboard-charts">
+        {/* Status distribution */}
+        <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, padding: '18px 20px' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: '#241419', margin: '0 0 16px' }}>توزيع حالات الطلبات</h3>
+          {statusDist.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {statusDist.map((s, i) => (
+                <div key={i}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                    <span style={{ fontSize: 12, color: '#241419' }}>{s.label}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#241419' }}>{s.value}</span>
+                  </div>
+                  <MiniBar value={s.value} max={maxStatus} color={s.color} />
+                </div>
               ))}
             </div>
-          </div>
-          <RevenueChart type="area" />
+          ) : (
+            <div style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9a8a85', fontSize: 13 }}>لا توجد بيانات بعد</div>
+          )}
         </div>
 
-        {/* Pie chart */}
-        <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
-          <h3 className="font-black text-sm mb-4" style={{ color: '#5A4047' }}>توزيع المبيعات</h3>
-          {statusDist.length > 0 ? (
-            <>
-              <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
-                  <Pie data={statusDist} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value">
-                    {statusDist.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip formatter={(v: any) => [v, 'طلب']} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="space-y-2 mt-2">
-                {statusDist.slice(0,4).map((s, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                      <span className="text-xs" style={{ color: '#5A4047' }}>{s.name}</span>
-                    </div>
-                    <span className="text-xs font-bold" style={{ color: '#5A4047' }}>{s.value}</span>
-                  </div>
-                ))}
+        {/* Top products */}
+        <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, padding: '18px 20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, color: '#241419', margin: 0 }}>أفضل المنتجات</h3>
+            <button onClick={() => navigate('/admin/products')} style={{ fontSize: 11, color: '#9A2D55', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>عرض الكل</button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {topProducts.length > 0 ? topProducts.map((p, i) => (
+              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#B08D57', width: 18, flexShrink: 0, textAlign: 'center' }}>#{i + 1}</span>
+                {p.image && <img src={p.image} alt={p.name} referrerPolicy="no-referrer" style={{ width: 34, height: 34, borderRadius: 8, objectFit: 'cover', flexShrink: 0, border: CARD_BORDER }} />}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: '#241419', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</p>
+                  <p style={{ fontSize: 10, color: '#9a8a85', margin: 0 }}>{p.price} د.ب</p>
+                </div>
               </div>
-            </>
-          ) : (
-            <div className="h-48 flex items-center justify-center text-sm" style={{ color: '#D79AA8' }}>لا توجد بيانات بعد</div>
-          )}
+            )) : <p style={{ fontSize: 12, color: '#9a8a85', textAlign: 'center', padding: '16px 0' }}>أضف منتجات لتظهر هنا</p>}
+          </div>
         </div>
       </div>
 
       {/* Bottom row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Latest orders */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>آخر الطلبات</h3>
-            <button className="text-xs font-bold flex items-center gap-1 hover:underline" style={{ color: '#C77D8A' }} onClick={() => navigate('/admin/orders')}>
-              عرض الكل <ArrowLeft className="w-3 h-3" />
-            </button>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 14 }} className="dashboard-bottom">
+        {/* Recent orders */}
+        <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid rgba(154,45,85,.08)' }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, color: '#241419', margin: 0 }}>آخر الطلبات</h3>
+            <button onClick={() => navigate('/admin/orders')} style={{ fontSize: 11, color: '#9A2D55', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>عرض الكل ←</button>
           </div>
-          <OrdersTable orders={recentOrders} />
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right', fontFamily: "'Cairo', sans-serif" }}>
+              <thead>
+                <tr style={{ background: '#F3EAE2' }}>
+                  {['رقم الطلب', 'العميل', 'المبلغ', 'الحالة', 'التاريخ'].map(h => (
+                    <th key={h} style={{ padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6b5a5f' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {recentOrders.length === 0 ? (
+                  <tr><td colSpan={5} style={{ padding: '32px 16px', textAlign: 'center', fontSize: 12, color: '#9a8a85' }}>لا توجد طلبات بعد</td></tr>
+                ) : recentOrders.map((o: any, i) => {
+                  const status = o.shippingStatus || o.status || 'new';
+                  const customer = o.customer?.name || o.customerName || '—';
+                  return (
+                    <tr key={o.id} style={{ borderTop: i > 0 ? '1px solid rgba(154,45,85,.07)' : 'none', cursor: 'pointer' }} onClick={() => navigate(`/admin/orders/${o.id}`)}>
+                      <td style={{ padding: '10px 16px', fontSize: 12, fontWeight: 600, color: '#9A2D55' }}>#{o.id?.slice(-6)}</td>
+                      <td style={{ padding: '10px 16px', fontSize: 12, color: '#241419' }}>{customer}</td>
+                      <td style={{ padding: '10px 16px', fontSize: 12, fontWeight: 600, color: '#241419' }}>{o.total?.toFixed(2)} د.ب</td>
+                      <td style={{ padding: '10px 16px' }}>
+                        <span style={statusBadgeStyle(status)}>{statusColors[status]?.label ?? status}</span>
+                      </td>
+                      <td style={{ padding: '10px 16px', fontSize: 11, color: '#9a8a85' }}>{o.date?.substring(0, 10)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Right column */}
-        <div className="space-y-4">
-          {/* Top products */}
-          <div className="rounded-2xl p-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>أفضل المنتجات</h3>
-              <button className="text-xs" style={{ color: '#C77D8A' }} onClick={() => navigate('/admin/products')}>عرض الكل</button>
-            </div>
-            <div className="space-y-2.5">
-              {topProducts.length > 0 ? topProducts.map((p, i) => (
-                <div key={p.id} className="flex items-center gap-3">
-                  <span className="text-xs font-black w-5 shrink-0 text-center" style={{ color: '#D79AA8' }}>#{i+1}</span>
-                  <img src={p.image} alt={p.name} referrerPolicy="no-referrer"
-                    className="w-9 h-9 rounded-xl object-cover shrink-0" style={{ border: '1px solid #F0DDE0' }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold truncate" style={{ color: '#5A4047' }}>{p.name}</p>
-                    <p className="text-[10px]" style={{ color: '#D79AA8' }}>{p.reviewCount || 0} تقييم</p>
-                  </div>
-                  <span className="text-xs font-black shrink-0" style={{ color: '#C77D8A' }}>{p.price} د.ب</span>
-                </div>
-              )) : (
-                <p className="text-xs text-center py-4" style={{ color: '#D79AA8' }}>أضف منتجات لتظهر هنا</p>
-              )}
-            </div>
-          </div>
-
-          {/* Low stock alerts */}
-          <div className="rounded-2xl p-4" style={{ background: lowStock.length > 0 ? '#FFF7ED' : '#FFFFFF', border: `1px solid ${lowStock.length > 0 ? '#FED7AA' : '#F0DDE0'}` }}>
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="w-4 h-4" style={{ color: lowStock.length > 0 ? '#F59E0B' : '#D79AA8' }} />
-              <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>تنبيهات المخزون</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Low stock */}
+          <div style={{ background: lowStock.length > 0 ? '#FFF7ED' : '#FFFFFF', border: `1px solid ${lowStock.length > 0 ? '#FED7AA' : 'rgba(154,45,85,.12)'}`, borderRadius: 12, padding: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <span style={{ fontSize: 16 }}>{lowStock.length > 0 ? '⚠️' : '📦'}</span>
+              <h3 style={{ fontSize: 12, fontWeight: 700, color: '#241419', margin: 0 }}>تنبيهات المخزون</h3>
             </div>
             {lowStock.length > 0 ? (
-              <div className="space-y-2">
-                {lowStock.slice(0,4).map(p => (
-                  <div key={p.id} className="flex items-center justify-between">
-                    <p className="text-xs font-medium truncate flex-1" style={{ color: '#5A4047' }}>{p.name}</p>
-                    <span className="text-xs font-black px-2 py-0.5 rounded-full mr-2" style={{ background: '#FEF2F2', color: '#EF4444' }}>
-                      {p.stock} متبقي
-                    </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {lowStock.slice(0, 4).map(p => (
+                  <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <p style={{ fontSize: 11, color: '#241419', margin: 0, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</p>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10, background: '#FEF2F2', color: '#EF4444', flexShrink: 0, marginRight: 6 }}>{p.stock} متبقي</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs" style={{ color: '#D79AA8' }}>لا توجد منتجات على وشك النفاد ✓</p>
+              <p style={{ fontSize: 11, color: '#9a8a85', margin: 0 }}>لا توجد منتجات على وشك النفاد ✓</p>
             )}
           </div>
 
-          {/* Reviews summary */}
-          <div className="rounded-2xl p-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>التقييمات الأخيرة</h3>
-              <span className="text-xs font-bold" style={{ color: '#D79AA8' }}>{reviews.length} تقييم</span>
+          {/* Reviews */}
+          <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, padding: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <h3 style={{ fontSize: 12, fontWeight: 700, color: '#241419', margin: 0 }}>التقييمات الأخيرة</h3>
+              <span style={{ fontSize: 11, color: '#9a8a85' }}>{reviews.length} تقييم</span>
             </div>
-            {reviews.slice(0,3).map(r => (
-              <div key={r.id} className="flex items-start gap-2 mb-2.5 last:mb-0">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0"
-                  style={{ background: 'linear-gradient(135deg,#D79AA8,#C77D8A)' }}>
+            {reviews.slice(0, 3).map((r: any) => (
+              <div key={r.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#F6DCE4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', fontWeight: 700, fontSize: 11, flexShrink: 0 }}>
                   {r.customerName?.charAt(0)}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] font-bold" style={{ color: '#5A4047' }}>{r.customerName}</span>
-                    <span className="text-[10px]" style={{ color: '#F5A623' }}>{'★'.repeat(r.rating)}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#241419' }}>{r.customerName}</span>
+                    <span style={{ fontSize: 10, color: '#F5A623' }}>{'★'.repeat(r.rating || 0)}</span>
                   </div>
-                  <p className="text-[10px] truncate" style={{ color: '#D79AA8' }}>{r.comment}</p>
+                  <p style={{ fontSize: 10, color: '#9a8a85', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.comment}</p>
                 </div>
               </div>
             ))}
-            {reviews.length === 0 && <p className="text-xs text-center py-2" style={{ color: '#D79AA8' }}>لا توجد تقييمات بعد</p>}
+            {reviews.length === 0 && <p style={{ fontSize: 11, color: '#9a8a85', textAlign: 'center', padding: '8px 0' }}>لا توجد تقييمات بعد</p>}
           </div>
         </div>
       </div>

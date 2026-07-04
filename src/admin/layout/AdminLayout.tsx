@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { X } from 'lucide-react';
 
 const titles: Record<string, string> = {
   '/admin': 'لوحة التحكم',
@@ -39,10 +38,10 @@ export default function AdminLayout() {
   }, [darkMode]);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#FFF8F8', direction: 'rtl' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: '#FBF7F8', direction: 'rtl' }}>
       {/* Desktop sidebar */}
       <div className="hidden lg:flex">
-        <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
+        <Sidebar />
       </div>
 
       {/* Mobile sidebar overlay */}
@@ -50,13 +49,12 @@ export default function AdminLayout() {
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
           <div className="relative z-10">
-            <Sidebar collapsed={false} onToggle={() => setMobileOpen(false)} />
+            <Sidebar />
             <button
               onClick={() => setMobileOpen(false)}
               className="absolute top-4 left-4 p-1 rounded-lg bg-white shadow-md"
-            >
-              <X className="w-4 h-4" style={{ color: '#5A4047' }} />
-            </button>
+              style={{ color: '#5A4047' }}
+            >✕</button>
           </div>
         </div>
       )}

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Save } from 'lucide-react';
 
 const KEY = 'almaasa_settings';
 const load = () => {
@@ -171,9 +170,8 @@ export default function SettingsPage() {
       <div className="flex justify-end">
         <button onClick={save}
           className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-colors"
-          style={{ background: saved ? '#22C55E' : '#D79AA8', color: 'white' }}>
-          <Save className="w-4 h-4" />
-          {saved ? 'تم الحفظ ✓' : 'حفظ الإعدادات'}
+          style={{ background: saved ? '#22C55E' : '#9A2D55', color: 'white', fontFamily: "'Cairo', sans-serif" }}>
+          {saved ? 'تم الحفظ ✓' : '💾 حفظ الإعدادات'}
         </button>
       </div>
     </div>
