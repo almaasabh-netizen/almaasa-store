@@ -1,0 +1,62 @@
+{
+  "skill_name": "brand",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We just hired you to do design work for our SaaS. Here's our live site: https://example.com. Before we start, can you get our brand set up so I don't have to re-explain everything every time?",
+      "expected_output": "Should do the asset legwork ITSELF from the URL rather than handing the user a homework list — crawl multiple key pages (not just the homepage), extract real computed values (colors, font-families, spacing, CTA treatment), grab favicon/OG/SVG logo, follow the footer to social profiles, and probe common brand/press paths (/brand, /press, /media-kit). Should ask the user only for what it genuinely can't reach (gated Figma, internal decks, print, the 'why'). Should diagnose the depth ITSELF, not ask the user to classify Revolution/Evolution/Optimization or lead with that jargon. Should check whether .agents/brand.md exists, 'get' the doc by deriving it from the real assets with concrete specifics not adjectives, include Fixed core vs. flexible range, and ask what's wrong/missing before finalizing.",
+      "assertions": [
+        "Does the gathering itself from the URL (crawls multiple pages, not just homepage)",
+        "Follows the footer to socials and probes brand/press paths autonomously",
+        "Sources the CURRENT logo from the live nav/header, treating favicon/OG/press-kit as possibly stale",
+        "Extracts real computed values and the logo in multiple forms",
+        "Asks the user only for what it cannot reach itself",
+        "Diagnoses depth itself without asking the user to pick or leading with REO jargon",
+        "Derives the doc from the real assets ('get', not invent)",
+        "Includes the Fixed core vs. flexible range section",
+        "Asks what is wrong / missing before finalizing"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Our brand isn't defined yet — we're a brand-new company with just a name and a rough idea. Can you set up our brand doc?",
+      "expected_output": "Should recognize the brand is undefined, so .agents/brand.md is an OUTPUT of strategy/direction work, not an input. Should point the user to brand-strategy (to define the feeling, muses, and latitude) and creative-direction (to establish the visual system) before a meaningful brand doc can exist. May offer to stub the document now and fill it as those skills produce answers. Should not fabricate a visual system out of nothing.",
+      "assertions": [
+        "Recognizes the brand is undefined",
+        "Points to brand-strategy and creative-direction as prerequisites",
+        "Does not fabricate colors/type/visual system from nothing",
+        "Offers to stub the document and fill it later"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Update our brand doc — we just switched our accent color from purple to a warm coral and added a new heading typeface, Reckless.",
+      "expected_output": "Should read the existing .agents/brand.md, summarize what's captured, and update only the relevant sections (Color: accent/action role and its ramp; Typography: heading face and its weight/style rules). Should preserve everything else. Should note the action-color protection implication of the new accent. Should confirm changes before saving.",
+      "assertions": [
+        "Reads existing .agents/brand.md first",
+        "Updates only the color and typography sections",
+        "Preserves unrelated sections",
+        "Addresses action-color protection for the new accent",
+        "Confirms before saving"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Our brand is honestly solid — good logo, good colors, people recognize us. The problem is our website and sales deck make it all look cheap. Where do we start?",
+      "expected_output": "Should diagnose this as Optimization (sound identity, poor execution) ITSELF — from the description and assets — without asking the user to choose a depth or leading with the Revolution/Evolution/Optimization jargon. Should reflect the conclusion back in plain language ('your brand's fine, the execution isn't, so we'll fix the execution'). Should NOT route to brand-strategy. Should capture the existing brand accurately into .agents/brand.md as the constraint, audit where the good identity is applied poorly, then route to the medium skills (web-design, collateral-design). Should avoid redefining muses/concepts and warn against over-scoping into a rebrand.",
+      "assertions": [
+        "Diagnoses Optimization itself, without making the user pick a depth",
+        "Does not lead with the REO jargon; reflects the conclusion in plain language",
+        "Does NOT route to brand-strategy",
+        "Captures the existing brand as the constraint",
+        "Audits execution against the sound identity",
+        "Routes to medium skills (web-design / collateral-design) to fix execution",
+        "Warns against over-scoping into a rebrand"
+      ],
+      "files": []
+    }
+  ]
+}
