@@ -214,7 +214,7 @@ The best save happens before the customer ever clicks "Cancel."
 Track these leading indicators of churn:
 
 | Signal | Risk Level | Timeframe |
-|--------|-----------|-----------|
+|--------|-----------|----------|
 | Login frequency drops 50%+ | High | 2-4 weeks before cancel |
 | Key feature usage stops | High | 1-3 weeks before cancel |
 | Support tickets spike then stop | High | 1-2 weeks before cancel |
@@ -405,7 +405,7 @@ For implementation, see the [tools registry](../../tools/REGISTRY.md).
 ### Related CLI Tools
 
 | Tool | Use For |
-|------|---------|
+|------|--------|
 | `stripe` | Subscription management, dunning config, payment retries |
 | `customer-io` | Dunning email sequences, retention campaigns |
 | `posthog` | Cancel flow A/B tests via feature flags, funnel analytics |
