@@ -29,8 +29,4 @@ Start here; add category-specific ones as needed.
 
 ## Turning placements into a feeling
 
-The pattern across the dots *is* the emotional target in latent form. "Masculine, industrial, sturdy, cool, serious, heavy, machined" is not a random list — it's *authority through engineered force* (a feeling you can now name and design toward). "Feminine, natural, refined, warm, quiet, light, handmade" is *calm, cared-for intimacy.* Read the cluster, name the emotion it implies, then reflect it back for confirmation the normal way. The spectrums are the on-ramp to the feeling, not a substitute for naming it.
-
-## Where it goes
-
-Record the placements in `.agents/brand-strategy.md` alongside the muses — they justify later color/type/texture calls ("we went matte and machined because you placed hard on industrial + sturdy"). They also feed the **fixed core / flexible range**: a brand can flex along a spectrum within a range and stay on-brand.
+The pattern across the sliders *is* the feeling — name it. A brand that lands warm + handmade + vintage + luxury reads as *heirloom craft*; one that lands cool + machined + futuristic + restrained reads as *precision engineering*. Use those descriptions to anchor the Emotional Target.
