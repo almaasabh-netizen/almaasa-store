@@ -82,7 +82,7 @@ The most underused signal, and often the most honest for long cycles and dark so
 
 - **When it beats tracking:** long consideration cycles, high word-of-mouth, brand/community-led, or heavy dark-social (see §5). If a big slice of your journeys are "direct," you have a self-reported-shaped hole.
 - **Ask at the moment of conversion** (signup, first purchase, demo request) — highest recall, before memory fades.
-- **Wording:** open-ended ("How did you first hear about us?") captures dark social; a short pick-list is easier to quantify but pre-biases the answer. Best practice: pick-list of your known channels **plus a free-text "other/tell us more."**
+- **Wording:** open-ended ("How did you first hear about us?") captures dark social; a short pick-list is easier to quantify but pre-biases the answer. Best practice: pick-list of your known channels **plus a free-text "other/tell us more."
 - **Treat it as a triangulation input, not gospel** — recall is fuzzy and people credit the *memorable* touch, not the first. It's the out-of-model check that keeps your tracked models honest.
 - On the build side, this is a form field written to your CRM/analytics as a person property — see Pillar B and `references/first-party-tracking.md`.
 
