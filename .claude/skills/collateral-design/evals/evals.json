@@ -1,0 +1,16 @@
+{
+  "skill_name": "collateral-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Can you design us a pitch deck? Here's the outline — about 15 slides. We'll be presenting it live to investors but also emailing it around afterward.",
+      "expected_output": "Should first read the system from .agents/design.md / brand.md / product-marketing.md and get the copy/story before designing. Should surface the presented-vs-read decision as the key fork.",
+      "assertions": [
+        "Reads the settled system first",
+        "Raises presented-vs-read as the decisive fork",
+        "One idea per slide, bullet soup killed"
+      ],
+      "files": []
+    }
+  ]
+}
