@@ -1,0 +1,45 @@
+{
+  "skill_name": "logo-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Is our logo any good? It's a serif 'M' inside a rounded square, plus the wordmark.",
+      "expected_output": "Should refuse to judge the mark in a vacuum: first gather it in every form and pull the direct competitors' logos, and read the Emotional Target from .agents/brand.md. Should evaluate against SAD with each dimension in its context.",
+      "assertions": [
+        "Takes the current mark from the live nav",
+        "Gathers the mark in all implementations and the competitor set before judging",
+        "Reads the Emotional Target as the basis for Appropriate",
+        "Judges Simple across the implementation grid",
+        "Judges Distinct against direct competitors, not in isolation",
+        "Reports per-dimension verdicts with evidence"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Design a logo for our new B2B security product. We want it to feel like a vault — calm, certain, impenetrable.",
+      "expected_output": "Should work from .agents/brand.md, sketch across the three families, resolve in black and white before color, and build the full system. Should check distinctiveness against security-category conventions (shields, locks, keyholes are clichés).",
+      "assertions": [
+        "Works from the Emotional Target",
+        "Sketches across typographic / pictorial / abstract families",
+        "Resolves in black and white before color",
+        "Builds the full system",
+        "Screens directions for appropriateness to the 'vault' feeling",
+        "Checks distinctiveness against category clichés"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Our logo looks great on the website hero. Can we just call it done?",
+      "expected_output": "Should push back that the hero lockup is not enough. Simplicity is verified across every implementation — favicon, social avatar, app icon, single-color, reversed, tiny/print — and the mark must be the same construction in all of them.",
+      "assertions": [
+        "Rejects judging the logo from the hero lockup alone",
+        "Explains simplicity is verified across the full implementation grid",
+        "Notes the mark must be one consistent construction everywhere",
+        "Brings up Appropriate and Distinct as still open"
+      ],
+      "files": []
+    }
+  ]
+}
