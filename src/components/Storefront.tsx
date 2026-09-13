@@ -419,10 +419,26 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </div>
 
           {/* Hero image */}
-          <div style={{ width: '100%', maxWidth: 1240, height: 460, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: PH, color: '#9A2D55', font: '500 12px/1.4 ui-monospace,Menlo,monospace', boxSizing: 'border-box' }}>
+          <div style={{ width: '100%', maxWidth: 1240, height: 460, margin: '0 auto', overflow: 'hidden', boxSizing: 'border-box', position: 'relative' }}>
             {products[0]?.image ? (
               <img src={products[0].image} alt="hero" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : 'صورة رئيسية — عارضة بمخور فاخر'}
+            ) : (
+              <div style={{
+                width: '100%', height: '100%',
+                background: 'linear-gradient(135deg, #F6DCE4 0%, #ECD9DD 40%, #F3EAE2 70%, #FAF0E6 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden',
+              }}>
+                {/* Decorative circles */}
+                <div style={{ position: 'absolute', top: -80, right: -80, width: 340, height: 340, borderRadius: '50%', background: 'rgba(154,45,85,0.08)' }} />
+                <div style={{ position: 'absolute', bottom: -60, left: -60, width: 260, height: 260, borderRadius: '50%', background: 'rgba(176,141,87,0.1)' }} />
+                <div style={{ position: 'absolute', top: 60, left: 120, width: 120, height: 120, borderRadius: '50%', background: 'rgba(154,45,85,0.05)' }} />
+                {/* Center motif */}
+                <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                  <div style={{ fontFamily: "'Amiri', serif", fontSize: 72, color: 'rgba(154,45,85,0.15)', lineHeight: 1, userSelect: 'none' }}>◆</div>
+                  <div style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#9A2D55', opacity: 0.6, marginTop: -10 }}>ألماسة</div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Categories */}

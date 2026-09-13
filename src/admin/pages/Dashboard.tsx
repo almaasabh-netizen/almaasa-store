@@ -82,10 +82,26 @@ export default function Dashboard() {
 
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
-        <StatCard title="إجمالي المبيعات" value={totalRevenue.toFixed(0)} suffix=" د.ب" bg="#F6DCE4" icon={<span style={{ fontSize: 18 }}>💰</span>} />
-        <StatCard title="إجمالي الطلبات" value={orders.length} bg="#EBF5FF" icon={<span style={{ fontSize: 18 }}>🛍️</span>} />
-        <StatCard title="العملاء" value={uniqueCustomers} bg="#F0FDF4" icon={<span style={{ fontSize: 18 }}>👥</span>} />
-        <StatCard title="متوسط الطلب" value={avgOrder.toFixed(2)} suffix=" د.ب" bg="#FFF7ED" icon={<span style={{ fontSize: 18 }}>📈</span>} />
+        <StatCard title="إجمالي المبيعات" value={totalRevenue.toFixed(0)} suffix=" د.ب" bg="#F6DCE4" icon={
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A2D55" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+        } />
+        <StatCard title="إجمالي الطلبات" value={orders.length} bg="#EBF5FF" icon={
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+          </svg>
+        } />
+        <StatCard title="العملاء" value={uniqueCustomers} bg="#F0FDF4" icon={
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        } />
+        <StatCard title="متوسط الطلب" value={avgOrder.toFixed(2)} suffix=" د.ب" bg="#FFF7ED" icon={
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+          </svg>
+        } />
       </div>
 
       {/* Charts row */}

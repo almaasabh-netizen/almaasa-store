@@ -23,7 +23,6 @@ const titles: Record<string, string> = {
 
 export default function AdminLayout() {
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -67,7 +66,7 @@ export default function AdminLayout() {
           onMenuOpen={() => setMobileOpen(true)}
           title={title}
         />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6" style={{ background: '#FFF8F8' }}>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6" style={{ background: '#FBF7F8' }}>
           <Outlet />
         </main>
       </div>
