@@ -110,7 +110,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     const savedZones = localStorage.getItem('ama_shipping_zones');
     if (savedZones) {
       try { setShippingZones(JSON.parse(savedZones)); }
-      catch (e) { console.error(e); }
+      catch { /* invalid JSON in localStorage */ }
     } else {
       const defaultZones = [
         {

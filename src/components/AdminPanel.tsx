@@ -186,18 +186,14 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
     if (savedGateways) {
       try {
         setPaymentGateways(JSON.parse(savedGateways));
-      } catch (e) {
-        console.error("Error loading payment gateways", e);
-      }
+      } catch { /* invalid JSON */ }
     }
 
     const savedZones = localStorage.getItem('ama_shipping_zones');
     if (savedZones) {
       try {
         setShippingZones(JSON.parse(savedZones));
-      } catch (e) {
-        console.error("Error loading shipping zones", e);
-      }
+      } catch { /* invalid JSON */ }
     }
   };
 
@@ -525,8 +521,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       } else {
         setAiError(data.error || 'حدث خطأ غير متوقع أثناء توليد الوصف.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setAiError('فشل الاتصال بالخادم الذكي لتوليد الوصف.');
     } finally {
       setIsGeneratingDesc(false);
