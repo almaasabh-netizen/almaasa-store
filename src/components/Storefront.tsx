@@ -396,320 +396,149 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
       {/* ── HOME PAGE ──────────────────────────────────────────── */}
       {activeTab === 'home' && (
-        <main style={{ background: '#FAF7F4' }}>
+        <main style={{ background: '#FFFFFF' }}>
 
           {/* ── ANNOUNCEMENT BAR ── */}
-          <div style={{ background: '#1A0D11', color: 'rgba(255,255,255,0.9)', textAlign: 'center', padding: '10px 20px', fontSize: 12.5, letterSpacing: '0.12em', fontWeight: 500 }}>
-            شحن مجاني لجميع الطلبات فوق ٣٠ دينار &nbsp;·&nbsp; مجموعة الخريف ٢٠٢٦ متاحة الآن
+          <div style={{ background: '#F5F0EB', color: '#3D2030', textAlign: 'center', padding: '11px 20px', fontSize: 12, letterSpacing: '0.1em', fontWeight: 500, borderBottom: '1px solid rgba(61,32,48,0.08)' }}>
+            شحن مجاني للطلبات فوق ٣٠ دينار &nbsp;·&nbsp; مجموعة الخريف ٢٠٢٦
           </div>
 
-          {/* ── HERO ── */}
-          <section style={{ width: '100%', minHeight: 'calc(100vh - 56px)', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'stretch' }}>
-            {/* BG */}
-            <div style={{ position: 'absolute', inset: 0, background: products[0]?.image ? `url(${products[0].image}) center/cover no-repeat` : 'linear-gradient(145deg,#1A0D11 0%,#3D1828 45%,#6B2540 100%)', zIndex: 0 }} />
-            {/* Gradient overlay */}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(26,13,17,0.05) 0%, rgba(26,13,17,0.55) 50%, rgba(26,13,17,0.82) 100%)', zIndex: 1 }} />
-
-            {/* Decorative vertical text */}
-            <div style={{ position: 'absolute', left: 28, top: '50%', transform: 'translateY(-50%) rotate(180deg)', writingMode: 'vertical-rl', fontSize: 10, letterSpacing: '0.28em', color: 'rgba(255,255,255,0.3)', zIndex: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 12 }}>
-              ALMAASA COLLECTION 2026
-              <div style={{ width: 1, height: 48, background: 'rgba(255,255,255,0.2)' }} />
+          {/* ── HERO — split layout ── */}
+          <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '88vh' }}>
+            {/* Right: image */}
+            <div style={{ order: 1, background: products[0]?.image ? `url(${products[0].image}) center/cover` : '#F0EAE4', position: 'relative', overflow: 'hidden' }}>
+              {!products[0]?.image && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg,#F5EEE8,#EBE0D8)' }}>
+                  <span style={{ fontFamily: "'Amiri', serif", fontSize: 56, color: 'rgba(154,45,85,0.12)', userSelect: 'none' }}>ألماسة</span>
+                </div>
+              )}
             </div>
-
-            {/* Content */}
-            <div style={{ position: 'relative', zIndex: 3, maxWidth: 1240, width: '100%', margin: '0 auto', padding: '0 60px', display: 'flex', alignItems: 'center', minHeight: 'calc(100vh - 96px)' }}>
-              <div style={{ maxWidth: 560 }}>
-                {/* Season tag */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 36 }}>
-                  <div style={{ width: 36, height: 1, background: '#C4956A' }} />
-                  <span style={{ fontSize: 11, letterSpacing: '0.3em', color: '#C4956A', fontWeight: 700 }}>AUTUMN / WINTER 2026</span>
-                </div>
-
-                <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(2.8rem,5.5vw,72px)', lineHeight: 1.12, color: '#FFFAF6', margin: '0 0 28px', fontWeight: 400 }}>
-                  فخامة تُروى<br />
-                  <em style={{ fontStyle: 'italic', color: '#C4956A' }}>بتفاصيل هادئة</em>
-                </h1>
-
-                <p style={{ fontSize: 15, color: 'rgba(255,250,246,0.72)', maxWidth: 400, lineHeight: 2, margin: '0 0 44px', fontWeight: 400 }}>
-                  مخاوير وأزياء نسائية مصممة بعناية فائقة، تجمع بين الرقي الشرقي الأصيل والأناقة العصرية
-                </p>
-
-                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                  <button onClick={() => setActiveTab('shop')} style={{
-                    padding: '16px 44px', background: '#9A2D55', color: '#FFFAF6',
-                    border: 'none', fontSize: 13, fontWeight: 700, letterSpacing: '0.08em',
-                    cursor: 'pointer', fontFamily: "'Cairo', sans-serif", transition: 'background .2s',
-                  }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7B2244'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#9A2D55'; }}
-                  >
-                    تسوّقي المجموعة
-                  </button>
-                  <button onClick={() => setActiveTab('about')} style={{
-                    padding: '16px 36px', background: 'transparent', color: 'rgba(255,250,246,0.85)',
-                    border: '1px solid rgba(255,250,246,0.35)', fontSize: 13, fontWeight: 600, letterSpacing: '0.06em',
-                    cursor: 'pointer', fontFamily: "'Cairo', sans-serif", transition: 'border-color .2s, color .2s',
-                  }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#C4956A'; (e.currentTarget as HTMLElement).style.color = '#C4956A'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,250,246,0.35)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,250,246,0.85)'; }}
-                  >
-                    اكتشفي القصة
-                  </button>
-                </div>
+            {/* Left: text */}
+            <div style={{ order: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '80px 72px', background: '#FFFFFF' }}>
+              <p style={{ fontSize: 11, letterSpacing: '0.22em', color: '#9A8080', fontWeight: 600, margin: '0 0 32px', textTransform: 'uppercase' }}>مجموعة الخريف — ٢٠٢٦</p>
+              <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(2.4rem,4vw,60px)', lineHeight: 1.18, color: '#1A0A0F', margin: '0 0 24px', fontWeight: 400 }}>
+                فخامة تُروى<br />بتفاصيل هادئة
+              </h1>
+              <p style={{ fontSize: 15, color: '#7A6065', lineHeight: 1.95, margin: '0 0 48px', maxWidth: 380 }}>
+                مخاوير وأزياء نسائية مصممة بعناية، لإطلالة تجمع بين الرقي الشرقي الأصيل والأناقة العصرية.
+              </p>
+              <div style={{ display: 'flex', gap: 14 }}>
+                <button onClick={() => setActiveTab('shop')} style={{
+                  padding: '14px 40px', background: '#1A0A0F', color: '#FFFFFF',
+                  border: 'none', fontSize: 13, fontWeight: 600, letterSpacing: '0.06em',
+                  cursor: 'pointer', fontFamily: "'Cairo', sans-serif",
+                  transition: 'background .18s',
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#9A2D55'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1A0A0F'; }}
+                >تسوّقي الآن</button>
+                <button onClick={() => setActiveTab('about')} style={{
+                  padding: '14px 32px', background: 'transparent', color: '#1A0A0F',
+                  border: '1px solid rgba(26,10,15,0.2)', fontSize: 13, fontWeight: 600,
+                  cursor: 'pointer', fontFamily: "'Cairo', sans-serif",
+                  transition: 'border-color .18s',
+                }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#9A2D55'; (e.currentTarget as HTMLElement).style.color = '#9A2D55'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(26,10,15,0.2)'; (e.currentTarget as HTMLElement).style.color = '#1A0A0F'; }}
+                >اعرفي أكثر</button>
               </div>
-            </div>
-
-            {/* Bottom scroll hint */}
-            <div style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, zIndex: 3 }}>
-              <div style={{ fontSize: 9, letterSpacing: '0.22em', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>SCROLL</div>
-              <div style={{ width: 1, height: 40, background: 'linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)' }} />
             </div>
           </section>
 
           {/* ── TRUST BAR ── */}
-          <section style={{ background: '#FFFFFF', borderTop: '1px solid rgba(26,13,17,0.07)', borderBottom: '1px solid rgba(26,13,17,0.07)' }}>
-            <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 60px', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)' }}>
-              {[
-                { icon: '🚚', title: 'شحن مجاني', sub: 'للطلبات فوق ٣٠ د.ب' },
-                { icon: '↩', title: 'إرجاع سهل', sub: 'خلال ١٤ يوماً' },
-                { icon: '🔒', title: 'دفع آمن', sub: 'تشفير SSL' },
-              ].map((item, i) => (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'center', gap: 14,
-                  padding: '22px 0',
-                  borderLeft: i < 2 ? '1px solid rgba(26,13,17,0.07)' : 'none',
-                  justifyContent: 'center',
-                }}>
-                  <span style={{ fontSize: 22 }}>{item.icon}</span>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1A0D11' }}>{item.title}</div>
-                    <div style={{ fontSize: 11.5, color: '#9A8080', marginTop: 2 }}>{item.sub}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* ── NEW ARRIVALS ── */}
-          <section style={{ padding: '96px 0 80px' }}>
-            <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 60px' }}>
-              {/* Section header */}
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 48 }}>
+          <div style={{ borderTop: '1px solid #EBEBEB', borderBottom: '1px solid #EBEBEB', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)' }}>
+            {[
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, title: 'شحن مجاني', sub: 'فوق ٣٠ د.ب' },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.28-5.37L23 10"/></svg>, title: 'إرجاع مجاني', sub: 'خلال ١٤ يوماً' },
+              { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>, title: 'دفع آمن', sub: '100% مشفّر' },
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, padding: '20px 16px', borderLeft: i > 0 ? '1px solid #EBEBEB' : 'none', color: '#3D2030' }}>
+                <span style={{ color: '#9A6070', flexShrink: 0 }}>{item.icon}</span>
                 <div>
-                  <div style={{ fontSize: 10, letterSpacing: '0.28em', color: '#C4956A', fontWeight: 700, marginBottom: 10 }}>NEW ARRIVALS</div>
-                  <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 38, color: '#1A0D11', margin: 0, lineHeight: 1.2, fontWeight: 400 }}>وصل حديثاً</h2>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1A0A0F' }}>{item.title}</div>
+                  <div style={{ fontSize: 11.5, color: '#9A8080' }}>{item.sub}</div>
                 </div>
-                <button onClick={() => setActiveTab('shop')} style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#9A2D55', fontSize: 13, fontWeight: 600, fontFamily: "'Cairo', sans-serif",
-                  display: 'flex', alignItems: 'center', gap: 6, padding: '0 0 2px',
-                  borderBottom: '1px solid currentColor',
-                }}>
-                  عرض المجموعة كاملة
+              </div>
+            ))}
+          </div>
+
+          {/* ── PRODUCTS ── */}
+          <section style={{ padding: '80px 0' }}>
+            <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 40px' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 40 }}>
+                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 30, color: '#1A0A0F', margin: 0, fontWeight: 400 }}>وصل حديثاً</h2>
+                <button onClick={() => setActiveTab('shop')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#9A8080', fontFamily: "'Cairo', sans-serif", letterSpacing: '0.06em', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                  عرض الكل
                 </button>
               </div>
-
-              {/* Products grid */}
-              {products.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 2 }}>
-                  {products.slice(0, 4).map((p, idx) => (
-                    <button key={p.id} onClick={() => handleProductClick(p)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'right', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}
-                      className="luxury-card"
-                    >
-                      {/* Image */}
-                      <div style={{ aspectRatio: '3/4', width: '100%', background: p.image ? `url(${p.image}) center/cover no-repeat` : PH, position: 'relative', overflow: 'hidden' }}
-                        className="product-img">
-                        {/* Hover overlay */}
-                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,13,17,0)', transition: 'background .3s' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,13,17,0.12)'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(26,13,17,0)'; }}
-                        />
-                        {idx === 0 && (
-                          <div style={{ position: 'absolute', top: 16, right: 16, background: '#9A2D55', color: '#fff', fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', padding: '5px 12px' }}>NEW</div>
-                        )}
-                        {!p.image && (
-                          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <span style={{ fontFamily: "'Amiri', serif", fontSize: 32, color: 'rgba(154,45,85,0.2)' }}>◆</span>
-                          </div>
-                        )}
-                      </div>
-                      {/* Info */}
-                      <div style={{ padding: '18px 4px 24px', background: '#FAF7F4' }}>
-                        <div style={{ fontFamily: "'Amiri', serif", fontSize: 17, color: '#1A0D11', marginBottom: 6, lineHeight: 1.4 }}>{p.name}</div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, color: '#9A2D55', fontVariantNumeric: 'tabular-nums' }}>{p.price.toFixed(2)} د.ب</div>
-                          {p.colors && p.colors.length > 0 && (
-                            <div style={{ display: 'flex', gap: 4 }}>
-                              {p.colors.slice(0, 3).map((c: string, i: number) => (
-                                <div key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: c, border: '1px solid rgba(0,0,0,0.15)' }} />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                /* Empty state — editorial placeholder */
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 2 }}>
-                  {['مخوار كلاسيك', 'عباءة فاخرة', 'مخوار مطرز', 'فستان سهرة'].map((name, i) => (
-                    <div key={i} style={{ display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ aspectRatio: '3/4', background: `linear-gradient(${160 + i * 15}deg, #F6DCE4, #ECD9DD ${30 + i * 10}%, #F3EAE2)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8 }}>
-                        <span style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: 'rgba(154,45,85,0.25)' }}>◆</span>
-                        <span style={{ fontSize: 10, color: 'rgba(154,45,85,0.4)', letterSpacing: '0.1em' }}>صورة المنتج</span>
-                      </div>
-                      <div style={{ padding: '18px 4px 24px', background: '#FAF7F4' }}>
-                        <div style={{ fontFamily: "'Amiri', serif", fontSize: 17, color: '#1A0D11', marginBottom: 6 }}>{name}</div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#9A2D55' }}>٢٥.٠٠ د.ب</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* ── EDITORIAL COLLECTIONS ── */}
-          <section style={{ background: '#1A0D11', padding: '0' }}>
-            <div style={{ maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 500 }}>
-              {/* Left: large image */}
-              <div style={{ position: 'relative', overflow: 'hidden' }}>
-                {(categories[0] as any)?.image ? (
-                  <img src={(categories[0] as any).image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', minHeight: 500, background: 'linear-gradient(145deg,#2D1020,#5C2040)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontFamily: "'Amiri', serif", fontSize: 60, color: 'rgba(196,149,106,0.3)' }}>◆</span>
-                  </div>
-                )}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,13,17,0.7) 0%, transparent 60%)' }} />
-                <div style={{ position: 'absolute', bottom: 40, right: 40 }}>
-                  <div style={{ fontSize: 10, letterSpacing: '0.25em', color: '#C4956A', marginBottom: 10, fontWeight: 700 }}>COLLECTION I</div>
-                  <div style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#FFFAF6', marginBottom: 20 }}>{categories.filter(c=>c.id!=='all')[0]?.name || 'المخاوير'}</div>
-                  <button onClick={() => { setActiveTab('shop'); setSelectedCategory(categories.filter(c=>c.id!=='all')[0]?.id || 'all'); }} style={{ background: 'none', border: '1px solid rgba(255,250,246,0.5)', color: '#FFFAF6', padding: '11px 28px', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
-                    تسوّقي الآن
-                  </button>
-                </div>
-              </div>
-              {/* Right: 2 stacked */}
-              <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}>
-                {[1, 2].map(i => {
-                  const cat = categories.filter(c => c.id !== 'all')[i];
-                  return (
-                    <div key={i} style={{ position: 'relative', overflow: 'hidden', borderTop: i === 1 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
-                      {(cat as any)?.image ? (
-                        <img src={(cat as any).image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', background: i === 1 ? 'linear-gradient(135deg,#3D2030,#7A3055)' : 'linear-gradient(135deg,#1F1020,#4A2040)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <span style={{ fontFamily: "'Amiri', serif", fontSize: 40, color: 'rgba(196,149,106,0.2)' }}>◆</span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(230px,1fr))', gap: 28 }}>
+                {(products.length > 0 ? products.slice(0, 4) : [
+                  { id: 'p1', name: 'مخوار كلاسيك', price: 35, image: '' },
+                  { id: 'p2', name: 'عباءة ساتان', price: 48, image: '' },
+                  { id: 'p3', name: 'مخوار مطرز', price: 65, image: '' },
+                  { id: 'p4', name: 'فستان سهرة', price: 89, image: '' },
+                ] as any[]).map((p: any) => (
+                  <button key={p.id} onClick={() => p.price && handleProductClick(p)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 0 }}>
+                    <div style={{ aspectRatio: '3/4', width: '100%', background: p.image ? `url(${p.image}) center/cover` : '#F3EDE8', position: 'relative', overflow: 'hidden' }}>
+                      {!p.image && (
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontFamily: "'Amiri', serif", fontSize: 24, color: 'rgba(154,45,85,0.15)' }}>◆</span>
                         </div>
                       )}
-                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,13,17,0.65) 0%, transparent 60%)' }} />
-                      <div style={{ position: 'absolute', bottom: 28, right: 28 }}>
-                        <div style={{ fontFamily: "'Amiri', serif", fontSize: 22, color: '#FFFAF6', marginBottom: 12 }}>{cat?.name || (i === 1 ? 'الفساتين' : 'الإكسسوارات')}</div>
-                        <button onClick={() => { setActiveTab('shop'); if(cat) setSelectedCategory(cat.id); }} style={{ background: 'none', border: 'none', color: '#C4956A', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", display: 'flex', alignItems: 'center', gap: 6, letterSpacing: '0.06em', padding: 0 }}>
-                          تصفّحي الآن ←
-                        </button>
-                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* ── BRAND STRIP ── */}
-          <section style={{ background: '#FFFFFF', padding: '80px 60px' }}>
-            <div style={{ maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
-              <div>
-                <div style={{ fontSize: 10, letterSpacing: '0.28em', color: '#C4956A', fontWeight: 700, marginBottom: 18 }}>OUR STORY</div>
-                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 38, color: '#1A0D11', margin: '0 0 22px', lineHeight: 1.3, fontWeight: 400 }}>
-                  كل قطعة تحكي قصة
-                </h2>
-                <p style={{ fontSize: 15, color: '#6B5060', lineHeight: 2.0, margin: '0 0 36px' }}>
-                  في ألماسة، نؤمن أن الأزياء الفاخرة ليست مجرد ملابس — إنها فن يُلبس. كل مخوار وكل فستان يُصمَّم بعناية لتعكس الهوية الأنثوية الراقية.
-                </p>
-                <button onClick={() => setActiveTab('about')} style={{
-                  background: 'none', border: 'none', cursor: 'pointer', color: '#9A2D55',
-                  fontSize: 13, fontWeight: 700, fontFamily: "'Cairo', sans-serif",
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  borderBottom: '1.5px solid #9A2D55', padding: '0 0 3px',
-                }}>
-                  اقرئي قصتنا
-                </button>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                {[
-                  { num: '+٥٠٠', label: 'تصميم حصري' },
-                  { num: '+٢٠٠٠', label: 'عميلة سعيدة' },
-                  { num: '٧', label: 'سنوات من الفخامة' },
-                  { num: '١٠٠٪', label: 'جودة مضمونة' },
-                ].map((s, i) => (
-                  <div key={i} style={{ background: '#FAF7F4', padding: '32px 24px', textAlign: 'center' }}>
-                    <div style={{ fontFamily: "'Cormorant Garamond', 'Amiri', serif", fontSize: 36, fontWeight: 300, color: '#9A2D55', lineHeight: 1, marginBottom: 8, fontStyle: 'italic' }}>{s.num}</div>
-                    <div style={{ fontSize: 12, color: '#9A8080', letterSpacing: '0.06em', fontWeight: 600 }}>{s.label}</div>
-                  </div>
+                    <div style={{ paddingTop: 14 }}>
+                      <div style={{ fontSize: 14, color: '#1A0A0F', marginBottom: 4, fontWeight: 500 }}>{p.name}</div>
+                      <div style={{ fontSize: 13.5, color: '#9A6070', fontWeight: 600 }}>{p.price?.toFixed ? p.price.toFixed(2) : p.price} د.ب</div>
+                    </div>
+                  </button>
                 ))}
               </div>
             </div>
           </section>
 
-          {/* ── FEATURED PRODUCT (editorial) ── */}
-          {products.length > 0 && (
-            <section style={{ background: '#FAF7F4', padding: '0 0 0' }}>
-              <div style={{ maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 560, alignItems: 'center' }}>
-                {/* Image */}
-                <div style={{ aspectRatio: '4/5', background: products[1]?.image ? `url(${products[1].image}) center/cover` : PH, position: 'relative' }}>
-                  {!products[1]?.image && (
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 10 }}>
-                      <span style={{ fontFamily: "'Amiri', serif", fontSize: 48, color: 'rgba(154,45,85,0.2)' }}>◆</span>
+          {/* ── CATEGORIES — 3 col ── */}
+          <section style={{ background: '#F8F4F1', padding: '64px 40px' }}>
+            <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+              <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#1A0A0F', margin: '0 0 40px', fontWeight: 400 }}>تسوّقي حسب الفئة</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 16 }}>
+                {(categories.filter(c => c.id !== 'all').slice(0, 3).length > 0
+                  ? categories.filter(c => c.id !== 'all').slice(0, 3)
+                  : [{ id: 'c1', name: 'المخاوير', image: '' }, { id: 'c2', name: 'الفساتين', image: '' }, { id: 'c3', name: 'الإكسسوارات', image: '' }]
+                ).map((cat: any, i) => (
+                  <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); }}
+                    style={{ position: 'relative', border: 'none', cursor: 'pointer', padding: 0, overflow: 'hidden', background: cat.image ? 'none' : ['#EDE4DD', '#E4D8D0', '#DDD2C8'][i] }}>
+                    {cat.image ? (
+                      <img src={cat.image} alt={cat.name} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                      <div style={{ aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontFamily: "'Amiri', serif", fontSize: 36, color: 'rgba(154,45,85,0.18)' }}>◆</span>
+                      </div>
+                    )}
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', padding: 20, background: 'linear-gradient(to top, rgba(26,10,15,0.55) 0%, transparent 60%)' }}>
+                      <span style={{ fontFamily: "'Amiri', serif", fontSize: 20, color: '#FFFFFF', fontWeight: 400 }}>{cat.name}</span>
                     </div>
-                  )}
-                </div>
-                {/* Text */}
-                <div style={{ padding: '60px 80px' }}>
-                  <div style={{ fontSize: 10, letterSpacing: '0.28em', color: '#C4956A', fontWeight: 700, marginBottom: 20 }}>FEATURED PIECE</div>
-                  <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 36, color: '#1A0D11', margin: '0 0 16px', lineHeight: 1.3, fontWeight: 400 }}>
-                    {products[1]?.name || 'مخوار المجموعة الخاصة'}
-                  </h2>
-                  <div style={{ width: 40, height: 2, background: '#C4956A', marginBottom: 24 }} />
-                  <p style={{ fontSize: 14.5, color: '#6B5060', lineHeight: 2, margin: '0 0 32px' }}>
-                    {products[1]?.description || 'قطعة مصممة بأرقى الخامات، تجمع بين الأناقة الشرقية والتفاصيل العصرية لإطلالة لا تُنسى'}
-                  </p>
-                  <div style={{ fontSize: 26, fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', color: '#9A2D55', marginBottom: 32, fontVariantNumeric: 'tabular-nums' }}>
-                    {(products[1]?.price || 0).toFixed(2)} <span style={{ fontSize: 16 }}>د.ب</span>
-                  </div>
-                  <button onClick={() => products[1] && handleProductClick(products[1])} style={{
-                    padding: '16px 48px', background: '#1A0D11', color: '#FFFAF6',
-                    border: 'none', fontSize: 13, fontWeight: 700, letterSpacing: '0.08em',
-                    cursor: 'pointer', fontFamily: "'Cairo', sans-serif",
-                  }}>
-                    تسوّقي هذه القطعة
                   </button>
-                </div>
+                ))}
               </div>
-            </section>
-          )}
+            </div>
+          </section>
 
           {/* ── REVIEWS ── */}
           {reviews.length > 0 && (
-            <section style={{ background: '#1A0D11', padding: '80px 60px' }}>
+            <section style={{ padding: '80px 40px', background: '#FFFFFF' }}>
               <div style={{ maxWidth: 1240, margin: '0 auto' }}>
-                <div style={{ textAlign: 'center', marginBottom: 56 }}>
-                  <div style={{ fontSize: 10, letterSpacing: '0.28em', color: '#C4956A', fontWeight: 700, marginBottom: 14 }}>TESTIMONIALS</div>
-                  <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 36, color: '#FFFAF6', margin: 0, fontWeight: 400 }}>ماذا تقول عميلاتنا</h2>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 2 }}>
+                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#1A0A0F', margin: '0 0 40px', fontWeight: 400 }}>ماذا تقول عميلاتنا</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 24 }}>
                   {reviews.slice(0, 3).map((r: Review, i) => (
-                    <div key={r.id || i} style={{ background: 'rgba(255,250,246,0.05)', padding: '36px 32px', borderTop: '2px solid rgba(196,149,106,0.3)' }}>
-                      <div style={{ display: 'flex', gap: 3, marginBottom: 20 }}>
+                    <div key={r.id || i} style={{ padding: '28px', border: '1px solid #EBEBEB' }}>
+                      <div style={{ display: 'flex', gap: 2, marginBottom: 16 }}>
                         {Array.from({ length: 5 }).map((_, j) => (
-                          <span key={j} style={{ color: j < (r.rating || 5) ? '#C4956A' : 'rgba(255,255,255,0.15)', fontSize: 14 }}>★</span>
+                          <span key={j} style={{ color: j < (r.rating || 5) ? '#C4956A' : '#E8E0D8', fontSize: 13 }}>★</span>
                         ))}
                       </div>
-                      <p style={{ fontFamily: "'Amiri', serif", fontSize: 17, color: 'rgba(255,250,246,0.85)', lineHeight: 1.8, margin: '0 0 24px', fontWeight: 400 }}>"{r.comment}"</p>
-                      <div style={{ fontSize: 12, color: '#C4956A', fontWeight: 700, letterSpacing: '0.08em' }}>{r.customerName}</div>
+                      <p style={{ fontSize: 14, color: '#3D2030', lineHeight: 1.85, margin: '0 0 20px' }}>"{r.comment}"</p>
+                      <div style={{ fontSize: 12, color: '#9A8080', fontWeight: 600 }}>{r.customerName}</div>
                     </div>
                   ))}
                 </div>
@@ -718,72 +547,47 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           )}
 
           {/* ── NEWSLETTER ── */}
-          <section style={{ background: '#F3EDE6', padding: '96px 60px', textAlign: 'center' }}>
-            <div style={{ maxWidth: 560, margin: '0 auto' }}>
-              <div style={{ fontSize: 10, letterSpacing: '0.28em', color: '#C4956A', fontWeight: 700, marginBottom: 16 }}>NEWSLETTER</div>
-              <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 36, color: '#1A0D11', margin: '0 0 14px', fontWeight: 400 }}>كوني أول من تعلم</h2>
-              <p style={{ fontSize: 14, color: '#9A8080', lineHeight: 1.9, margin: '0 0 36px' }}>
-                اشتركي في نشرتنا لتصلك أحدث المجموعات والعروض الحصرية قبل الجميع
-              </p>
-              <div style={{ display: 'flex', gap: 0, maxWidth: 420, margin: '0 auto' }}>
-                <input type="email" placeholder="بريدك الإلكتروني" style={{
-                  flex: 1, padding: '15px 20px', border: '1px solid rgba(26,13,17,0.18)',
-                  borderLeft: 'none', fontSize: 13, fontFamily: "'Cairo', sans-serif",
-                  outline: 'none', background: '#FFFFFF', direction: 'rtl',
-                }} />
-                <button style={{
-                  padding: '15px 28px', background: '#9A2D55', color: '#FFFFFF',
-                  border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                  fontFamily: "'Cairo', sans-serif", letterSpacing: '0.06em', whiteSpace: 'nowrap',
-                }}>
-                  اشتركي
-                </button>
+          <section style={{ background: '#1A0A0F', padding: '80px 40px', textAlign: 'center' }}>
+            <div style={{ maxWidth: 480, margin: '0 auto' }}>
+              <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 30, color: '#FFFFFF', margin: '0 0 12px', fontWeight: 400 }}>كوني أول من تعلم</h2>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', margin: '0 0 32px', lineHeight: 1.8 }}>أحدث المجموعات والعروض الحصرية مباشرة إلى بريدك</p>
+              <div style={{ display: 'flex' }}>
+                <input type="email" placeholder="بريدك الإلكتروني" style={{ flex: 1, padding: '13px 18px', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.25)', background: 'transparent', color: '#FFFFFF', fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', direction: 'rtl' }} />
+                <button style={{ padding: '13px 28px', background: '#9A2D55', color: '#FFFFFF', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif', whiteSpace: 'nowrap" }}>اشتركي</button>
               </div>
             </div>
           </section>
 
           {/* ── FOOTER ── */}
-          <footer style={{ background: '#1A0D11', color: 'rgba(255,250,246,0.7)', padding: '64px 60px 32px' }}>
-            <div style={{ maxWidth: 1240, margin: '0 auto' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48, marginBottom: 56 }}>
-                {/* Brand */}
-                <div>
-                  <div style={{ fontFamily: "'Amiri', serif", fontSize: 34, color: '#FFFAF6', marginBottom: 16 }}>ألماسة</div>
-                  <p style={{ fontSize: 13, lineHeight: 1.9, maxWidth: 260, margin: '0 0 24px' }}>
-                    أزياء نسائية فاخرة مصممة لتعكس الأناقة الشرقية الأصيلة
-                  </p>
-                  <div style={{ display: 'flex', gap: 14 }}>
-                    {[
-                      { label: 'Instagram', href: ig },
-                      { label: 'WhatsApp', href: wa },
-                    ].map(s => (
-                      <a key={s.label} href={s.href} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: '#C4956A', textDecoration: 'none', fontWeight: 700, letterSpacing: '0.08em', borderBottom: '1px solid rgba(196,149,106,0.4)', paddingBottom: 2 }}>{s.label}</a>
+          <footer style={{ background: '#F8F4F1', borderTop: '1px solid #EBEBEB', padding: '48px 40px 28px' }}>
+            <div style={{ maxWidth: 1240, margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 40, marginBottom: 40 }}>
+              <div>
+                <div style={{ fontFamily: "'Amiri', serif", fontSize: 26, color: '#1A0A0F', marginBottom: 12 }}>ألماسة</div>
+                <p style={{ fontSize: 13, color: '#7A6065', lineHeight: 1.8, margin: '0 0 20px', maxWidth: 220 }}>أزياء نسائية فاخرة — البحرين</p>
+                <div style={{ display: 'flex', gap: 16 }}>
+                  {[{ label: 'Instagram', href: ig }, { label: 'WhatsApp', href: wa }].map(s => (
+                    <a key={s.label} href={s.href} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: '#9A6070', textDecoration: 'none', fontWeight: 600 }}>{s.label}</a>
+                  ))}
+                </div>
+              </div>
+              {[
+                { title: 'تسوّقي', links: [{ label: 'المجموعة الكاملة', fn: () => setActiveTab('shop') }] },
+                { title: 'خدمة العملاء', links: [{ label: 'تتبع الطلب', fn: () => setActiveTab('tracking') }, { label: 'تواصلي معنا', fn: () => setActiveTab('contact') }] },
+                { title: 'عن ألماسة', links: [{ label: 'قصتنا', fn: () => setActiveTab('about') }] },
+              ].map(col => (
+                <div key={col.title}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#1A0A0F', letterSpacing: '0.1em', marginBottom: 16 }}>{col.title}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {col.links.map(l => (
+                      <button key={l.label} onClick={l.fn} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7A6065', fontSize: 13, fontFamily: "'Cairo', sans-serif", textAlign: 'right', padding: 0 }}>{l.label}</button>
                     ))}
                   </div>
                 </div>
-                {/* Links */}
-                {[
-                  { title: 'تسوّقي', links: [{ label: 'المجموعة الكاملة', fn: () => setActiveTab('shop') }, { label: 'وصل حديثاً', fn: () => setActiveTab('shop') }] },
-                  { title: 'خدمة العملاء', links: [{ label: 'تتبع الطلب', fn: () => setActiveTab('tracking') }, { label: 'تواصلي معنا', fn: () => setActiveTab('contact') }] },
-                  { title: 'عن ألماسة', links: [{ label: 'قصتنا', fn: () => setActiveTab('about') }, { label: 'سياسة الخصوصية', fn: () => {} }] },
-                ].map(col => (
-                  <div key={col.title}>
-                    <div style={{ fontSize: 10, letterSpacing: '0.22em', color: '#C4956A', fontWeight: 700, marginBottom: 20 }}>{col.title}</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {col.links.map(l => (
-                        <button key={l.label} onClick={l.fn} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,250,246,0.65)', fontSize: 13, fontFamily: "'Cairo', sans-serif", textAlign: 'right', padding: 0, transition: 'color .2s' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#FFFAF6'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,250,246,0.65)'; }}
-                        >{l.label}</button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ borderTop: '1px solid rgba(255,250,246,0.08)', paddingTop: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, flexWrap: 'wrap', gap: 12 }}>
-                <span>© ٢٠٢٦ ألماسة. جميع الحقوق محفوظة.</span>
-                <span style={{ color: 'rgba(255,250,246,0.4)', letterSpacing: '0.06em' }}>ALMAASA LUXURY FASHION</span>
-              </div>
+              ))}
+            </div>
+            <div style={{ borderTop: '1px solid #EBEBEB', paddingTop: 20, fontSize: 12, color: '#9A8080', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+              <span>© ٢٠٢٦ ألماسة. جميع الحقوق محفوظة.</span>
+              <span>Almaasa Fashion — Bahrain</span>
             </div>
           </footer>
 
