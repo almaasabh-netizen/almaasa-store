@@ -37,9 +37,9 @@ export default function AdminLayout() {
   }, [darkMode]);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#FBF7F8', direction: 'rtl' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: '#F9F6F4', direction: 'rtl' }}>
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex">
+      <div className="hidden lg:flex" style={{ flexShrink: 0 }}>
         <Sidebar />
       </div>
 
@@ -66,7 +66,7 @@ export default function AdminLayout() {
           onMenuOpen={() => setMobileOpen(true)}
           title={title}
         />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6" style={{ background: '#FBF7F8' }}>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6" style={{ background: '#F9F6F4' }}>
           <Outlet />
         </main>
       </div>

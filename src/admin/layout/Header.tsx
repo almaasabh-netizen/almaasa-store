@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { getStoredData } from '../../data';
+import React from 'react';
+
+const ROSE = '#9A2D55';
+const INK2 = '#7A6065';
+const LINE = 'rgba(26,13,17,.07)';
 
 interface HeaderProps {
   darkMode: boolean;
@@ -8,125 +11,131 @@ interface HeaderProps {
   title: string;
 }
 
-export default function Header({ onMenuOpen, title }: HeaderProps) {
-  const [showNotifs, setShowNotifs] = useState(false);
-  const data = getStoredData();
-  const newOrders = data.orders?.filter((o: any) => o.status === 'new').length || 0;
-  const lowStock = data.products?.filter((p: any) => p.stock > 0 && p.stock <= 5).length || 0;
-
-  const notifs = [
-    ...(newOrders > 0 ? [{ icon: '🛍️', text: `${newOrders} طلب جديد بانتظار المعالجة`, time: 'الآن' }] : []),
-    ...(lowStock > 0 ? [{ icon: '📦', text: `${lowStock} منتج على وشك النفاد`, time: 'منذ 5 دقائق' }] : []),
-  ];
+export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: HeaderProps) {
+  const notifCount = React.useMemo(() => {
+    try {
+      const raw = localStorage.getItem('ama_orders');
+      if (!raw) return 0;
+      return JSON.parse(raw).filter((o: any) => o.status === 'new').length;
+    } catch { return 0; }
+  }, []);
 
   return (
     <header style={{
-      display: 'flex', alignItems: 'center', gap: 12,
-      padding: '0 20px', background: '#FFFFFF', height: 60,
-      borderBottom: '1px solid rgba(154,45,85,.1)',
+      height: 56, flexShrink: 0,
+      background: '#FFFFFF', borderBottom: `1px solid ${LINE}`,
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: '0 20px',
       fontFamily: "'Cairo', sans-serif",
-      flexShrink: 0,
+      direction: 'rtl',
     }}>
       {/* Mobile menu */}
       <button
-        onClick={onMenuOpen}
         className="lg:hidden"
-        style={{ padding: '6px 8px', borderRadius: 8, border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 18, color: '#5A4047' }}
-      >☰</button>
+        onClick={onMenuOpen}
+        style={{
+          width: 32, height: 32, display: 'flex', alignItems: 'center',
+          justifyContent: 'center', border: 'none', background: 'transparent',
+          cursor: 'pointer', color: INK2, borderRadius: 6, flexShrink: 0,
+        }}
+        aria-label="فتح القائمة"
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
 
-      {/* Title */}
-      <h1 style={{ fontSize: 15, fontWeight: 700, color: '#241419', margin: 0 }} className="hidden sm:block">{title}</h1>
-
-      {/* Search */}
-      <div className="hidden md:flex" style={{
-        flex: 1, maxWidth: 280, alignItems: 'center', gap: 8,
-        borderRadius: 10, padding: '7px 12px', marginRight: 8,
-        background: '#FBF7F8', border: '1px solid rgba(154,45,85,.1)',
-      }}>
-        <span style={{ color: '#c9b8b2', fontSize: 13 }}>🔍</span>
-        <input
-          type="text"
-          placeholder="بحث..."
-          style={{
-            background: 'transparent', border: 'none', outline: 'none',
-            fontSize: 13, color: '#241419', width: '100%',
-            fontFamily: "'Cairo', sans-serif",
-          }}
-          dir="rtl"
-        />
+      {/* Breadcrumb / Title */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+        <span style={{ fontSize: 11, color: INK2, whiteSpace: 'nowrap' }}>الإدارة</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={INK2} strokeWidth="2" strokeLinecap="round" style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#1A0D11', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 'auto' }}>
-        {/* Notifications */}
-        <div style={{ position: 'relative' }}>
-          <button
-            onClick={() => setShowNotifs(!showNotifs)}
-            style={{
-              position: 'relative', padding: '7px 8px', borderRadius: 8,
-              border: 'none', background: 'transparent', cursor: 'pointer',
-              fontSize: 16,
-            }}
-          >
-            🔔
-            {notifs.length > 0 && (
-              <span style={{
-                position: 'absolute', top: 5, right: 5, width: 8, height: 8,
-                borderRadius: '50%', background: '#9A2D55', display: 'block',
-              }} />
-            )}
-          </button>
-
-          {showNotifs && (
-            <div style={{
-              position: 'absolute', left: 0, top: '100%', marginTop: 8,
-              width: 300, borderRadius: 12, boxShadow: '0 8px 32px rgba(154,45,85,.15)',
-              background: '#FFFFFF', border: '1px solid rgba(154,45,85,.1)', zIndex: 50,
-            }}>
-              <div style={{
-                padding: '12px 16px', borderBottom: '1px solid rgba(154,45,85,.1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#241419' }}>الإشعارات</span>
-                <span style={{
-                  fontSize: 11, padding: '2px 8px', borderRadius: 20,
-                  background: '#F6DCE4', color: '#9A2D55', fontWeight: 700,
-                }}>{notifs.length}</span>
-              </div>
-              <div style={{ maxHeight: 280, overflowY: 'auto' }}>
-                {notifs.map((n, i) => (
-                  <div key={i} style={{
-                    display: 'flex', alignItems: 'flex-start', gap: 10,
-                    padding: '12px 16px', borderBottom: '1px solid rgba(154,45,85,.06)',
-                  }}>
-                    <span style={{ fontSize: 18, flexShrink: 0 }}>{n.icon}</span>
-                    <div>
-                      <p style={{ fontSize: 12, fontWeight: 500, color: '#241419', margin: 0 }}>{n.text}</p>
-                      <p style={{ fontSize: 10, color: '#9a8a85', margin: 0, marginTop: 2 }}>{n.time}</p>
-                    </div>
-                  </div>
-                ))}
-                {notifs.length === 0 && (
-                  <div style={{ padding: '20px 16px', textAlign: 'center', fontSize: 12, color: '#9a8a85' }}>
-                    لا توجد إشعارات جديدة
-                  </div>
-                )}
-              </div>
-            </div>
+      {/* Actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+        {/* Dark mode */}
+        <button
+          onClick={onToggleDark}
+          style={{
+            width: 34, height: 34, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', border: 'none', background: 'transparent',
+            cursor: 'pointer', color: INK2, borderRadius: 8,
+            transition: 'background .15s',
+          }}
+          title={darkMode ? 'الوضع النهاري' : 'الوضع الليلي'}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(26,13,17,.06)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+        >
+          {darkMode ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
           )}
-        </div>
+        </button>
 
-        {/* User */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', borderRadius: 8 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: '50%', background: '#F3EAE2',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#9A2D55', fontWeight: 700, fontSize: 13, flexShrink: 0,
-          }}>م</div>
-          <div className="hidden sm:block" style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: '#241419', margin: 0 }}>مدير المتجر</p>
-            <p style={{ fontSize: 10, color: '#9a8a85', margin: 0 }}>مدير النظام</p>
-          </div>
-        </div>
+        {/* Search */}
+        <button
+          style={{
+            width: 34, height: 34, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', border: 'none', background: 'transparent',
+            cursor: 'pointer', color: INK2, borderRadius: 8,
+            transition: 'background .15s',
+          }}
+          title="بحث"
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(26,13,17,.06)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+
+        {/* Notifications */}
+        <button
+          style={{
+            width: 34, height: 34, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', border: 'none', background: 'transparent',
+            cursor: 'pointer', color: INK2, borderRadius: 8, position: 'relative',
+            transition: 'background .15s',
+          }}
+          title="الإشعارات"
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(26,13,17,.06)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          {notifCount > 0 && (
+            <span style={{
+              position: 'absolute', top: 5, right: 5,
+              width: 8, height: 8, borderRadius: '50%',
+              background: ROSE, border: '1.5px solid #fff',
+            }} />
+          )}
+        </button>
+
+        {/* Divider */}
+        <div style={{ width: 1, height: 22, background: LINE, margin: '0 4px' }} />
+
+        {/* Avatar */}
+        <div style={{
+          width: 30, height: 30, borderRadius: '50%',
+          background: 'rgba(154,45,85,.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: ROSE, fontWeight: 800, fontSize: 12, cursor: 'pointer',
+          border: '1.5px solid rgba(154,45,85,.2)',
+          fontFamily: "'Cairo', sans-serif",
+        }}>م</div>
       </div>
     </header>
   );
