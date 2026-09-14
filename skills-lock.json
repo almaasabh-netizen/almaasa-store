@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "linkedin-marketing": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "2e5adfe26104344364025a21524495668a57962634d26176015e80e05d1a4f8e"
+    },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
