@@ -161,13 +161,12 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   const [methodPrice, setMethodPrice] = useState<number>(2.0);
   const [methodDescription, setMethodDescription] = useState<string>('');
 
-  // Load backend content on mount
+  // Load backend content on mount — verify JWT cookie with server
   useEffect(() => {
-    // Check if previously authorized
-    const isAuth = sessionStorage.getItem('ama_admin_authenticated') === 'true';
-    if (isAuth) {
-      setIsAdminAuth(true);
-    }
+    fetch('/api/admin-verify', { credentials: 'include' })
+      .then(r => r.json())
+      .then(data => { if (data.authenticated) setIsAdminAuth(true); })
+      .catch(() => { /* not authenticated */ });
     loadData();
   }, []);
 
@@ -383,6 +382,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       const response = await fetch('/api/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: emailInput, password: passwordInput })
       });
 
@@ -390,7 +390,6 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
       if (response.ok && data.success) {
         setIsAdminAuth(true);
-        sessionStorage.setItem('ama_admin_authenticated', 'true');
         addOperationLog(
           'تسجيل دخول ناجح للأدمين',
           `تم تسجيل الدخول إلى لوحة التحكم الإدارية بنجاح (${emailInput}).`,
@@ -409,9 +408,11 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin-logout', { method: 'POST', credentials: 'include' });
+    } catch { /* ignore network errors on logout */ }
     setIsAdminAuth(false);
-    sessionStorage.removeItem('ama_admin_authenticated');
   };
 
   // Modify Order state
