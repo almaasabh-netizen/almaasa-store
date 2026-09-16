@@ -211,25 +211,48 @@ async function startServer() {
 
   // ── Instagram Feed Proxy ─────────────────────────────────────
   app.get("/api/instagram-feed", apiLimiter, async (req, res) => {
+    const feedId = process.env.BEHOLD_FEED_ID || "HbcZC4oN0hh4xfAHUvTm";
+    if (!feedId) {
+      return res.status(500).json({ error: "BEHOLD_FEED_ID غير مضبوط في متغيرات البيئة." });
+    }
     try {
-      const feedId = process.env.BEHOLD_FEED_ID || "HbcZC4oN0hh4xfAHUvTm";
       const url = `https://feeds.behold.so/${feedId}`;
       const response = await fetch(url, {
         headers: {
           "Accept": "application/json",
           "User-Agent": "Mozilla/5.0 (compatible; AlmaasaStore/1.0)",
-          "Origin": "https://almaasa-store.onrender.com",
-        }
+        },
+        signal: AbortSignal.timeout(10000), // 10s timeout
       });
+
       const text = await response.text();
+
       if (!response.ok) {
-        console.error("Behold error:", response.status, text.slice(0, 200));
-        throw new Error("Behold feed unavailable");
+        console.error("Behold error:", response.status, text.slice(0, 300));
+        return res.status(502).json({
+          error: `فشل الاتصال بـ Behold (${response.status}). تحقق من صحة الـ Feed ID.`,
+        });
       }
-      res.json(JSON.parse(text));
+
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("Behold returned non-JSON:", text.slice(0, 200));
+        return res.status(502).json({ error: "استجابة غير صالحة من Behold." });
+      }
+
+      // Normalise: return a flat posts array regardless of Behold response shape
+      const posts: any[] = Array.isArray(data) ? data : (data.posts ?? data.items ?? []);
+      res.json(posts);
     } catch (err: any) {
+      const isTimeout = err.name === "TimeoutError" || err.name === "AbortError";
       console.error("Instagram feed error:", err.message);
-      res.status(500).json({ error: "فشل تحميل بيانات Instagram. حاول لاحقاً." });
+      res.status(502).json({
+        error: isTimeout
+          ? "انتهت مهلة الاتصال بـ Behold. حاول لاحقاً."
+          : "فشل تحميل بيانات Instagram. حاول لاحقاً.",
+      });
     }
   });
 

@@ -613,16 +613,22 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
   const handleImportFromInstagram = async () => {
     setIsImportingFromIG(true);
     try {
-      const res = await fetch('/api/instagram-feed');
-      const body = await res.json();
-      if (!res.ok) {
-        alert(`⚠️ خطأ من الخادم: ${body.error || res.status}`);
+      const res = await fetch('/api/instagram-feed', { credentials: 'include' });
+      let body: any;
+      try {
+        body = await res.json();
+      } catch {
+        alert('⚠️ الخادم أرجع استجابة غير صالحة. تحقق من إعداد BEHOLD_FEED_ID في متغيرات البيئة.');
         return;
       }
-      // Behold returns array directly or { posts: [...] }
-      const posts: any[] = Array.isArray(body) ? body : (body.posts ?? []);
+      if (!res.ok) {
+        alert(`⚠️ فشل الاتصال بإنستقرام: ${body?.error || `خطأ ${res.status}`}`);
+        return;
+      }
+      // Server normalises Behold response to a flat array
+      const posts: any[] = Array.isArray(body) ? body : [];
       if (posts.length === 0) {
-        alert('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد');
+        alert('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد.\nتأكد من أن الـ Feed ID صحيح وأن الحساب به منشورات.');
         return;
       }
       const data = getStoredData();
@@ -630,20 +636,28 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       let added = 0;
       const newProducts = [...data.products];
       for (const post of posts) {
-        if (post.mediaType === 'VIDEO' || post.media_type === 'VIDEO') continue;
-        // Prefer Behold-hosted CDN images (don't expire), fallback to direct Instagram URL
+        // Skip videos
+        const mType = (post.mediaType || post.media_type || '').toUpperCase();
+        if (mType === 'VIDEO') continue;
+
+        // Prefer Behold CDN images (stable URLs), then direct Instagram, then thumbnail
         const imgUrl =
           post.sizes?.medium?.mediaUrl ||
-          post.sizes?.small?.mediaUrl ||
           post.sizes?.large?.mediaUrl ||
+          post.sizes?.small?.mediaUrl ||
+          post.prunedMediaUrl ||   // Behold v3 key
           post.mediaUrl ||
           post.media_url ||
-          post.thumbnailUrl;
+          post.thumbnailUrl ||
+          post.thumbnail_url;
         if (!imgUrl) continue;
-        const igId = `ig_${post.id}`;
+
+        const igId = `ig_${post.id || post.shortCode || Date.now()}`;
         if (existingIds.has(igId)) continue;
-        const caption = post.caption || '';
-        const name = caption.split('\n')[0].replace(/#\S+/g, '').trim().slice(0, 60) || 'منتج من إنستقرام';
+
+        const caption = post.caption || post.text || '';
+        const firstLine = caption.split('\n')[0].replace(/#\S+/g, '').replace(/@\S+/g, '').trim();
+        const name = firstLine.slice(0, 60) || 'منتج من إنستقرام';
         newProducts.push({
           id: igId,
           name,
