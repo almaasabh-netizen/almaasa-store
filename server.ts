@@ -3,6 +3,8 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { timingSafeEqual } from "crypto";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
@@ -10,14 +12,42 @@ async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
 
-  app.use(express.json());
+  // CORS — allow only the production origin (and localhost in dev)
+  const allowedOrigins = [
+    "https://almaasa-store.onrender.com",
+    "http://localhost:3000",
+    "http://localhost:5173",
+  ];
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+    }
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+  });
+
+  app.use(express.json({ limit: "2mb" }));
+
+  // Rate limiter — 10 attempts per 15 minutes per IP
+  const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "تجاوزت عدد محاولات تسجيل الدخول. حاول مجدداً بعد 15 دقيقة." },
+  });
 
   // Admin Login Endpoint - validates credentials against env vars
-  app.post("/api/admin-login", async (req, res) => {
+  app.post("/api/admin-login", loginLimiter, async (req, res) => {
     try {
       const { email, password } = req.body;
 
-      if (!email || !password) {
+      if (!email || !password || typeof email !== "string" || typeof password !== "string") {
         return res.status(400).json({ error: "يرجى إدخال البريد الإلكتروني وكلمة المرور." });
       }
 
@@ -25,13 +55,20 @@ async function startServer() {
       const adminPassword = process.env.ADMIN_PASSWORD;
 
       if (!adminEmail || !adminPassword) {
-        return res.status(500).json({
-          error: "لم يتم تهيئة بيانات اعتماد المشرف في الخادم. يرجى مراجعة الإعدادات."
-        });
+        console.error("ADMIN_EMAIL or ADMIN_PASSWORD env vars not set");
+        return res.status(500).json({ error: "خطأ في إعدادات الخادم." });
       }
 
-      const emailMatch = email.trim().toLowerCase() === adminEmail.trim().toLowerCase();
-      const passwordMatch = password === adminPassword;
+      // Timing-safe comparison to prevent timing attacks
+      const emailNorm = email.trim().toLowerCase();
+      const adminEmailNorm = adminEmail.trim().toLowerCase();
+      const emailBuf = Buffer.from(emailNorm.padEnd(256));
+      const adminEmailBuf = Buffer.from(adminEmailNorm.padEnd(256));
+      const passBuf = Buffer.from(password.padEnd(256));
+      const adminPassBuf = Buffer.from(adminPassword.padEnd(256));
+
+      const emailMatch = timingSafeEqual(emailBuf, adminEmailBuf);
+      const passwordMatch = timingSafeEqual(passBuf, adminPassBuf);
 
       if (emailMatch && passwordMatch) {
         return res.json({ success: true });
@@ -44,34 +81,11 @@ async function startServer() {
     }
   });
 
-  // Debug endpoint - raw Behold response
-  app.get("/api/instagram-debug", async (req, res) => {
-    try {
-      const url = "https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm";
-      const response = await fetch(url, {
-        headers: { "Accept": "application/json", "User-Agent": "Mozilla/5.0" }
-      });
-      const data = await response.json();
-      const firstPost = data.posts?.[0] ?? data[0] ?? null;
-      res.json({
-        status: response.status,
-        isArray: Array.isArray(data),
-        topLevelKeys: Object.keys(data),
-        postsCount: (data.posts ?? data).length,
-        firstPostKeys: firstPost ? Object.keys(firstPost) : null,
-        firstPost: firstPost,
-      });
-    } catch (err: any) {
-      res.json({ fetchError: err.message });
-    }
-  });
-
   // Instagram Feed Proxy (Behold)
   app.get("/api/instagram-feed", async (req, res) => {
     try {
-      const feedId = "HbcZC4oN0hh4xfAHUvTm";
+      const feedId = process.env.BEHOLD_FEED_ID || "HbcZC4oN0hh4xfAHUvTm";
       const url = `https://feeds.behold.so/${feedId}`;
-      console.log("Fetching Behold feed:", url);
       const response = await fetch(url, {
         headers: {
           "Accept": "application/json",
@@ -80,13 +94,15 @@ async function startServer() {
         }
       });
       const text = await response.text();
-      console.log("Behold status:", response.status, "Content-Type:", response.headers.get("content-type"), "body[:300]:", text.slice(0, 300));
-      if (!response.ok) throw new Error(`Behold ${response.status}: ${text.slice(0,200)}`);
+      if (!response.ok) {
+        console.error("Behold error:", response.status, text.slice(0, 200));
+        throw new Error("فشل تحميل بيانات Instagram");
+      }
       const data = JSON.parse(text);
       res.json(data);
     } catch (err: any) {
       console.error("Instagram feed error:", err.message);
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: "فشل تحميل بيانات Instagram. حاول لاحقاً." });
     }
   });
 

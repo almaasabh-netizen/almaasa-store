@@ -98,7 +98,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     setCategories(data.categories);
 
     const params = new URLSearchParams(window.location.search);
-    const trackingCode = params.get('track');
+    const rawCode = params.get('track');
+    const trackingCode = rawCode ? rawCode.replace(/[^A-Za-z0-9\-]/g, '').slice(0, 64) : null;
     if (trackingCode) {
       setActiveTab('tracking');
       setTrackSearchQuery(trackingCode);
@@ -1035,29 +1036,19 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                           </div>
                         )}
                         {paymentMethod === 'knet' && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <input type="text" placeholder="رقم البطاقة" value={knetCardNum} onChange={e => setKnetCardNum(e.target.value)}
-                              style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
-                            <input type="password" placeholder="الرقم السري (PIN)" value={knetPin} onChange={e => setKnetPin(e.target.value)} maxLength={4}
-                              style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
+                          <div style={{ background: '#FFF8F0', border: '1px solid rgba(154,45,85,.15)', padding: '14px 16px', fontSize: 13, color: '#7A5030', lineHeight: 1.8 }}>
+                            ستُحوَّلين إلى بوابة KNET الآمنة لإتمام الدفع بعد تأكيد الطلب.
                           </div>
                         )}
                         {paymentMethod === 'card' && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <input type="text" placeholder="الاسم على البطاقة" value={cardName} onChange={e => setCardName(e.target.value)}
-                              style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
-                            <input type="text" placeholder="رقم البطاقة" value={cardNumber} onChange={e => setCardNumber(e.target.value)}
-                              style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: 'monospace', outline: 'none', textAlign: 'center' }} />
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                              <input type="text" placeholder="MM/YY" value={cardExpiry} onChange={e => setCardExpiry(e.target.value)}
-                                style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: 'monospace', outline: 'none', textAlign: 'center' }} />
-                              <input type="password" placeholder="CVV" value={cardCvv} onChange={e => setCardCvv(e.target.value)} maxLength={3}
-                                style={{ padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: 'monospace', outline: 'none', textAlign: 'center' }} />
-                            </div>
+                          <div style={{ background: '#FFF8F0', border: '1px solid rgba(154,45,85,.15)', padding: '14px 16px', fontSize: 13, color: '#7A5030', lineHeight: 1.8 }}>
+                            ستُحوَّلين إلى بوابة الدفع الآمنة لإدخال بيانات بطاقتك بعد تأكيد الطلب.
                           </div>
                         )}
                         {paymentMethod === 'applepay' && (
-                          <p style={{ fontSize: 13, color: '#9a8a85', textAlign: 'center', padding: '12px 0' }}>جاري الاتصال بـ Face ID / Touch ID...</p>
+                          <div style={{ background: '#FFF8F0', border: '1px solid rgba(154,45,85,.15)', padding: '14px 16px', fontSize: 13, color: '#7A5030', lineHeight: 1.8 }}>
+                            ستظهر نافذة Apple Pay لإتمام الدفع بعد تأكيد الطلب.
+                          </div>
                         )}
                       </div>
                     </div>

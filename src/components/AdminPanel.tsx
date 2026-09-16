@@ -358,7 +358,11 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
       }
     };
     setPaymentGateways(updated);
-    localStorage.setItem('ama_payment_gateways', JSON.stringify(updated));
+    // Strip sensitive keys before persisting to localStorage
+    const safeGateways = JSON.parse(JSON.stringify(updated));
+    if (safeGateways.tap) { safeGateways.tap.secretKey = ''; }
+    if (safeGateways.vpay) { safeGateways.vpay.apiKey = ''; }
+    localStorage.setItem('ama_payment_gateways', JSON.stringify(safeGateways));
     
     // Log operation
     addOperationLog(
