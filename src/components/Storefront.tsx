@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  ShoppingBag, Search, Truck, Heart, ArrowRight, CheckCircle,
-  Clock, Check, X, Phone, MapPin, Tag, Plus, Minus,
-  Star, ShieldCheck, CreditCard, ChevronRight,
-  Home, Menu, Instagram, Package, Zap,
+  ShoppingBag, Search, Truck, Heart, CheckCircle,
+  Clock, X, Phone, Plus,
+  Star, Home, Menu, Instagram, Package,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product, Order, Coupon, SizeGuide, Review, StoreSettings, OrderItem, Category } from '../types';
@@ -542,7 +541,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   <small style={{ fontSize: 18, marginLeft: 4 }}>د.ب</small>
                   {products[0]?.price?.toFixed(2) || '—'}
                 </div>
-                <button onClick={() => handleProductClick(products[0])} style={{ padding: '14px 40px', background: '#160B10', color: '#FFF', border: 'none', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.07em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", width: 'fit-content', transition: 'background .18s,transform .18s' }}
+                <button onClick={() => products[0] && handleProductClick(products[0])} style={{ padding: '14px 40px', background: '#160B10', color: '#FFF', border: 'none', fontSize: 12.5, fontWeight: 700, letterSpacing: '0.07em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", width: 'fit-content', transition: 'background .18s,transform .18s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#9A2D55'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#160B10'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
                   تسوّقي هذه القطعة
