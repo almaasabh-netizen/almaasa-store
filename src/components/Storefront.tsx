@@ -80,6 +80,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [trackedOrder, setTrackedOrder] = useState<Order | null>(null);
   const [trackError, setTrackError] = useState('');
 
+  /* ── NEWSLETTER ─────────────────────────────────────────────── */
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+
   /* ── CONTACT FORM ───────────────────────────────────────────── */
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
@@ -290,11 +293,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     <div style={{ background: '#FBF7F2', fontFamily: "'Cairo', sans-serif", color: '#241419', minHeight: '100vh' }} dir="rtl">
 
       {/* ── TOASTS ────────────────────────────────────────────── */}
-      <div className="fixed top-5 left-5 z-[100] space-y-2 pointer-events-none">
+      <div className="fixed top-5 right-5 z-[100] space-y-2 pointer-events-none">
         <AnimatePresence>
           {toasts.map(t => (
             <motion.div key={t.id}
-              initial={{ x: -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -60, opacity: 0 }}
+              initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }}
               className="pointer-events-auto px-4 py-3 rounded text-white text-xs font-semibold shadow-xl"
               style={{
                 background: t.type === 'success' ? '#9A2D55' : t.type === 'error' ? '#c0392b' : '#B08D57',
@@ -329,6 +332,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 { label: 'المخاوير', page: 'shop' as Page },
                 { label: 'من نحن', page: 'about' as Page },
                 { label: 'تواصلي معنا', page: 'contact' as Page },
+                { label: 'تتبع طلبي', page: 'tracking' as Page },
               ].map(({ label, page }) => (
                 <button key={page} onClick={() => setActiveTab(page)} style={{
                   color: activeTab === page ? '#9A2D55' : '#241419',
@@ -366,6 +370,12 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           <div style={{ width: '100%', borderBottom: '1px solid rgba(154,45,85,.18)' }} />
 
           {/* Mobile nav dropdown */}
+          {mobileMenuOpen && (
+            <div
+              className="fixed inset-0 z-[39]"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+          )}
           <AnimatePresence>
             {mobileMenuOpen && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
@@ -403,6 +413,13 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             @keyframes _ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
             @keyframes _fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
             @keyframes _scrollPulse { 0%,100%{height:48px;opacity:1} 50%{height:28px;opacity:.5} }
+            @media (max-width: 768px) {
+              ._hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
+              ._brand-grid { grid-template-columns: 1fr !important; }
+              ._feature-grid { grid-template-columns: 1fr !important; }
+              ._footer-grid { grid-template-columns: 1fr 1fr !important; }
+              ._content-pb { padding-bottom: 72px; }
+            }
             ._anim1{animation:_fadeUp .7s cubic-bezier(.22,.68,0,1.2) .1s both}
             ._anim2{animation:_fadeUp .7s cubic-bezier(.22,.68,0,1.2) .24s both}
             ._anim3{animation:_fadeUp .7s cubic-bezier(.22,.68,0,1.2) .38s both}
@@ -652,8 +669,16 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(1.9rem,3vw,40px)', color: '#160B10', fontWeight: 400, margin: '0 0 12px', lineHeight: 1.2 }}>كوني أول من تعلم</h2>
               <p style={{ fontSize: 13.5, color: '#6A4850', lineHeight: 1.85, margin: '0 0 32px' }}>أحدث المجموعات والعروض الحصرية مباشرة إلى بريدك — قبل الجميع</p>
               <div style={{ display: 'flex', background: '#FFF', border: '1px solid rgba(22,11,16,.1)' }}>
-                <input type="email" placeholder="بريدك الإلكتروني" style={{ flex: 1, padding: '14px 18px', border: 'none', fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: 'transparent', color: '#160B10', direction: 'rtl' }} />
-                <button style={{ padding: '14px 28px', background: '#9A2D55', color: '#FFF', border: 'none', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', transition: 'background .15s' }}
+                <input type="email" placeholder="بريدك الإلكتروني" value={newsletterEmail} onChange={e => setNewsletterEmail(e.target.value)} style={{ flex: 1, padding: '14px 18px', border: 'none', fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: 'transparent', color: '#160B10', direction: 'rtl' }} />
+                <button onClick={() => {
+                  if (!newsletterEmail.trim()) return;
+                  try {
+                    const existing = JSON.parse(localStorage.getItem('ama_newsletter_emails') || '[]');
+                    localStorage.setItem('ama_newsletter_emails', JSON.stringify([...existing, newsletterEmail.trim()]));
+                  } catch { localStorage.setItem('ama_newsletter_emails', JSON.stringify([newsletterEmail.trim()])); }
+                  addToast('شكراً! سيتم التواصل معكِ قريباً');
+                  setNewsletterEmail('');
+                }} style={{ padding: '14px 28px', background: '#9A2D55', color: '#FFF', border: 'none', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', transition: 'background .15s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7B2244'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#9A2D55'; }}>
                   اشتركي
@@ -1093,7 +1118,12 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                           تفعيل
                         </button>
                       </div>
-                      {activeCoupon && <p style={{ fontSize: 12, color: '#27ae60', marginTop: 6 }}>✓ خصم {activeCoupon.type === 'percentage' ? `${activeCoupon.discount}%` : `${activeCoupon.discount.toFixed(2)} د.ب`} مطبّق</p>}
+                      {activeCoupon && (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+                          <p style={{ fontSize: 12, color: '#27ae60', margin: 0 }}>✓ خصم {activeCoupon.type === 'percentage' ? `${activeCoupon.discount}%` : `${activeCoupon.discount.toFixed(2)} د.ب`} مطبّق</p>
+                          <button onClick={() => { setActiveCoupon(null); setCouponCode(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#c0392b', fontSize: 14, padding: '0 4px', lineHeight: 1 }}>✕</button>
+                        </div>
+                      )}
                       {couponError && <p style={{ fontSize: 12, color: '#c0392b', marginTop: 6 }}>{couponError}</p>}
                     </div>
                   )}
@@ -1203,7 +1233,16 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
                 <textarea placeholder="رسالتكِ" rows={5} value={contactMsg} onChange={e => setContactMsg(e.target.value)}
                   style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none', resize: 'vertical' }} />
-                <button onClick={() => { if (contactName && contactMsg) setContactSent(true); }}
+                <button onClick={() => {
+                  if (!contactName || !contactMsg) { addToast('يرجى تعبئة الاسم والرسالة', 'error'); return; }
+                  try {
+                    const existing = JSON.parse(localStorage.getItem('ama_contact_messages') || '[]');
+                    localStorage.setItem('ama_contact_messages', JSON.stringify([...existing, { name: contactName, phone: contactPhone, email: contactEmail, message: contactMsg, date: new Date().toISOString() }]));
+                  } catch { localStorage.setItem('ama_contact_messages', JSON.stringify([{ name: contactName, phone: contactPhone, email: contactEmail, message: contactMsg, date: new Date().toISOString() }])); }
+                  setContactSent(true);
+                  addToast('تم إرسال رسالتكِ، سنتواصل معكِ قريباً');
+                  setTimeout(() => { setContactName(''); setContactPhone(''); setContactEmail(''); setContactMsg(''); }, 2000);
+                }}
                   style={{ padding: 16, background: '#9A2D55', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, borderRadius: 2, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                   إرسال الرسالة
                 </button>
