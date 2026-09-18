@@ -6,8 +6,10 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AdminLayout from './admin/layout/AdminLayout';
+import AuthGuard from './admin/AuthGuard';
 import StorefrontApp from './StorefrontApp';
 
+const Login       = lazy(() => import('./admin/pages/Login'));
 const Dashboard   = lazy(() => import('./admin/pages/Dashboard'));
 const Orders      = lazy(() => import('./admin/pages/Orders'));
 const OrderDetails= lazy(() => import('./admin/pages/OrderDetails'));
@@ -38,29 +40,40 @@ function AdminFallback() {
   );
 }
 
+const S = (C: React.ComponentType) => (
+  <Suspense fallback={<AdminFallback />}><C /></Suspense>
+);
+
 export default function App() {
   return (
     <Routes>
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Suspense fallback={<AdminFallback />}><Dashboard /></Suspense>} />
-        <Route path="orders" element={<Suspense fallback={<AdminFallback />}><Orders /></Suspense>} />
-        <Route path="orders/:id" element={<Suspense fallback={<AdminFallback />}><OrderDetails /></Suspense>} />
-        <Route path="hero-banners" element={<Suspense fallback={<AdminFallback />}><HeroBanners /></Suspense>} />
-        <Route path="products" element={<Suspense fallback={<AdminFallback />}><Products /></Suspense>} />
-        <Route path="products/new" element={<Suspense fallback={<AdminFallback />}><ProductForm /></Suspense>} />
-        <Route path="products/:id" element={<Suspense fallback={<AdminFallback />}><ProductForm /></Suspense>} />
-        <Route path="categories" element={<Suspense fallback={<AdminFallback />}><Categories /></Suspense>} />
-        <Route path="customers" element={<Suspense fallback={<AdminFallback />}><Customers /></Suspense>} />
-        <Route path="inventory" element={<Suspense fallback={<AdminFallback />}><Inventory /></Suspense>} />
-        <Route path="marketing" element={<Suspense fallback={<AdminFallback />}><Marketing /></Suspense>} />
-        <Route path="coupons" element={<Suspense fallback={<AdminFallback />}><Coupons /></Suspense>} />
-        <Route path="reviews" element={<Suspense fallback={<AdminFallback />}><Reviews /></Suspense>} />
-        <Route path="reports" element={<Suspense fallback={<AdminFallback />}><Reports /></Suspense>} />
-        <Route path="settings" element={<Suspense fallback={<AdminFallback />}><Settings /></Suspense>} />
-        <Route path="users" element={<Suspense fallback={<AdminFallback />}><Users /></Suspense>} />
-        <Route path="support" element={<Suspense fallback={<AdminFallback />}><Support /></Suspense>} />
-        <Route path="shipping" element={<Suspense fallback={<AdminFallback />}><Shipping /></Suspense>} />
+      {/* Public admin login */}
+      <Route path="/admin/login" element={<Suspense fallback={<AdminFallback />}><Login /></Suspense>} />
+
+      {/* Protected admin routes */}
+      <Route path="/admin" element={<AuthGuard />}>
+        <Route element={<AdminLayout />}>
+          <Route index element={S(Dashboard)} />
+          <Route path="orders" element={S(Orders)} />
+          <Route path="orders/:id" element={S(OrderDetails)} />
+          <Route path="hero-banners" element={S(HeroBanners)} />
+          <Route path="products" element={S(Products)} />
+          <Route path="products/new" element={S(ProductForm)} />
+          <Route path="products/:id" element={S(ProductForm)} />
+          <Route path="categories" element={S(Categories)} />
+          <Route path="customers" element={S(Customers)} />
+          <Route path="inventory" element={S(Inventory)} />
+          <Route path="marketing" element={S(Marketing)} />
+          <Route path="coupons" element={S(Coupons)} />
+          <Route path="reviews" element={S(Reviews)} />
+          <Route path="reports" element={S(Reports)} />
+          <Route path="settings" element={S(Settings)} />
+          <Route path="users" element={S(Users)} />
+          <Route path="support" element={S(Support)} />
+          <Route path="shipping" element={S(Shipping)} />
+        </Route>
       </Route>
+
       <Route path="*" element={<StorefrontApp />} />
     </Routes>
   );
