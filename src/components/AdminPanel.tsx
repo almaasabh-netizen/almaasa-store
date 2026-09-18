@@ -345,18 +345,21 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   };
 
   const handleDeleteMethod = (zoneId: string, methodId: string) => {
-    if (confirm('هل أنتِ متأكدة من رغبتكِ في حذف خيار وطريقة التوصيل المحددة؟')) {
-      const updatedZones = shippingZones.map(z => {
-        if (z.id === zoneId) {
-          return {
-            ...z,
-            methods: z.methods.filter((m: any) => m.id !== methodId)
-          };
-        }
-        return z;
-      });
-      saveShippingZones(updatedZones);
-    }
+    setConfirmDialog({
+      msg: 'هل أنتِ متأكدة من رغبتكِ في حذف خيار وطريقة التوصيل المحددة؟',
+      onConfirm: () => {
+        const updatedZones = shippingZones.map(z => {
+          if (z.id === zoneId) {
+            return {
+              ...z,
+              methods: z.methods.filter((m: any) => m.id !== methodId)
+            };
+          }
+          return z;
+        });
+        saveShippingZones(updatedZones);
+      }
+    });
   };
 
   const handleUpdateGateway = (gatewayKey: string, updatedFields: any) => {
@@ -595,20 +598,23 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
   // Delete product safely
   const handleDeleteProduct = (id: string, name: string) => {
-    if (confirm(`هل أنت متأكد من رغبتك بحذف المنتج [${name}] نهائياً من العرض؟`)) {
-      const updated = products.filter(p => p.id !== id);
-      setProducts(updated);
-      saveStoredData({ products: updated });
+    setConfirmDialog({
+      msg: `هل أنت متأكد من رغبتك بحذف المنتج [${name}] نهائياً من العرض؟`,
+      onConfirm: () => {
+        const updated = products.filter(p => p.id !== id);
+        setProducts(updated);
+        saveStoredData({ products: updated });
 
-      addOperationLog(
-        `حذف منتج ${name}`,
-        `تم إلغاء عرض المنتج من السجلات.`,
-        'إدارة السلع الماسية',
-        'product',
-        'warning'
-      );
-      loadData();
-    }
+        addOperationLog(
+          `حذف منتج ${name}`,
+          `تم إلغاء عرض المنتج من السجلات.`,
+          'إدارة السلع الماسية',
+          'product',
+          'warning'
+        );
+        loadData();
+      }
+    });
   };
 
   // Save edited product
@@ -1045,32 +1051,48 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       </div>
                       <span className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full">↑ +12.1% من الشهر الماضي</span>
                     </div>
-                    <div className="h-48 w-full relative">
-                      <svg className="w-full h-full" viewBox="0 0 500 160" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#9A2D55" stopOpacity="0.15" />
-                            <stop offset="100%" stopColor="#9A2D55" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-                        <line x1="0" y1="40" x2="500" y2="40" stroke="#f8f4f6" strokeWidth="1" />
-                        <line x1="0" y1="80" x2="500" y2="80" stroke="#f8f4f6" strokeWidth="1" />
-                        <line x1="0" y1="120" x2="500" y2="120" stroke="#f8f4f6" strokeWidth="1" />
-                        <text x="0" y="38" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">20K</text>
-                        <text x="0" y="78" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">15K</text>
-                        <text x="0" y="118" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">10K</text>
-                        <path d="M30,140 L80,130 L130,100 L180,115 L230,70 L280,90 L330,50 L380,65 L430,30 L480,15"
-                          fill="none" stroke="#9A2D55" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M30,140 L80,130 L130,100 L180,115 L230,70 L280,90 L330,50 L380,65 L430,30 L480,15 L480,155 L30,155 Z"
-                          fill="url(#salesGrad)" />
-                        {[[230,70],[330,50],[480,15]].map(([cx,cy],i) => (
-                          <circle key={i} cx={cx} cy={cy} r="4" fill="#9A2D55" stroke="white" strokeWidth="2" />
-                        ))}
-                      </svg>
-                    </div>
-                    <div className="flex justify-between text-[10px] text-slate-400 font-medium mt-1 px-1">
-                      {['1 مايو','5 مايو','10 مايو','15 مايو','20 مايو','25 مايو','30 مايو'].map(d => <span key={d}>{d}</span>)}
-                    </div>
+                    {(() => {
+                      const monthlyData = getMonthlyStats(orders);
+                      const maxVal = Math.max(...monthlyData.map(([,v]) => v), 1);
+                      const chartW = 460, chartH = 140, pad = 20;
+                      const pts = monthlyData.map(([,v], i) => {
+                        const x = pad + (monthlyData.length > 1 ? (i / (monthlyData.length - 1)) : 0.5) * (chartW - 2*pad);
+                        const y = pad + (1 - v/maxVal) * (chartH - 2*pad);
+                        return [x, y] as [number, number];
+                      });
+                      const svgPath = pts.length > 1 ? `M${pts.map(([x,y])=>`${x},${y}`).join(' L')}` : '';
+                      const fillPath = pts.length > 1 ? `${svgPath} L${pts[pts.length-1][0]},${chartH-4} L${pts[0][0]},${chartH-4} Z` : '';
+                      return (
+                        <div className="h-48 w-full relative">
+                          <svg className="w-full h-full" viewBox={`0 0 500 ${chartH}`} preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#9A2D55" stopOpacity="0.15" />
+                                <stop offset="100%" stopColor="#9A2D55" stopOpacity="0" />
+                              </linearGradient>
+                            </defs>
+                            <line x1="0" y1="35" x2="500" y2="35" stroke="#f8f4f6" strokeWidth="1" />
+                            <line x1="0" y1="75" x2="500" y2="75" stroke="#f8f4f6" strokeWidth="1" />
+                            <line x1="0" y1="115" x2="500" y2="115" stroke="#f8f4f6" strokeWidth="1" />
+                            {svgPath ? (
+                              <>
+                                <path d={fillPath} fill="url(#salesGrad)" />
+                                <path d={svgPath} fill="none" stroke="#9A2D55" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                {pts.map(([x,y],i) => <circle key={i} cx={x} cy={y} r="4" fill="#9A2D55" stroke="white" strokeWidth="2" />)}
+                              </>
+                            ) : (
+                              <text x="250" y="70" textAnchor="middle" fontSize="11" fill="#cbd5e1" fontFamily="sans-serif">لا توجد بيانات مبيعات بعد</text>
+                            )}
+                          </svg>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-medium mt-1 px-1">
+                            {monthlyData.length > 0
+                              ? monthlyData.map(([m]) => <span key={m}>{m}</span>)
+                              : ['—','—','—','—','—','—'].map((d,i) => <span key={i}>{d}</span>)
+                            }
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* B2: Category Donut */}
@@ -1092,22 +1114,44 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                         <text x="60" y="68" textAnchor="middle" fontSize="8" fill="#9B8178" fontFamily="sans-serif">طلب</text>
                       </svg>
                     </div>
-                    <div className="space-y-2">
-                      {[
-                        { label: 'مخاوير', pct: '45%', color: 'bg-[#9A2D55]' },
-                        { label: 'أقمشة', pct: '30%', color: 'bg-[#C4956A]' },
-                        { label: 'تصاميم', pct: '15%', color: 'bg-[#e8d5c4]' },
-                        { label: 'أخرى', pct: '10%', color: 'bg-slate-200' },
-                      ].map(({ label, pct, color }) => (
-                        <div key={label} className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2.5 h-2.5 rounded-full ${color} shrink-0`} />
-                            <span className="text-slate-600 font-medium">{label}</span>
-                          </div>
-                          <span className="font-bold text-slate-700">{pct}</span>
+                    {(() => {
+                      // Compute category breakdown from orders or fallback to products
+                      const counts: Record<string, number> = {};
+                      orders.forEach(o => (o.items || []).forEach((item: any) => {
+                        const cat = item.product?.category || 'أخرى';
+                        counts[cat] = (counts[cat] || 0) + (item.quantity || 1);
+                      }));
+                      // Fallback to products if no order items
+                      if (Object.keys(counts).length === 0) {
+                        products.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
+                      }
+                      const total = Object.values(counts).reduce((a,b) => a+b, 0) || 1;
+                      const palette = ['#9A2D55','#C4956A','#e8d5c4','#94a3b8','#10b981','#f59e0b'];
+                      const entries = Object.entries(counts).sort(([,a],[,b]) => b-a).slice(0,5);
+                      const catMap: Record<string, string> = {
+                        'available':'متوفر', 'with-sheilah':'مع شيلة', 'kids':'أطفال',
+                        'mother-daughter':'أم وبنت', 'accessories':'اكسسوارات'
+                      };
+                      return (
+                        <div className="space-y-2">
+                          {entries.map(([cat, cnt], i) => {
+                            const pct = Math.round((cnt/total)*100);
+                            return (
+                              <div key={cat} className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{background: palette[i % palette.length]}} />
+                                  <span className="text-slate-600 font-medium">{catMap[cat] || cat}</span>
+                                </div>
+                                <span className="font-bold text-slate-700">{pct}%</span>
+                              </div>
+                            );
+                          })}
+                          {entries.length === 0 && (
+                            <p className="text-xs text-slate-400 text-center">لا توجد بيانات بعد</p>
+                          )}
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -1145,11 +1189,13 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                 ord.shippingStatus === 'delivered' ? 'bg-emerald-100 text-emerald-700' :
                                 ord.shippingStatus === 'shipped' ? 'bg-blue-100 text-blue-700' :
                                 ord.shippingStatus === 'processing' ? 'bg-amber-100 text-amber-700' :
+                                ord.shippingStatus === 'cancelled' ? 'bg-red-100 text-red-700' :
                                 'bg-rose-100 text-[#9A2D55]'
                               }`}>
-                                {ord.shippingStatus === 'delivered' ? 'مكتمل' :
-                                 ord.shippingStatus === 'shipped' ? 'قيد الشحن' :
-                                 ord.shippingStatus === 'processing' ? 'قيد التجهيز' : 'ملغي'}
+                                {ord.shippingStatus === 'delivered' ? 'تم التوصيل' :
+                                 ord.shippingStatus === 'shipped' ? 'تم الشحن' :
+                                 ord.shippingStatus === 'processing' ? 'جاري التجهيز' :
+                                 ord.shippingStatus === 'cancelled' ? 'ملغي' : 'قيد المعالجة'}
                               </span>
                             </td>
                           </tr>
@@ -1199,7 +1245,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                             { label: 'مكتمل', count: orders.filter(o=>o.shippingStatus==='delivered').length, color: 'bg-emerald-500' },
                             { label: 'قيد التجهيز', count: orders.filter(o=>o.shippingStatus==='processing').length, color: 'bg-amber-400' },
                             { label: 'قيد الشحن', count: orders.filter(o=>o.shippingStatus==='shipped').length, color: 'bg-blue-500' },
-                            { label: 'ملغي', count: orders.filter(o=>o.shippingStatus==='pending').length, color: 'bg-[#9A2D55]' },
+                            { label: 'قيد المعالجة', count: orders.filter(o=>o.shippingStatus==='pending').length, color: 'bg-[#9A2D55]' },
                           ].map(({ label, count, color }) => (
                             <div key={label} className="flex items-center justify-between">
                               <div className="flex items-center gap-1.5">
