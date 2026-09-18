@@ -149,8 +149,8 @@ export default function Sidebar() {
                 >
                   {/* Active stripe */}
                   <span style={{
-                    position: 'absolute', right: 0, top: '20%', bottom: '20%',
-                    width: 3, borderRadius: '2px 0 0 2px',
+                    position: 'absolute', left: 0, top: '20%', bottom: '20%',
+                    width: 3, borderRadius: '0 2px 2px 0',
                     background: ROSE, opacity: active ? 1 : 0,
                     transition: 'opacity .15s',
                   }} />

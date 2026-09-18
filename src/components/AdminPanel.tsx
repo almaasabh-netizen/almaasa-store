@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  BarChart3, ShoppingBag, Users, Truck, Sparkles, FolderKanban, 
-  Settings, CreditCard, Layers, Sliders, ClipboardList, Star, 
-  Trash2, Plus, CheckCircle, Clock, Undo2, LogIn, Lock, 
-  Tag, Compass, HelpCircle, Wallet, FileText, LayoutGrid, 
+  BarChart3, ShoppingBag, Users, Truck, Sparkles, FolderKanban,
+  Settings, CreditCard, Layers, Sliders, ClipboardList, Star,
+  Trash2, Plus, CheckCircle, Clock, Undo2, LogIn, LogOut, Lock,
+  Tag, Compass, HelpCircle, Wallet, FileText, LayoutGrid,
   RefreshCw, Check, AlertTriangle, Eye, Printer, Percent, BadgeAlert,
   Globe, Instagram, X, Pencil, ExternalLink
 } from 'lucide-react';
@@ -39,6 +39,8 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   // Filter options for logging and queue searches
   const [logTypeFilter, setLogTypeFilter] = useState<string>('all');
   const [orderSearch, setOrderSearch] = useState('');
+  const [ordersPage, setOrdersPage] = useState(1);
+  const ORDERS_PER_PAGE = 20;
   const [productSearch, setProductSearch] = useState('');
 
   // Focused Order Detail overlay
@@ -756,7 +758,6 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       code: newCouponCode.toUpperCase().trim(),
       type: newCouponType,
       discount: newCouponDiscount,
-      minOrderAmount: newCouponMinOrder ? Number(newCouponMinOrder) : undefined,
       expiryDate: newCouponExpiry || undefined,
       isActive: newCouponActive,
       usageCount: 0,
@@ -781,11 +782,13 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       return;
     }
     const slug = newCatName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-    const newCat: Category = {
+    const newCat = {
       id: slug || `cat-${Date.now()}`,
       name: newCatName.trim(),
+      slug: slug || `cat-${Date.now()}`,
+      count: 0,
       description: newCatDesc.trim() || undefined,
-    } as any;
+    } as Category;
     const updated = [...categories, newCat];
     setCategories(updated);
     saveStoredData({ categories: updated });
@@ -854,9 +857,10 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
           background: adminToast.type === 'error' ? '#DC2626' : adminToast.type === 'info' ? '#1D4ED8' : '#059669',
           color: '#fff', padding: '12px 20px', borderRadius: 8,
           boxShadow: '0 4px 20px rgba(0,0,0,0.2)', fontFamily: "'Cairo', sans-serif",
-          fontSize: 14, maxWidth: 320, direction: 'rtl'
+          fontSize: 14, maxWidth: 320, direction: 'rtl', display: 'flex', alignItems: 'center', gap: 8
         }}>
-          {adminToast.msg}
+          <span style={{flex: 1}}>{adminToast.msg}</span>
+          <button onClick={() => setAdminToast(null)} style={{marginRight: 8, background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16, lineHeight: 1}}>×</button>
         </div>
       )}
 
@@ -1038,7 +1042,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
               </button>
               <button onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold text-rose-400 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer">
-                <LogIn className="w-4 h-4 rotate-180" />
+                <LogOut className="w-4 h-4" />
                 تسجيل الخروج
               </button>
             </div>
@@ -1103,9 +1107,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 {/* A. Stats Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { label: 'إجمالي المبيعات', value: `${totalRevenue.toFixed(2)} د.ب`, growth: '+12.1%', icon: Wallet, color: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' },
+                    { label: 'إجمالي المبيعات', value: `${totalRevenue.toFixed(2)} د.ب`, growth: '—', icon: Wallet, color: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' }, // TODO: compute from real data
                     { label: 'إجمالي الطلبات', value: `${orders.length} طلب`, growth: `+${pendingOrdersCount} جديد`, icon: ShoppingBag, color: 'bg-rose-50 text-[#9A2D55]', border: 'border-rose-100' },
-                    { label: 'العملاء الجدد', value: `${totalClientsCount} عميل`, growth: '+8.3%', icon: Users, color: 'bg-blue-50 text-blue-600', border: 'border-blue-100' },
+                    { label: 'العملاء الجدد', value: `${totalClientsCount} عميل`, growth: '—', icon: Users, color: 'bg-blue-50 text-blue-600', border: 'border-blue-100' }, // TODO: compute from real data
                     { label: 'المخزون المنخفض', value: `${lowStockProductsCount} منتج`, growth: lowStockProductsCount > 0 ? '⚠️ يحتاج تجديد' : '✓ مستوى جيد', icon: BadgeAlert, color: lowStockProductsCount > 0 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600', border: lowStockProductsCount > 0 ? 'border-amber-100' : 'border-emerald-100' },
                   ].map(({ label, value, growth, icon: Icon, color, border }) => (
                     <div key={label} className={`bg-white border ${border} rounded-2xl p-4 shadow-sm`}>
@@ -1131,7 +1135,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                         <h3 className="font-black text-sm text-slate-800">المبيعات</h3>
                         <p className="text-[10px] text-slate-400 font-medium">آخر 30 يوم</p>
                       </div>
-                      <span className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full">↑ +12.1% من الشهر الماضي</span>
+                      <span className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full">آخر 6 أشهر</span>{/* TODO: compute growth from real data */}
                     </div>
                     {(() => {
                       const monthlyData = getMonthlyStats(orders);
@@ -1345,18 +1349,24 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="bg-white rounded-2xl border border-slate-100 p-4">
                       <h3 className="font-black text-sm text-slate-800 mb-3">أفضل المنتجات مبيعاً</h3>
                       <div className="space-y-3">
-                        {products.slice(0, 3).map((p, i) => (
+                        {products.slice(0, 3).map((p, i) => {
+                          const soldCount = orders.reduce((sum: number, o: any) => {
+                            const item = o.items?.find((it: any) => it.product?.id === p.id);
+                            return sum + (item ? item.quantity : 0);
+                          }, 0);
+                          return (
                           <div key={p.id} className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#F8EDE8] shrink-0">
                               <img src={p.image} alt={p.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[11px] font-bold text-slate-700 truncate">{p.name}</p>
-                              <p className="text-[10px] text-slate-400">{p.reviewCount} مبيع</p>
+                              <p className="text-[10px] text-slate-400">{soldCount} مبيع</p>
                             </div>
                             <span className="text-xs font-black text-[#9A2D55] shrink-0">{p.price.toFixed(0)} د.ب</span>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -1378,14 +1388,21 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     type="text" 
                     placeholder="ابحثي باسم الزبونة أو رقم الهاتف أو كود تتبع الشحن..."
                     value={orderSearch}
-                    onChange={(e) => setOrderSearch(e.target.value)}
+                    onChange={(e) => { setOrderSearch(e.target.value); setOrdersPage(1); }}
                     className="flex-1 bg-[#FAF6F6] border rounded-xl px-4 py-2.5 text-xs font-semibold focus:outline-none"
                   />
-                  <button className="bg-slate-900 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs">تحديث</button>
                 </div>
 
                 {/* High density Orders Table */}
-                <div className="bg-white border rounded-2xl overflow-hidden shadow-2xs">
+                {(() => {
+                  const filteredOrders = orders.filter(o => !orderSearch ||
+                    o.customer.name.toLowerCase().includes(orderSearch.toLowerCase()) ||
+                    o.trackingCode.toLowerCase().includes(orderSearch.toLowerCase()) ||
+                    o.customer.phone.includes(orderSearch)
+                  );
+                  const pagedOrders = filteredOrders.slice((ordersPage - 1) * ORDERS_PER_PAGE, ordersPage * ORDERS_PER_PAGE);
+                  return (<>
+                <div className="bg-white border rounded-2xl shadow-2xs" style={{overflowX: 'auto'}}>
                   <table className="w-full text-right text-xs">
                     <thead>
                       <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
@@ -1399,13 +1416,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 font-bold">
-                      {orders
-                        .filter(o => !orderSearch || 
-                           o.customer.name.toLowerCase().includes(orderSearch.toLowerCase()) || 
-                           o.trackingCode.toLowerCase().includes(orderSearch.toLowerCase()) || 
-                           o.customer.phone.includes(orderSearch)
-                        )
-                        .map((order) => (
+                      {pagedOrders.length === 0 ? (
+                        <tr><td colSpan={7} className="p-10 text-center text-slate-400 text-sm font-medium">لا توجد طلبات مطابقة</td></tr>
+                      ) : pagedOrders.map((order) => (
                           <tr key={order.id} className="hover:bg-[#FAF6F6]/50">
                             <td className="p-3 font-mono text-slate-800">{order.id}</td>
                             <td className="p-3">
@@ -1428,9 +1441,15 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                               </select>
                             </td>
                             <td className="p-3">
-                              <select 
-                                value={order.shippingStatus} 
-                                onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value as Order['shippingStatus'])}
+                              <select
+                                value={order.shippingStatus}
+                                onChange={(e) => {
+                                  const newStatus = e.target.value as Order['shippingStatus'];
+                                  setConfirmDialog({
+                                    msg: `تأكيد تغيير الحالة إلى "${newStatus}"؟`,
+                                    onConfirm: () => handleUpdateOrderStatus(order.id, newStatus)
+                                  });
+                                }}
                                 className={`p-1.5 rounded-lg text-[10px] font-bold focus:outline-none border ${
                                   order.shippingStatus === 'delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                                   order.shippingStatus === 'shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
@@ -1442,6 +1461,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                 <option value="processing">جاري التفصيل والقص</option>
                                 <option value="shipped">تم تسليم الشاحن ✈️</option>
                                 <option value="delivered">تمت التسوية والتسليم✓</option>
+                                <option value="cancelled">ملغي</option>
                               </select>
                             </td>
                             <td className="p-3">
@@ -1468,6 +1488,15 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     </tbody>
                   </table>
                 </div>
+                {filteredOrders.length > ORDERS_PER_PAGE && (
+                  <div style={{display:'flex', gap:8, justifyContent:'center', padding:'16px 0', direction:'rtl'}}>
+                    <button disabled={ordersPage === 1} onClick={() => setOrdersPage(p => p - 1)} style={{background: ordersPage === 1 ? '#f1f5f9' : '#1e293b', color: ordersPage === 1 ? '#94a3b8' : '#fff', border:'none', borderRadius:8, padding:'6px 16px', fontSize:13, cursor: ordersPage === 1 ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>السابق</button>
+                    <span style={{padding:'6px 12px', fontSize:13, color:'#475569', fontWeight:600}}>صفحة {ordersPage} من {Math.ceil(filteredOrders.length / ORDERS_PER_PAGE)}</span>
+                    <button disabled={ordersPage >= Math.ceil(filteredOrders.length / ORDERS_PER_PAGE)} onClick={() => setOrdersPage(p => p + 1)} style={{background: ordersPage >= Math.ceil(filteredOrders.length / ORDERS_PER_PAGE) ? '#f1f5f9' : '#1e293b', color: ordersPage >= Math.ceil(filteredOrders.length / ORDERS_PER_PAGE) ? '#94a3b8' : '#fff', border:'none', borderRadius:8, padding:'6px 16px', fontSize:13, cursor: ordersPage >= Math.ceil(filteredOrders.length / ORDERS_PER_PAGE) ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>التالي</button>
+                  </div>
+                )}
+                </>);
+                })()}
 
               </div>
             )}
@@ -1497,6 +1526,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 <div className="bg-white border rounded-2xl p-5">
                   <h3 className="font-bold text-slate-800 mb-4 text-xs border-b pb-2">دفتر المعاملات والمدخول من بوابات الدفع الخليجية</h3>
                   <div className="space-y-3">
+                    {orders.filter(o => o.paymentStatus === 'paid').length === 0 && (
+                      <p className="text-center text-slate-400 text-sm py-8 font-medium">لا توجد مبيعات بعد</p>
+                    )}
                     {orders.filter(o => o.paymentStatus === 'paid').map((ticket) => (
                       <div key={ticket.id} className="bg-slate-50 border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between text-xs gap-3">
                         <div>
@@ -1521,6 +1553,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
               <div className="space-y-6">
                 <div className="bg-white border rounded-2xl p-5">
                   <h3 className="font-bold text-slate-800 text-xs mb-4">قائمة وسجلات المشترين وبوليسيات الاتصال</h3>
+                  {Array.from(new Set(orders.map(o => o.customer.phone))).length === 0 && (
+                    <p className="text-center text-slate-400 text-sm py-8 font-medium">لا يوجد عملاء بعد</p>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Array.from(new Set(orders.map(o => o.customer.phone))).map((phoneNum, idx) => {
                       const clientOrders = orders.filter(o => o.customer.phone === phoneNum);
@@ -1592,6 +1627,31 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 ========================================= */}
             {activeMenu === 'categories' && (
               <div className="space-y-6">
+                {/* Add Category Form */}
+                <div className="bg-white border rounded-2xl p-5">
+                  <h3 className="font-bold text-slate-800 text-xs mb-4">إضافة تصنيف جديد</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-[10px] text-slate-400 font-bold block mb-1">اسم التصنيف *</label>
+                      <input type="text" value={newCatName} onChange={e => setNewCatName(e.target.value)}
+                        placeholder="مخاوير العيد"
+                        className="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-400 font-bold block mb-1">الوصف (اختياري)</label>
+                      <input type="text" value={newCatDesc} onChange={e => setNewCatDesc(e.target.value)}
+                        placeholder="وصف مختصر للتصنيف"
+                        className="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none" />
+                    </div>
+                    <div className="flex items-end">
+                      <button onClick={handleAddCategory}
+                        className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white font-extrabold text-xs px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer">
+                        <Plus className="w-3.5 h-3.5" /> إضافة تصنيف
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="bg-white border rounded-2xl p-5">
                   <div className="flex items-center justify-between border-b pb-2 mb-4">
                     <h3 className="font-bold text-slate-800 text-xs">إدارة أقسام وتصنيفات مخاوير ألماسة</h3>
@@ -1600,11 +1660,40 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
                   <div className="space-y-3">
                     {categories.map((cat) => (
-                      <div key={cat.id} className="bg-[#FAF6F6] rounded-xl p-3 flex justify-between items-center text-xs">
-                        <strong className="text-slate-800">{cat.name}</strong>
-                        <span className="text-[#9A2D55] font-mono font-bold bg-white border px-3 py-1 rounded-lg">
-                          يحتوي {products.filter(p => p.category === cat.id || cat.id === 'all').length} منتج
-                        </span>
+                      <div key={cat.id} className="bg-[#FAF6F6] rounded-xl p-3 text-xs">
+                        {editingCat && editingCat.id === cat.id ? (
+                          <div className="flex flex-col sm:flex-row gap-2 items-center">
+                            <input value={editingCat.name} onChange={e => setEditingCat({...editingCat, name: e.target.value})}
+                              className="flex-1 bg-white border rounded-lg px-2 py-1 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                            <input value={editingCat.description || ''} onChange={e => setEditingCat({...editingCat, description: e.target.value})}
+                              placeholder="الوصف"
+                              className="flex-1 bg-white border rounded-lg px-2 py-1 text-xs focus:outline-none" />
+                            <div className="flex gap-1">
+                              <button onClick={handleUpdateCategory} className="bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-lg cursor-pointer">حفظ</button>
+                              <button onClick={() => setEditingCat(null)} className="bg-slate-200 text-slate-700 text-[10px] font-bold px-3 py-1 rounded-lg cursor-pointer">إلغاء</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <strong className="text-slate-800">{cat.name}</strong>
+                              {(cat as any).description && <p className="text-[10px] text-slate-400 mt-0.5">{(cat as any).description}</p>}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[#9A2D55] font-mono font-bold bg-white border px-3 py-1 rounded-lg">
+                                {products.filter(p => p.category === cat.id || cat.id === 'all').length} منتج
+                              </span>
+                              <button onClick={() => setEditingCat({...cat})}
+                                className="text-slate-500 hover:text-slate-800 border border-slate-200 px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer flex items-center gap-1">
+                                <Pencil className="w-3 h-3" /> تعديل
+                              </button>
+                              <button onClick={() => handleDeleteCategory(cat.id)}
+                                className="bg-rose-50 text-rose-600 hover:bg-rose-100 px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer flex items-center gap-1">
+                                <Trash2 className="w-3 h-3" /> حذف
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1696,11 +1785,16 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                   <CheckCircle className="w-3 h-3" /> نشر
                                 </button>
                               )}
+                              <a href="/" target="_blank" rel="noopener" title="معاينة في المتجر"
+                                style={{display:'inline-flex',alignItems:'center',padding:'2px 6px',borderRadius:6,background:'#f1f5f9',color:'#64748b',textDecoration:'none'}}
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
                               <button
                                 onClick={() => setEditingProduct({ ...prod })}
                                 className="text-[#9A2D55] hover:text-[#802446] font-bold flex items-center gap-1 cursor-pointer"
                               >
-                                <Check className="w-3.5 h-3.5" /> تعديل
+                                <Pencil className="w-3.5 h-3.5" /> تعديل
                               </button>
                               <button
                                 onClick={() => handleDeleteProduct(prod.id, prod.name)}
@@ -1765,12 +1859,13 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                     });
                                     setProducts(nextProds);
                                     saveStoredData({ products: nextProds });
+                                    showAdminToast('تم تحديث المخزون', 'success');
                                   }}
                                   className="text-[10px] bg-rose-50 text-[#9A2D55] px-1.5 py-0.5 rounded border border-rose-100 font-bold hover:bg-rose-100 cursor-pointer"
                                 >
                                   +5 قطع
                                 </button>
-                                <button 
+                                <button
                                   onClick={() => {
                                     const nextProds = products.map(p => {
                                       if (p.id === prod.id) {
@@ -1780,6 +1875,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                     });
                                     setProducts(nextProds);
                                     saveStoredData({ products: nextProds });
+                                    showAdminToast('تم تحديث المخزون', 'success');
                                   }}
                                   className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded hover:bg-slate-200 cursor-pointer"
                                 >
@@ -1804,6 +1900,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 <div className="bg-white border rounded-2xl p-5">
                   <h3 className="font-bold text-slate-800 text-xs mb-4">آراء عملاء مخاوير ألماسة (تعديل وحجب وعرض مباشر)</h3>
                   <div className="space-y-4">
+                    {reviews.length === 0 && (
+                      <p className="text-center text-slate-400 text-sm py-8 font-medium">لا توجد تقييمات بعد</p>
+                    )}
                     {reviews.map((rev) => (
                       <div key={rev.id} className="bg-slate-50 border rounded-2xl p-4 text-xs space-y-2">
                         <div className="flex justify-between items-center bg-white p-2 rounded-xl border">
@@ -1846,7 +1945,61 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <span className="text-[10px] bg-rose-50 text-[#9A2D55] px-2 py-0.5 rounded font-bold">النشط: {coupons.filter(c => c.isActive).length} كوبونات</span>
                   </div>
 
+                  {/* Add Coupon Form */}
+                  <div className="bg-slate-50 border border-dashed border-[#9A2D55]/30 rounded-xl p-4 mb-4 space-y-3">
+                    <h4 className="font-bold text-slate-700 text-xs mb-2">إضافة كوبون جديد</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">كود الكوبون *</label>
+                        <input
+                          type="text"
+                          value={newCouponCode}
+                          onChange={e => setNewCouponCode(e.target.value.toUpperCase())}
+                          placeholder="ALMAASA20"
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">نوع الخصم</label>
+                        <select value={newCouponType} onChange={e => setNewCouponType(e.target.value as 'percentage'|'fixed')}
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none">
+                          <option value="percentage">نسبة مئوية %</option>
+                          <option value="fixed">مبلغ ثابت</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">قيمة الخصم *</label>
+                        <input type="number" min={0} value={newCouponDiscount} onChange={e => setNewCouponDiscount(Number(e.target.value))}
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">حد أقصى للاستخدام (اختياري)</label>
+                        <input type="number" min={0} value={newCouponMinOrder} onChange={e => setNewCouponMinOrder(e.target.value)}
+                          placeholder="مثال: 50"
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">تاريخ الانتهاء (اختياري)</label>
+                        <input type="date" value={newCouponExpiry} onChange={e => setNewCouponExpiry(e.target.value)}
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none" />
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <label className="flex items-center gap-2 text-xs font-bold cursor-pointer mt-4">
+                          <input type="checkbox" checked={newCouponActive} onChange={e => setNewCouponActive(e.target.checked)} />
+                          <span>فعال</span>
+                        </label>
+                      </div>
+                    </div>
+                    <button onClick={handleAddCoupon}
+                      className="bg-[#9A2D55] hover:bg-[#802446] text-white font-extrabold text-xs px-5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer">
+                      <Plus className="w-3.5 h-3.5" /> إضافة الكوبون
+                    </button>
+                  </div>
+
                   <div className="space-y-3">
+                    {coupons.length === 0 && (
+                      <p className="text-center text-slate-400 text-sm py-6 font-medium">لا توجد كوبونات بعد. أضيفي أول كوبون أعلاه</p>
+                    )}
                     {coupons.map((coupon) => (
                       <div key={coupon.code} className="bg-[#FAF6F6] border rounded-xl p-4 flex items-center justify-between text-xs gap-3 font-semibold">
                         <div>
@@ -1905,7 +2058,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="space-y-4">
                       {/* Top status & toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label dir="ltr" className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={paymentGateways.tap.enabled}
@@ -1958,7 +2111,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                             }}
                             className="bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded font-sans font-bold cursor-pointer transition-colors"
                           >
-                            {copiedTextId === 'tap-wh' ? 'تم النسخ!' : 'عرض'}
+                            {copiedTextId === 'tap-wh' ? 'تم النسخ!' : 'نسخ'}
                           </button>
                         </div>
                       </div>
@@ -1988,7 +2141,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="space-y-4">
                       {/* Top status & toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label dir="ltr" className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={paymentGateways.cod.enabled}
@@ -2041,7 +2194,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="space-y-4">
                       {/* Top status & toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label dir="ltr" className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={paymentGateways.bankTransfer.enabled}
@@ -2102,7 +2255,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="space-y-4">
                       {/* Top status & toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label dir="ltr" className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={paymentGateways.vpay.enabled}
@@ -2155,7 +2308,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                             }}
                             className="bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded font-sans font-bold cursor-pointer transition-colors"
                           >
-                            {copiedTextId === 'vpay-wh' ? 'تم النسخ!' : 'عرض'}
+                            {copiedTextId === 'vpay-wh' ? 'تم النسخ!' : 'نسخ'}
                           </button>
                         </div>
                       </div>

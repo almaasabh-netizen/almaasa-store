@@ -48,8 +48,8 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
       {/* Breadcrumb / Title */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
         <span style={{ fontSize: 11, color: INK2, whiteSpace: 'nowrap' }}>الإدارة</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={INK2} strokeWidth="2" strokeLinecap="round" style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
-          <polyline points="9 18 15 12 9 6"/>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={INK2} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}>
+          <polyline points="15 18 9 12 15 6"/>
         </svg>
         <span style={{ fontSize: 13, fontWeight: 700, color: '#1A0D11', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</span>
       </div>
