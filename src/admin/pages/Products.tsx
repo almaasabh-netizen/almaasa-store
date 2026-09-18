@@ -18,23 +18,65 @@ export default function Products() {
     setIsImporting(true);
     try {
       const res = await fetch('/api/instagram-feed');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      const posts = json.posts || json.feed || json;
-      const newProducts = (Array.isArray(posts) ? posts : []).map((p: any) => ({
-        id: `ig_${p.id || Date.now()}_${Math.random().toString(36).slice(2,6)}`,
-        name: (p.caption || p.title || 'منتج من إنستقرام').slice(0, 60),
-        price: 0, stock: 0, category: '', description: p.caption || '',
-        image: p.perm_url || p.media_url || p.thumbnail_url || '',
-        isDraft: true,
-      }));
-      if (newProducts.length === 0) { toast('لم يتم العثور على منشورات', 'info'); return; }
+      if (!res.ok) {
+        toast(json.error || 'فشل الاستيراد', 'error');
+        return;
+      }
+      // Server already returns a flat array
+      const posts: any[] = Array.isArray(json) ? json : [];
+      if (posts.length === 0) { toast('لا توجد منشورات في الـ Feed', 'info'); return; }
+
+      const existingIds = new Set((data.products || []).map((p: any) => p.id));
+      const newProducts: any[] = [];
+
+      for (const p of posts) {
+        // Skip videos
+        const mType = (p.mediaType || p.media_type || '').toUpperCase();
+        if (mType === 'VIDEO') continue;
+        // Skip posts without stable ID
+        if (!p.id && !p.shortCode) continue;
+        const pid = `ig_${p.id || p.shortCode}`;
+        if (existingIds.has(pid)) continue;
+        existingIds.add(pid);
+
+        // Pick best image URL (Behold v3 keys first)
+        const image =
+          p.sizes?.large?.mediaUrl ||
+          p.sizes?.medium?.mediaUrl ||
+          p.sizes?.small?.mediaUrl ||
+          p.prunedMediaUrl ||
+          p.mediaUrl ||
+          p.media_url ||
+          p.thumbnailUrl ||
+          p.thumbnail_url || '';
+        if (!image) continue;
+
+        // Clean caption
+        const caption = p.caption || p.text || '';
+        const firstLine = caption.split('\n')[0]
+          .replace(/#\S+/g, '').replace(/@\S+/g, '').trim();
+        const name = firstLine.slice(0, 60) || 'منتج من إنستقرام';
+
+        newProducts.push({
+          id: pid, name,
+          description: caption.slice(0, 300),
+          price: 0, originalPrice: undefined,
+          image, category: 'available',
+          stock: 10, sizes: ['S','M','L','XL'],
+          colors: [], rating: 5, reviewCount: 0,
+          hasSheilah: false, isDraft: true,
+        });
+      }
+
+      if (newProducts.length === 0) { toast('كل الصور موجودة مسبقاً أو لا توجد صور جديدة', 'info'); return; }
       const updated = { ...data, products: [...(data.products || []), ...newProducts] };
       saveStoredData(updated);
       setData(updated);
-      toast(`تم استيراد ${newProducts.length} منتج بنجاح`, 'success');
-    } catch {
-      toast('فشل الاستيراد — تأكد من إعداد Behold API', 'error');
+      toast(`تم استيراد ${newProducts.length} منتج كمسودة — أضيفي السعر قبل النشر`, 'success');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast(`فشل الاستيراد: ${msg}`, 'error');
     } finally {
       setIsImporting(false);
     }
