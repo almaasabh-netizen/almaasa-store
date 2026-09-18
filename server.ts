@@ -1,23 +1,103 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { timingSafeEqual } from "crypto";
+import rateLimit from "express-rate-limit";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
+
+// ── JWT helper ──────────────────────────────────────────────────
+const JWT_SECRET = process.env.JWT_SECRET || (() => {
+  if (process.env.NODE_ENV === "production") {
+    console.error("FATAL: JWT_SECRET env var must be set in production");
+    process.exit(1);
+  }
+  // Dev-only fallback — never used in production
+  return "dev-secret-change-me-in-production";
+})();
+
+const TOKEN_COOKIE = "ama_admin_token";
+const COOKIE_MAX_AGE = 8 * 60 * 60 * 1000; // 8 hours in ms
+
+function signToken(): string {
+  return jwt.sign({ role: "admin" }, JWT_SECRET, { expiresIn: "8h" });
+}
+
+function verifyToken(token: string): boolean {
+  try {
+    const payload = jwt.verify(token, JWT_SECRET) as any;
+    return payload?.role === "admin";
+  } catch {
+    return false;
+  }
+}
+
+// Middleware: require valid JWT cookie on protected routes
+function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const token = req.cookies?.[TOKEN_COOKIE];
+  if (!token || !verifyToken(token)) {
+    return res.status(401).json({ error: "غير مصرح. يرجى تسجيل الدخول." });
+  }
+  next();
+}
 
 async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
+  const isProd = process.env.NODE_ENV === "production";
 
-  app.use(express.json());
+  // ── Security headers ─────────────────────────────────────────
+  const allowedOrigins = [
+    "https://almaasa-store.onrender.com",
+    "http://localhost:3000",
+    "http://localhost:5173",
+  ];
 
-  // Admin Login Endpoint - validates credentials against env vars
-  app.post("/api/admin-login", async (req, res) => {
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+  });
+
+  app.use(cookieParser());
+  app.use(express.json({ limit: "2mb" }));
+
+  // ── Rate limiters ────────────────────────────────────────────
+  const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "تجاوزت عدد محاولات تسجيل الدخول. حاول مجدداً بعد 15 دقيقة." },
+  });
+
+  const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 60,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "طلبات كثيرة. حاول لاحقاً." },
+  });
+
+  // ── Auth: Login ──────────────────────────────────────────────
+  app.post("/api/admin-login", loginLimiter, async (req, res) => {
     try {
       const { email, password } = req.body;
 
-      if (!email || !password) {
+      if (!email || !password || typeof email !== "string" || typeof password !== "string") {
         return res.status(400).json({ error: "يرجى إدخال البريد الإلكتروني وكلمة المرور." });
       }
 
@@ -25,15 +105,30 @@ async function startServer() {
       const adminPassword = process.env.ADMIN_PASSWORD;
 
       if (!adminEmail || !adminPassword) {
-        return res.status(500).json({
-          error: "لم يتم تهيئة بيانات اعتماد المشرف في الخادم. يرجى مراجعة الإعدادات."
-        });
+        console.error("ADMIN_EMAIL or ADMIN_PASSWORD env vars not set");
+        return res.status(500).json({ error: "خطأ في إعدادات الخادم." });
       }
 
-      const emailMatch = email.trim().toLowerCase() === adminEmail.trim().toLowerCase();
-      const passwordMatch = password === adminPassword;
+      // Timing-safe comparison — prevents timing attacks
+      const emailNorm = email.trim().toLowerCase();
+      const adminEmailNorm = adminEmail.trim().toLowerCase();
+      const emailBuf = Buffer.from(emailNorm.padEnd(256));
+      const adminEmailBuf = Buffer.from(adminEmailNorm.padEnd(256));
+      const passBuf = Buffer.from(password.padEnd(256));
+      const adminPassBuf = Buffer.from(adminPassword.padEnd(256));
+
+      const emailMatch = timingSafeEqual(emailBuf, adminEmailBuf);
+      const passwordMatch = timingSafeEqual(passBuf, adminPassBuf);
 
       if (emailMatch && passwordMatch) {
+        const token = signToken();
+        res.cookie(TOKEN_COOKIE, token, {
+          httpOnly: true,          // JS cannot read this cookie
+          secure: isProd,          // HTTPS only in production
+          sameSite: "strict",      // CSRF protection
+          maxAge: COOKIE_MAX_AGE,
+          path: "/",
+        });
         return res.json({ success: true });
       } else {
         return res.status(401).json({ error: "البريد الإلكتروني أو كلمة المرور غير صحيحة." });
@@ -44,58 +139,27 @@ async function startServer() {
     }
   });
 
-  // Debug endpoint - raw Behold response
-  app.get("/api/instagram-debug", async (req, res) => {
-    try {
-      const url = "https://feeds.behold.so/HbcZC4oN0hh4xfAHUvTm";
-      const response = await fetch(url, {
-        headers: { "Accept": "application/json", "User-Agent": "Mozilla/5.0" }
-      });
-      const data = await response.json();
-      const firstPost = data.posts?.[0] ?? data[0] ?? null;
-      res.json({
-        status: response.status,
-        isArray: Array.isArray(data),
-        topLevelKeys: Object.keys(data),
-        postsCount: (data.posts ?? data).length,
-        firstPostKeys: firstPost ? Object.keys(firstPost) : null,
-        firstPost: firstPost,
-      });
-    } catch (err: any) {
-      res.json({ fetchError: err.message });
+  // ── Auth: Verify (called on page load to restore session) ────
+  app.get("/api/admin-verify", (req, res) => {
+    const token = req.cookies?.[TOKEN_COOKIE];
+    if (token && verifyToken(token)) {
+      return res.json({ authenticated: true });
     }
+    return res.status(401).json({ authenticated: false });
   });
 
-  // Instagram Feed Proxy (Behold)
-  app.get("/api/instagram-feed", async (req, res) => {
-    try {
-      const feedId = "HbcZC4oN0hh4xfAHUvTm";
-      const url = `https://feeds.behold.so/${feedId}`;
-      console.log("Fetching Behold feed:", url);
-      const response = await fetch(url, {
-        headers: {
-          "Accept": "application/json",
-          "User-Agent": "Mozilla/5.0 (compatible; AlmaasaStore/1.0)",
-          "Origin": "https://almaasa-store.onrender.com",
-        }
-      });
-      const text = await response.text();
-      console.log("Behold status:", response.status, "Content-Type:", response.headers.get("content-type"), "body[:300]:", text.slice(0, 300));
-      if (!response.ok) throw new Error(`Behold ${response.status}: ${text.slice(0,200)}`);
-      const data = JSON.parse(text);
-      res.json(data);
-    } catch (err: any) {
-      console.error("Instagram feed error:", err.message);
-      res.status(500).json({ error: err.message });
-    }
+  // ── Auth: Logout ─────────────────────────────────────────────
+  app.post("/api/admin-logout", (req, res) => {
+    res.clearCookie(TOKEN_COOKIE, { path: "/" });
+    return res.json({ success: true });
   });
 
-  // AI Description Generator Endpoint
-  app.post("/api/generate-description", async (req, res) => {
+  // ── Protected: AI Description Generator ─────────────────────
+  app.post("/api/generate-description", requireAuth, apiLimiter, async (req, res) => {
     try {
       const { productName, categoryName, imageBase64 } = req.body;
 
-      if (!productName) {
+      if (!productName || typeof productName !== "string" || productName.length > 200) {
         return res.status(400).json({ error: "الرجاء تحديد اسم للمنتج أولاً." });
       }
 
@@ -108,15 +172,10 @@ async function startServer() {
 
       const ai = new GoogleGenAI({
         apiKey: apiKey,
-        httpOptions: {
-          headers: {
-            "User-Agent": "aistudio-build",
-          },
-        },
+        httpOptions: { headers: { "User-Agent": "aistudio-build" } },
       });
 
       const categoryPart = categoryName ? `من فئة ${categoryName}` : "";
-
       const systemInstruction = `أنت كاتب تسويقي محترف ومبدع لمتجر "بوتيك ألماسة" (Almaasa Boutique) المتخصص في بيع المخاوير والجلابيات التقليدية الإماراتية والخليجية الفاخرة وتوابعها.
 اكتب وصفاً ترويجياً فخماً وجذاباً وراقياً جداً للمنتج، مستخدماً لغة عربية سليمة وعبارات أنيقة تشجع الزبائن على الشراء.
 اجعل الوصف قصيراً (من سطرين إلى ثلاثة أسطر كحد أقصى) ليتناسب مع قيود العرض. ركّز على التطريز الفاخر، جودة القماش (مثل الحرير والقطن)، والتطريز بالخرز أو الزري اللامع، ومناسبة هذا الموديل للأعياد والمناسبات والجمعات السعيدة.
@@ -126,47 +185,95 @@ async function startServer() {
 
       let contents: any = prompt;
 
-      if (imageBase64 && imageBase64.startsWith("data:")) {
+      if (imageBase64 && typeof imageBase64 === "string" && imageBase64.startsWith("data:")) {
         const mimeType = imageBase64.substring(5, imageBase64.indexOf(";base64,"));
         const base64Data = imageBase64.substring(imageBase64.indexOf(";base64,") + 8);
-
         contents = {
           parts: [
-            {
-              inlineData: {
-                mimeType: mimeType || "image/jpeg",
-                data: base64Data,
-              },
-            },
-            {
-              text: `${prompt}\nيرجى تحليل صورة هذا المخور أو الجلابية من حيث اللون، نوع القماش، نمط التطريز، والزينة ومواءمتها بدقة في الوصف التسويقي الممتاز المقترح.`,
-            },
+            { inlineData: { mimeType: mimeType || "image/jpeg", data: base64Data } },
+            { text: `${prompt}\nيرجى تحليل صورة هذا المخور أو الجلابية من حيث اللون، نوع القماش، نمط التطريز، والزينة ومواءمتها بدقة في الوصف التسويقي الممتاز المقترح.` },
           ],
         };
       }
 
       const response = await ai.models.generateContent({
         model: "gemini-3.5-flash",
-        contents: contents,
-        config: {
-          systemInstruction: systemInstruction,
-          temperature: 0.8,
-        }
+        contents,
+        config: { systemInstruction, temperature: 0.8 },
       });
 
-      const description = response.text?.trim() || "";
-
-      return res.json({ description });
+      return res.json({ description: response.text?.trim() || "" });
     } catch (error: any) {
-      console.error("Gemini description generation error:", error);
-      return res.status(500).json({
-        error: "فشلت عملية توليد الوصف بالذكاء الاصطناعي. يرجى المحاولة لاحقاً مسبوقة بالتحقق من الاتصال ومفتاح الـ API."
+      console.error("Gemini error:", error);
+      return res.status(500).json({ error: "فشلت عملية توليد الوصف. يرجى المحاولة لاحقاً." });
+    }
+  });
+
+  // ── Instagram Feed Proxy ─────────────────────────────────────
+  app.get("/api/instagram-feed", apiLimiter, async (req, res) => {
+    // Explicit check: warn in logs if env var is missing (fallback still works)
+    const feedId = process.env.BEHOLD_FEED_ID || "HbcZC4oN0hh4xfAHUvTm";
+    if (!process.env.BEHOLD_FEED_ID) {
+      console.warn("BEHOLD_FEED_ID env var not set — using hardcoded fallback");
+    }
+    try {
+      const url = `https://feeds.behold.so/${feedId}`;
+      const response = await fetch(url, {
+        headers: {
+          "Accept": "application/json",
+          "User-Agent": "Mozilla/5.0 (compatible; AlmaasaStore/1.0)",
+        },
+        signal: AbortSignal.timeout(10000),
+      });
+
+      const text = await response.text();
+
+      if (!response.ok) {
+        console.error("Behold error:", response.status, text.slice(0, 300));
+        return res.status(502).json({
+          error: `فشل الاتصال بـ Behold (${response.status}). تحقق من صحة الـ Feed ID.`,
+        });
+      }
+
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("Behold returned non-JSON:", text.slice(0, 200));
+        return res.status(502).json({ error: "استجابة غير صالحة من Behold." });
+      }
+
+      // Normalise: return a flat posts array regardless of Behold response shape
+      // Known shapes: array, { posts }, { items }, { feed }
+      let posts: any[];
+      if (Array.isArray(data)) {
+        posts = data;
+      } else if (Array.isArray(data.posts)) {
+        posts = data.posts;
+      } else if (Array.isArray(data.items)) {
+        posts = data.items;
+      } else if (Array.isArray(data.feed)) {
+        posts = data.feed;
+      } else {
+        console.error("Behold: unrecognised response shape, keys:", Object.keys(data));
+        return res.status(502).json({ error: "تنسيق استجابة Behold غير معروف. تحقق من الـ Feed ID." });
+      }
+
+      res.json(posts);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      const isTimeout = error.name === "TimeoutError" || error.name === "AbortError";
+      console.error("Instagram feed error:", error.message);
+      res.status(502).json({
+        error: isTimeout
+          ? "انتهت مهلة الاتصال بـ Behold. حاول لاحقاً."
+          : "فشل تحميل بيانات Instagram. حاول لاحقاً.",
       });
     }
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
+  // ── Static / Vite ────────────────────────────────────────────
+  if (!isProd) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",

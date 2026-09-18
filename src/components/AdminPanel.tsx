@@ -161,13 +161,12 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   const [methodPrice, setMethodPrice] = useState<number>(2.0);
   const [methodDescription, setMethodDescription] = useState<string>('');
 
-  // Load backend content on mount
+  // Load backend content on mount — verify JWT cookie with server
   useEffect(() => {
-    // Check if previously authorized
-    const isAuth = sessionStorage.getItem('ama_admin_authenticated') === 'true';
-    if (isAuth) {
-      setIsAdminAuth(true);
-    }
+    fetch('/api/admin-verify', { credentials: 'include' })
+      .then(r => r.json())
+      .then(data => { if (data.authenticated) setIsAdminAuth(true); })
+      .catch(() => { /* not authenticated */ });
     loadData();
   }, []);
 
@@ -186,18 +185,14 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
     if (savedGateways) {
       try {
         setPaymentGateways(JSON.parse(savedGateways));
-      } catch (e) {
-        console.error("Error loading payment gateways", e);
-      }
+      } catch { /* invalid JSON */ }
     }
 
     const savedZones = localStorage.getItem('ama_shipping_zones');
     if (savedZones) {
       try {
         setShippingZones(JSON.parse(savedZones));
-      } catch (e) {
-        console.error("Error loading shipping zones", e);
-      }
+      } catch { /* invalid JSON */ }
     }
   };
 
@@ -362,7 +357,11 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
       }
     };
     setPaymentGateways(updated);
-    localStorage.setItem('ama_payment_gateways', JSON.stringify(updated));
+    // Strip sensitive keys before persisting to localStorage
+    const safeGateways = JSON.parse(JSON.stringify(updated));
+    if (safeGateways.tap) { safeGateways.tap.secretKey = ''; }
+    if (safeGateways.vpay) { safeGateways.vpay.apiKey = ''; }
+    localStorage.setItem('ama_payment_gateways', JSON.stringify(safeGateways));
     
     // Log operation
     addOperationLog(
@@ -383,6 +382,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       const response = await fetch('/api/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: emailInput, password: passwordInput })
       });
 
@@ -390,7 +390,6 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
       if (response.ok && data.success) {
         setIsAdminAuth(true);
-        sessionStorage.setItem('ama_admin_authenticated', 'true');
         addOperationLog(
           'تسجيل دخول ناجح للأدمين',
           `تم تسجيل الدخول إلى لوحة التحكم الإدارية بنجاح (${emailInput}).`,
@@ -409,9 +408,11 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin-logout', { method: 'POST', credentials: 'include' });
+    } catch { /* ignore network errors on logout */ }
     setIsAdminAuth(false);
-    sessionStorage.removeItem('ama_admin_authenticated');
   };
 
   // Modify Order state
@@ -525,8 +526,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       } else {
         setAiError(data.error || 'حدث خطأ غير متوقع أثناء توليد الوصف.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       setAiError('فشل الاتصال بالخادم الذكي لتوليد الوصف.');
     } finally {
       setIsGeneratingDesc(false);
@@ -614,15 +614,21 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     setIsImportingFromIG(true);
     try {
       const res = await fetch('/api/instagram-feed');
-      const body = await res.json();
-      if (!res.ok) {
-        alert(`⚠️ خطأ من الخادم: ${body.error || res.status}`);
+      let body: any;
+      try {
+        body = await res.json();
+      } catch {
+        alert('⚠️ الخادم أرجع استجابة غير صالحة. تحقق من إعداد BEHOLD_FEED_ID في متغيرات البيئة.');
         return;
       }
-      // Behold returns array directly or { posts: [...] }
-      const posts: any[] = Array.isArray(body) ? body : (body.posts ?? []);
+      if (!res.ok) {
+        alert(`⚠️ فشل الاتصال بإنستقرام: ${body?.error || `خطأ ${res.status}`}`);
+        return;
+      }
+      // Server normalises Behold response to a flat array
+      const posts: any[] = Array.isArray(body) ? body : [];
       if (posts.length === 0) {
-        alert('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد');
+        alert('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد.\nتأكد من أن الـ Feed ID صحيح وأن الحساب به منشورات.');
         return;
       }
       const data = getStoredData();
@@ -630,20 +636,31 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       let added = 0;
       const newProducts = [...data.products];
       for (const post of posts) {
-        if (post.mediaType === 'VIDEO' || post.media_type === 'VIDEO') continue;
-        // Prefer Behold-hosted CDN images (don't expire), fallback to direct Instagram URL
+        // Skip videos
+        const mType = (post.mediaType || post.media_type || '').toUpperCase();
+        if (mType === 'VIDEO') continue;
+
+        // Prefer Behold CDN images (stable URLs), then direct Instagram, then thumbnail
         const imgUrl =
           post.sizes?.medium?.mediaUrl ||
-          post.sizes?.small?.mediaUrl ||
           post.sizes?.large?.mediaUrl ||
+          post.sizes?.small?.mediaUrl ||
+          post.prunedMediaUrl ||   // Behold v3 key
           post.mediaUrl ||
           post.media_url ||
-          post.thumbnailUrl;
+          post.thumbnailUrl ||
+          post.thumbnail_url;
         if (!imgUrl) continue;
-        const igId = `ig_${post.id}`;
+
+        // Skip posts with no stable ID to avoid duplicates
+        if (!post.id && !post.shortCode) continue;
+        const igId = `ig_${post.id || post.shortCode}`;
         if (existingIds.has(igId)) continue;
-        const caption = post.caption || '';
-        const name = caption.split('\n')[0].replace(/#\S+/g, '').trim().slice(0, 60) || 'منتج من إنستقرام';
+        existingIds.add(igId);
+
+        const caption = post.caption || post.text || '';
+        const firstLine = caption.split('\n')[0].replace(/#\S+/g, '').replace(/@\S+/g, '').trim();
+        const name = firstLine.slice(0, 60) || 'منتج من إنستقرام';
         newProducts.push({
           id: igId,
           name,
@@ -669,8 +686,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       } else {
         alert('ℹ️ كل الصور موجودة مسبقاً في المنتجات');
       }
-    } catch (err: any) {
-      alert(`⚠️ تعذّر الاتصال بإنستقرام: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(`⚠️ تعذّر الاتصال بإنستقرام: ${msg}`);
     } finally {
       setIsImportingFromIG(false);
     }
