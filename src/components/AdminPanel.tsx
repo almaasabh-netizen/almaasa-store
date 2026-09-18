@@ -5,7 +5,7 @@ import {
   Trash2, Plus, CheckCircle, Clock, Undo2, LogIn, Lock, 
   Tag, Compass, HelpCircle, Wallet, FileText, LayoutGrid, 
   RefreshCw, Check, AlertTriangle, Eye, Printer, Percent, BadgeAlert,
-  Globe, Instagram, X
+  Globe, Instagram, X, Pencil, ExternalLink
 } from 'lucide-react';
 import { Product, Order, OperationLog, Category, Coupon, SizeGuide, Review, StoreSettings } from '../types';
 import { getStoredData, saveStoredData, addOperationLog } from '../data';
@@ -100,6 +100,19 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
   const [openGatewayConfig, setOpenGatewayConfig] = useState<string | null>(null);
   const [copiedTextId, setCopiedTextId] = useState<string | null>(null);
+
+  // Coupon form state
+  const [newCouponCode, setNewCouponCode] = useState('');
+  const [newCouponType, setNewCouponType] = useState<'percentage'|'fixed'>('percentage');
+  const [newCouponDiscount, setNewCouponDiscount] = useState<number>(10);
+  const [newCouponMinOrder, setNewCouponMinOrder] = useState<string>('');
+  const [newCouponExpiry, setNewCouponExpiry] = useState<string>('');
+  const [newCouponActive, setNewCouponActive] = useState<boolean>(true);
+
+  // Category management state
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatDesc, setNewCatDesc] = useState('');
+  const [editingCat, setEditingCat] = useState<any>(null);
 
   // Toast & Confirm Dialog
   const [adminToast, setAdminToast] = useState<{msg: string; type: 'success'|'error'|'info'} | null>(null);
@@ -731,6 +744,75 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       'info'
     );
     loadData();
+  };
+
+  // Add new coupon
+  const handleAddCoupon = () => {
+    if (!newCouponCode.trim()) {
+      showAdminToast('يرجى إدخال كود الكوبون', 'error');
+      return;
+    }
+    const newCoupon: Coupon = {
+      code: newCouponCode.toUpperCase().trim(),
+      type: newCouponType,
+      discount: newCouponDiscount,
+      minOrderAmount: newCouponMinOrder ? Number(newCouponMinOrder) : undefined,
+      expiryDate: newCouponExpiry || undefined,
+      isActive: newCouponActive,
+      usageCount: 0,
+    };
+    const updated = [...coupons, newCoupon];
+    setCoupons(updated);
+    saveStoredData({ coupons: updated });
+    addOperationLog('إضافة كوبون', `تم إضافة كوبون [${newCoupon.code}]`, 'المشرف', 'system', 'success');
+    showAdminToast(`تم إضافة الكوبون ${newCoupon.code} بنجاح`, 'success');
+    setNewCouponCode('');
+    setNewCouponType('percentage');
+    setNewCouponDiscount(10);
+    setNewCouponMinOrder('');
+    setNewCouponExpiry('');
+    setNewCouponActive(true);
+  };
+
+  // Category handlers
+  const handleAddCategory = () => {
+    if (!newCatName.trim()) {
+      showAdminToast('يرجى إدخال اسم التصنيف', 'error');
+      return;
+    }
+    const slug = newCatName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+    const newCat: Category = {
+      id: slug || `cat-${Date.now()}`,
+      name: newCatName.trim(),
+      description: newCatDesc.trim() || undefined,
+    } as any;
+    const updated = [...categories, newCat];
+    setCategories(updated);
+    saveStoredData({ categories: updated });
+    showAdminToast(`تم إضافة التصنيف "${newCat.name}"`, 'success');
+    setNewCatName('');
+    setNewCatDesc('');
+  };
+
+  const handleDeleteCategory = (id: string) => {
+    setConfirmDialog({
+      msg: `هل أنتِ متأكدة من حذف التصنيف؟ سيتم إزالته نهائياً.`,
+      onConfirm: () => {
+        const updated = categories.filter(c => c.id !== id);
+        setCategories(updated);
+        saveStoredData({ categories: updated });
+        showAdminToast('تم حذف التصنيف', 'info');
+      }
+    });
+  };
+
+  const handleUpdateCategory = () => {
+    if (!editingCat) return;
+    const updated = categories.map(c => c.id === editingCat.id ? editingCat : c);
+    setCategories(updated);
+    saveStoredData({ categories: updated });
+    setEditingCat(null);
+    showAdminToast('تم تحديث التصنيف', 'success');
   };
 
   // Toggle Coupon Active rule
