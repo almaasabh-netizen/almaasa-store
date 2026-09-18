@@ -613,7 +613,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
   const handleImportFromInstagram = async () => {
     setIsImportingFromIG(true);
     try {
-      const res = await fetch('/api/instagram-feed', { credentials: 'include' });
+      const res = await fetch('/api/instagram-feed');
       let body: any;
       try {
         body = await res.json();
@@ -652,8 +652,11 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
           post.thumbnail_url;
         if (!imgUrl) continue;
 
-        const igId = `ig_${post.id || post.shortCode || Date.now()}`;
+        // Skip posts with no stable ID to avoid duplicates
+        if (!post.id && !post.shortCode) continue;
+        const igId = `ig_${post.id || post.shortCode}`;
         if (existingIds.has(igId)) continue;
+        existingIds.add(igId);
 
         const caption = post.caption || post.text || '';
         const firstLine = caption.split('\n')[0].replace(/#\S+/g, '').replace(/@\S+/g, '').trim();
@@ -683,8 +686,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       } else {
         alert('ℹ️ كل الصور موجودة مسبقاً في المنتجات');
       }
-    } catch (err: any) {
-      alert(`⚠️ تعذّر الاتصال بإنستقرام: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(`⚠️ تعذّر الاتصال بإنستقرام: ${msg}`);
     } finally {
       setIsImportingFromIG(false);
     }

@@ -211,9 +211,10 @@ async function startServer() {
 
   // ── Instagram Feed Proxy ─────────────────────────────────────
   app.get("/api/instagram-feed", apiLimiter, async (req, res) => {
+    // Explicit check: warn in logs if env var is missing (fallback still works)
     const feedId = process.env.BEHOLD_FEED_ID || "HbcZC4oN0hh4xfAHUvTm";
-    if (!feedId) {
-      return res.status(500).json({ error: "BEHOLD_FEED_ID غير مضبوط في متغيرات البيئة." });
+    if (!process.env.BEHOLD_FEED_ID) {
+      console.warn("BEHOLD_FEED_ID env var not set — using hardcoded fallback");
     }
     try {
       const url = `https://feeds.behold.so/${feedId}`;
@@ -222,7 +223,7 @@ async function startServer() {
           "Accept": "application/json",
           "User-Agent": "Mozilla/5.0 (compatible; AlmaasaStore/1.0)",
         },
-        signal: AbortSignal.timeout(10000), // 10s timeout
+        signal: AbortSignal.timeout(10000),
       });
 
       const text = await response.text();
@@ -243,11 +244,26 @@ async function startServer() {
       }
 
       // Normalise: return a flat posts array regardless of Behold response shape
-      const posts: any[] = Array.isArray(data) ? data : (data.posts ?? data.items ?? []);
+      // Known shapes: array, { posts }, { items }, { feed }
+      let posts: any[];
+      if (Array.isArray(data)) {
+        posts = data;
+      } else if (Array.isArray(data.posts)) {
+        posts = data.posts;
+      } else if (Array.isArray(data.items)) {
+        posts = data.items;
+      } else if (Array.isArray(data.feed)) {
+        posts = data.feed;
+      } else {
+        console.error("Behold: unrecognised response shape, keys:", Object.keys(data));
+        return res.status(502).json({ error: "تنسيق استجابة Behold غير معروف. تحقق من الـ Feed ID." });
+      }
+
       res.json(posts);
-    } catch (err: any) {
-      const isTimeout = err.name === "TimeoutError" || err.name === "AbortError";
-      console.error("Instagram feed error:", err.message);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      const isTimeout = error.name === "TimeoutError" || error.name === "AbortError";
+      console.error("Instagram feed error:", error.message);
       res.status(502).json({
         error: isTimeout
           ? "انتهت مهلة الاتصال بـ Behold. حاول لاحقاً."
