@@ -101,6 +101,14 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   const [openGatewayConfig, setOpenGatewayConfig] = useState<string | null>(null);
   const [copiedTextId, setCopiedTextId] = useState<string | null>(null);
 
+  // Toast & Confirm Dialog
+  const [adminToast, setAdminToast] = useState<{msg: string; type: 'success'|'error'|'info'} | null>(null);
+  const showAdminToast = (msg: string, type: 'success'|'error'|'info' = 'success') => {
+    setAdminToast({msg, type});
+    setTimeout(() => setAdminToast(null), 3500);
+  };
+  const [confirmDialog, setConfirmDialog] = useState<{msg: string; onConfirm: () => void} | null>(null);
+
   // Shipping Zones states
   const [shippingZones, setShippingZones] = useState<any[]>([
     {
@@ -226,7 +234,7 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
   const handleSaveZone = () => {
     if (!zoneName.trim()) {
-      alert('الرجاء كتابة اسم المنطقة الجغرافية (مثال: محلي - BH)');
+      showAdminToast('الرجاء كتابة اسم المنطقة الجغرافية (مثال: محلي - BH)', 'info');
       return;
     }
 
@@ -260,10 +268,13 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   };
 
   const handleDeleteZone = (zoneId: string) => {
-    if (confirm('هل أنتِ متأكدة من رغبتكِ في حذف هذه المنطقة الجغرافية بالكامل وكافة طرق الشحن التابعة لها؟')) {
-      const filtered = shippingZones.filter(z => z.id !== zoneId);
-      saveShippingZones(filtered);
-    }
+    setConfirmDialog({
+      msg: 'هل أنتِ متأكدة من رغبتكِ في حذف هذه المنطقة الجغرافية بالكامل وكافة طرق الشحن التابعة لها؟',
+      onConfirm: () => {
+        const filtered = shippingZones.filter(z => z.id !== zoneId);
+        saveShippingZones(filtered);
+      }
+    });
   };
 
   const handleOpenAddMethod = (zoneId: string) => {
@@ -290,7 +301,7 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
   const handleSaveMethod = () => {
     if (!methodName.trim()) {
-      alert('الرجاء كتابة اسم طريقة الشحن');
+      showAdminToast('الرجاء كتابة اسم طريقة الشحن', 'info');
       return;
     }
 
@@ -489,7 +500,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 8 * 1024 * 1024) {
-        alert('حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 8 ميجابايت.');
+        showAdminToast('حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 8 ميجابايت.', 'error');
         return;
       }
       const reader = new FileReader();
@@ -618,17 +629,17 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       try {
         body = await res.json();
       } catch {
-        alert('⚠️ الخادم أرجع استجابة غير صالحة. تحقق من إعداد BEHOLD_FEED_ID في متغيرات البيئة.');
+        showAdminToast('⚠️ الخادم أرجع استجابة غير صالحة. تحقق من إعداد BEHOLD_FEED_ID في متغيرات البيئة.', 'error');
         return;
       }
       if (!res.ok) {
-        alert(`⚠️ فشل الاتصال بإنستقرام: ${body?.error || `خطأ ${res.status}`}`);
+        showAdminToast(`⚠️ فشل الاتصال بإنستقرام: ${body?.error || `خطأ ${res.status}`}`, 'error');
         return;
       }
       // Server normalises Behold response to a flat array
       const posts: any[] = Array.isArray(body) ? body : [];
       if (posts.length === 0) {
-        alert('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد.\nتأكد من أن الـ Feed ID صحيح وأن الحساب به منشورات.');
+        showAdminToast('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد.', 'info');
         return;
       }
       const data = getStoredData();
@@ -682,13 +693,13 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       saveStoredData({ products: newProducts });
       setProducts(newProducts);
       if (added > 0) {
-        alert(`✅ تم استيراد ${added} منتج جديد من إنستقرام كمسودة — عدّليهم وأضيفي السعر قبل النشر`);
+        showAdminToast(`تم استيراد ${added} منتج جديد من إنستقرام كمسودة — عدّليهم وأضيفي السعر قبل النشر`, 'success');
       } else {
-        alert('ℹ️ كل الصور موجودة مسبقاً في المنتجات');
+        showAdminToast('كل الصور موجودة مسبقاً في المنتجات', 'info');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      alert(`⚠️ تعذّر الاتصال بإنستقرام: ${msg}`);
+      showAdminToast(`تعذّر الاتصال بإنستقرام: ${msg}`, 'error');
     } finally {
       setIsImportingFromIG(false);
     }
@@ -729,6 +740,16 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     loadData();
   };
 
+  // Dashboard chart helpers
+  const getMonthlyStats = (orderList: any[]) => {
+    const months: Record<string, number> = {};
+    orderList.forEach(o => {
+      const m = o.date?.substring(0, 7) || '';
+      if (m) months[m] = (months[m] || 0) + (o.total || 0);
+    });
+    return Object.entries(months).sort(([a],[b]) => a.localeCompare(b)).slice(-6);
+  };
+
   // Dashboard Stats Calculations
   const totalRevenue = orders.filter(o => o.paymentStatus === 'paid').reduce((sum, o) => sum + o.total, 0);
   const pendingOrdersCount = orders.filter(o => o.shippingStatus === 'pending' || o.shippingStatus === 'processing').length;
@@ -737,7 +758,45 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
   return (
     <div className="min-h-screen bg-[#FAF5F2] text-slate-800 flex flex-col font-sans" dir="rtl" id="almaasa-backend-panel">
-      
+
+      {/* Toast Notification */}
+      {adminToast && (
+        <div style={{
+          position: 'fixed', top: 20, right: 20, zIndex: 9999,
+          background: adminToast.type === 'error' ? '#DC2626' : adminToast.type === 'info' ? '#1D4ED8' : '#059669',
+          color: '#fff', padding: '12px 20px', borderRadius: 8,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.2)', fontFamily: "'Cairo', sans-serif",
+          fontSize: 14, maxWidth: 320, direction: 'rtl'
+        }}>
+          {adminToast.msg}
+        </div>
+      )}
+
+      {/* Confirm Dialog */}
+      {confirmDialog && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 10000,
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 12, padding: 24, maxWidth: 340, width: '90%',
+            fontFamily: "'Cairo', sans-serif", direction: 'rtl', textAlign: 'center'
+          }}>
+            <p style={{marginBottom: 20, fontSize: 15, color: '#241419'}}>{confirmDialog.msg}</p>
+            <div style={{display: 'flex', gap: 12, justifyContent: 'center'}}>
+              <button
+                onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null); }}
+                style={{background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 24px', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14}}
+              >تأكيد</button>
+              <button
+                onClick={() => setConfirmDialog(null)}
+                style={{background: '#F3F4F6', color: '#374151', border: 'none', borderRadius: 8, padding: '8px 24px', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14}}
+              >إلغاء</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SECURITY GUEST LOGIN GUARD */}
       {!isAdminAuth ? (
         <div className="flex-1 flex items-center justify-center p-4 min-h-[90vh]">
@@ -2863,7 +2922,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 {/* Print Invoice Button / Print */}
                 <div className="pt-4 border-t flex justify-end gap-2">
                   <button 
-                    onClick={() => { setSelectedOrder(null); alert('جاري توجيه الأمر للطابعة المركزية للمعمل...'); }}
+                    onClick={() => { setSelectedOrder(null); showAdminToast('جاري توجيه الأمر للطابعة المركزية للمعمل...', 'info'); }}
                     className="bg-slate-900 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs flex items-center gap-1 cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5" /> طباعة الفاتورة والوصل 🧾
@@ -2931,7 +2990,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                   </button>
 
                   <button 
-                    onClick={() => { setShowShippingLabel(null); alert('جاري إطلاق الأمر وجمل البوليسية لخطوط الشحن Aramex...'); }}
+                    onClick={() => { setShowShippingLabel(null); showAdminToast('جاري إطلاق الأمر وجمل البوليسية لخطوط الشحن Aramex...', 'info'); }}
                     className="bg-[#9A2D55] text-white px-6 py-2 rounded-xl font-extrabold cursor-pointer"
                   >
                     تفويض وإرسال البوليسية 🖨️
@@ -2970,7 +3029,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       onChange={e => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        if (file.size > 8 * 1024 * 1024) { alert('الصورة أكبر من 8MB'); return; }
+                        if (file.size > 8 * 1024 * 1024) { showAdminToast('الصورة أكبر من 8MB', 'error'); return; }
                         const reader = new FileReader();
                         reader.onload = ev => setEditingProduct({...editingProduct, image: ev.target?.result as string});
                         reader.readAsDataURL(file);
@@ -2990,7 +3049,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       <label className="text-xs font-bold text-slate-600">الوصف</label>
                       <button
                         onClick={async () => {
-                          if (!editingProduct.name.trim()) { alert('اكتبي اسم المنتج أولاً'); return; }
+                          if (!editingProduct.name.trim()) { showAdminToast('اكتبي اسم المنتج أولاً', 'info'); return; }
                           const cat = categories.find(c => c.id === editingProduct.category);
                           setEditingProduct({...editingProduct, description: '⏳ جاري التوليد...'});
                           try {

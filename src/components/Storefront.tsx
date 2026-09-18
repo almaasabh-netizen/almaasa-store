@@ -406,7 +406,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
       {/* ── HOME PAGE ──────────────────────────────────────────── */}
       {activeTab === 'home' && (
-        <main style={{ background: '#FAF7F3', overflowX: 'hidden' }}>
+        <main className="_content-pb" style={{ background: '#FAF7F3', overflowX: 'hidden' }}>
 
           {/* ── CSS KEYFRAMES (injected once) ── */}
           <style>{`
@@ -435,7 +435,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           `}</style>
 
           {/* ── HERO ── */}
-          <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 'calc(100vh - 58px)' }}>
+          <section className="_hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 'calc(100vh - 58px)' }}>
             {/* Text side */}
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(40px,6vw,88px) clamp(24px,5vw,72px)', background: '#FAF7F3', position: 'relative' }}>
               <div className="_anim1" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32, fontSize: 10, letterSpacing: '0.28em', fontWeight: 700, color: '#C4A882', textTransform: 'uppercase' }}>
@@ -463,7 +463,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               </div>
               {/* Scroll indicator */}
               <div style={{ position: 'absolute', bottom: 32, right: 'clamp(24px,5vw,56px)', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-                <span style={{ fontSize: 9, letterSpacing: '0.24em', color: '#B8989E', fontWeight: 700 }}>SCROLL</span>
+                <span style={{ fontSize: 9, letterSpacing: '0.24em', color: '#B8989E', fontWeight: 700 }}>↓</span>
                 <span style={{ width: 1, background: 'linear-gradient(to bottom,#C4A882,transparent)', animationName: '_scrollPulse', animationDuration: '2s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite', height: 48, display: 'block' }}></span>
               </div>
             </div>
@@ -518,7 +518,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                       <div className="_pimg-inner" style={{ width: '100%', height: '100%', backgroundImage: p.image ? `url(${p.image})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {!p.image && <span style={{ fontFamily: "'Amiri', serif", fontSize: 36, color: 'rgba(154,45,85,.13)', fontStyle: 'italic' }}>◆</span>}
                       </div>
-                      {p.originalPrice && <div style={{ position: 'absolute', top: 12, right: 12, background: '#9A2D55', color: '#FFF', fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', padding: '4px 10px' }}>SALE</div>}
+                      {p.originalPrice && <div style={{ position: 'absolute', top: 12, right: 12, background: '#B85C2E', color: '#FFF', fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', padding: '4px 10px' }}>SALE</div>}
                     </div>
                     <div style={{ padding: '14px 2px 10px' }}>
                       <div style={{ fontSize: 13.5, color: '#160B10', fontWeight: 500, marginBottom: 5, lineHeight: 1.4 }}>{p.name}</div>
@@ -535,7 +535,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* ── FEATURE ── */}
           {products.length > 0 && (
-            <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#FFF' }}>
+            <section className="_feature-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#FFF' }}>
               <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg,#EAE0D4,#DCCEBF)', minHeight: 520, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 onMouseEnter={e => { const bg = e.currentTarget.querySelector('._fbg') as HTMLElement; if (bg) bg.style.transform = 'scale(1.04)'; }}
                 onMouseLeave={e => { const bg = e.currentTarget.querySelector('._fbg') as HTMLElement; if (bg) bg.style.transform = 'scale(1)'; }}>
@@ -602,7 +602,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </section>
 
           {/* ── BRAND PROMISE ── */}
-          <section style={{ background: '#160B10', display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', padding: '88px 44px', gap: 0, minHeight: 380 }}>
+          <section className="_brand-grid" style={{ background: '#160B10', display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', padding: '88px 44px', gap: 0, minHeight: 380 }}>
             <div style={{ paddingLeft: 0, paddingRight: 'clamp(24px,5vw,72px)' }}>
               <div style={{ fontSize: 10, letterSpacing: '0.28em', fontWeight: 700, color: 'rgba(255,255,255,.28)', textTransform: 'uppercase', marginBottom: 18 }}>OUR PROMISE</div>
               <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(2rem,3.2vw,44px)', color: '#FFF', fontWeight: 400, lineHeight: 1.22, margin: '0 0 18px' }}>
@@ -690,7 +690,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           {/* ── FOOTER ── */}
           <footer style={{ background: '#160B10', padding: '60px 44px 28px' }}>
             <div style={{ maxWidth: 1360, margin: '0 auto' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr 1fr 1fr', gap: 44, marginBottom: 44 }}>
+              <div className="_footer-grid" style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr 1fr 1fr', gap: 44, marginBottom: 44 }}>
                 <div>
                   <div style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#FFF', marginBottom: 14 }}>
                     ألماسة <span style={{ color: '#C4A882' }}>◆</span>
@@ -849,7 +849,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                           </div>
                         )}
                         {product.originalPrice && (
-                          <span style={{ position: 'absolute', top: 8, right: 8, background: '#9A2D55', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 2 }}>
+                          <span style={{ position: 'absolute', top: 8, right: 8, background: '#B85C2E', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 2 }}>
                             -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
                           </span>
                         )}
@@ -898,7 +898,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {checkoutStep === 'success' && newOrder ? (
             <div style={{ textAlign: 'center', padding: '40px 20px', maxWidth: 480, margin: '0 auto' }}>
-              <CheckCircle style={{ width: 56, height: 56, color: '#4CAF50', margin: '0 auto 20px' }} />
+              <CheckCircle style={{ width: 56, height: 56, color: '#5C8B4A', margin: '0 auto 20px' }} />
               <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#241419', marginBottom: 12 }}>تم الطلب بنجاح!</h2>
               <p style={{ fontSize: 14, color: '#6b5a5f', marginBottom: 24 }}>سيتم التواصل معكِ قريباً لتأكيد الطلب</p>
               <div style={{ background: '#F3EAE2', padding: 20, marginBottom: 24, textAlign: 'right' }}>
@@ -1012,6 +1012,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                           style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 2, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
                       </div>
                       {/* Shipping methods */}
+                      {availableShippingMethods.length === 0 && (
+                        <div style={{ padding: '12px 16px', background: '#FFF8F0', border: '1px solid rgba(154,45,85,.2)', fontSize: 13, color: '#7A5030', lineHeight: 1.8, borderRadius: 2 }}>
+                          عذراً، الشحن إلى هذه المنطقة غير متاح حالياً. تواصلي معنا للاستفسار.
+                        </div>
+                      )}
                       {availableShippingMethods.length > 0 && (
                         <div>
                           <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 10, fontWeight: 600 }}>طريقة التوصيل</label>
@@ -1219,7 +1224,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             {/* Form */}
             {contactSent ? (
               <div style={{ textAlign: 'center', padding: '60px 20px', display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
-                <CheckCircle style={{ width: 48, height: 48, color: '#4CAF50' }} />
+                <CheckCircle style={{ width: 48, height: 48, color: '#5C8B4A' }} />
                 <div style={{ fontFamily: "'Amiri', serif", fontSize: 24, color: '#241419' }}>شكراً لتواصلكِ!</div>
                 <p style={{ fontSize: 14, color: '#6b5a5f' }}>سيتم الرد عليكِ قريباً</p>
               </div>
@@ -1348,7 +1353,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       {/* ══════════════════════════════════════════════════════════
           FOOTER
       ══════════════════════════════════════════════════════════ */}
-      <footer style={{ background: '#241419', color: '#EADFD8', display: 'flex', justifyContent: 'center', fontFamily: "'Cairo', sans-serif" }}>
+      <footer style={{ background: '#160B10', color: '#EADFD8', display: 'flex', justifyContent: 'center', fontFamily: "'Cairo', sans-serif" }}>
         <div style={{ width: '100%', maxWidth: 1240, padding: '50px 40px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 30, textAlign: 'right' }}
           className="md:grid block">
           {/* Brand */}
