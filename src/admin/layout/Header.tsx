@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ROSE = '#9A2D55';
 const INK2 = '#7A6065';
@@ -12,6 +13,13 @@ interface HeaderProps {
 }
 
 export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: HeaderProps) {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await fetch('/api/admin-logout', { method: 'POST', credentials: 'include' });
+    navigate('/admin/login', { replace: true });
+  };
+
   const notifCount = React.useMemo(() => {
     try {
       const raw = localStorage.getItem('ama_orders');
@@ -48,8 +56,8 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
       {/* Breadcrumb / Title */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
         <span style={{ fontSize: 11, color: INK2, whiteSpace: 'nowrap' }}>الإدارة</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={INK2} strokeWidth="2" strokeLinecap="round" style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
-          <polyline points="9 18 15 12 9 6"/>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={INK2} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}>
+          <polyline points="15 18 9 12 15 6"/>
         </svg>
         <span style={{ fontSize: 13, fontWeight: 700, color: '#1A0D11', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</span>
       </div>
@@ -136,6 +144,26 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
           border: '1.5px solid rgba(154,45,85,.2)',
           fontFamily: "'Cairo', sans-serif",
         }}>م</div>
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          title="تسجيل الخروج"
+          style={{
+            width: 34, height: 34, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', border: 'none', background: 'transparent',
+            cursor: 'pointer', color: INK2, borderRadius: 8,
+            transition: 'background .15s, color .15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(220,60,60,.08)'; e.currentTarget.style.color = '#DC3030'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = INK2; }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
       </div>
     </header>
   );

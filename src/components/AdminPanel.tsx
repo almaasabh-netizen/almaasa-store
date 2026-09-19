@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  BarChart3, ShoppingBag, Users, Truck, Sparkles, FolderKanban, 
-  Settings, CreditCard, Layers, Sliders, ClipboardList, Star, 
-  Trash2, Plus, CheckCircle, Clock, Undo2, LogIn, Lock, 
-  Tag, Compass, HelpCircle, Wallet, FileText, LayoutGrid, 
+  BarChart3, ShoppingBag, Users, Truck, Sparkles, FolderKanban,
+  Settings, CreditCard, Layers, Sliders, ClipboardList, Star,
+  Trash2, Plus, CheckCircle, Clock, Undo2, LogIn, LogOut, Lock,
+  Tag, Compass, HelpCircle, Wallet, FileText, LayoutGrid,
   RefreshCw, Check, AlertTriangle, Eye, Printer, Percent, BadgeAlert,
-  Globe, Instagram, X
+  Globe, Instagram, X, Pencil, ExternalLink
 } from 'lucide-react';
 import { Product, Order, OperationLog, Category, Coupon, SizeGuide, Review, StoreSettings } from '../types';
 import { getStoredData, saveStoredData, addOperationLog } from '../data';
@@ -39,6 +39,8 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   // Filter options for logging and queue searches
   const [logTypeFilter, setLogTypeFilter] = useState<string>('all');
   const [orderSearch, setOrderSearch] = useState('');
+  const [ordersPage, setOrdersPage] = useState(1);
+  const ORDERS_PER_PAGE = 20;
   const [productSearch, setProductSearch] = useState('');
 
   // Focused Order Detail overlay
@@ -100,6 +102,27 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
   const [openGatewayConfig, setOpenGatewayConfig] = useState<string | null>(null);
   const [copiedTextId, setCopiedTextId] = useState<string | null>(null);
+
+  // Coupon form state
+  const [newCouponCode, setNewCouponCode] = useState('');
+  const [newCouponType, setNewCouponType] = useState<'percentage'|'fixed'>('percentage');
+  const [newCouponDiscount, setNewCouponDiscount] = useState<number>(10);
+  const [newCouponMinOrder, setNewCouponMinOrder] = useState<string>('');
+  const [newCouponExpiry, setNewCouponExpiry] = useState<string>('');
+  const [newCouponActive, setNewCouponActive] = useState<boolean>(true);
+
+  // Category management state
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatDesc, setNewCatDesc] = useState('');
+  const [editingCat, setEditingCat] = useState<any>(null);
+
+  // Toast & Confirm Dialog
+  const [adminToast, setAdminToast] = useState<{msg: string; type: 'success'|'error'|'info'} | null>(null);
+  const showAdminToast = (msg: string, type: 'success'|'error'|'info' = 'success') => {
+    setAdminToast({msg, type});
+    setTimeout(() => setAdminToast(null), 3500);
+  };
+  const [confirmDialog, setConfirmDialog] = useState<{msg: string; onConfirm: () => void} | null>(null);
 
   // Shipping Zones states
   const [shippingZones, setShippingZones] = useState<any[]>([
@@ -226,7 +249,7 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
   const handleSaveZone = () => {
     if (!zoneName.trim()) {
-      alert('الرجاء كتابة اسم المنطقة الجغرافية (مثال: محلي - BH)');
+      showAdminToast('الرجاء كتابة اسم المنطقة الجغرافية (مثال: محلي - BH)', 'info');
       return;
     }
 
@@ -260,10 +283,13 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   };
 
   const handleDeleteZone = (zoneId: string) => {
-    if (confirm('هل أنتِ متأكدة من رغبتكِ في حذف هذه المنطقة الجغرافية بالكامل وكافة طرق الشحن التابعة لها؟')) {
-      const filtered = shippingZones.filter(z => z.id !== zoneId);
-      saveShippingZones(filtered);
-    }
+    setConfirmDialog({
+      msg: 'هل أنتِ متأكدة من رغبتكِ في حذف هذه المنطقة الجغرافية بالكامل وكافة طرق الشحن التابعة لها؟',
+      onConfirm: () => {
+        const filtered = shippingZones.filter(z => z.id !== zoneId);
+        saveShippingZones(filtered);
+      }
+    });
   };
 
   const handleOpenAddMethod = (zoneId: string) => {
@@ -290,7 +316,7 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
 
   const handleSaveMethod = () => {
     if (!methodName.trim()) {
-      alert('الرجاء كتابة اسم طريقة الشحن');
+      showAdminToast('الرجاء كتابة اسم طريقة الشحن', 'info');
       return;
     }
 
@@ -334,18 +360,21 @@ export default function AdminPanel({ onBackToStore }: AdminPanelProps) {
   };
 
   const handleDeleteMethod = (zoneId: string, methodId: string) => {
-    if (confirm('هل أنتِ متأكدة من رغبتكِ في حذف خيار وطريقة التوصيل المحددة؟')) {
-      const updatedZones = shippingZones.map(z => {
-        if (z.id === zoneId) {
-          return {
-            ...z,
-            methods: z.methods.filter((m: any) => m.id !== methodId)
-          };
-        }
-        return z;
-      });
-      saveShippingZones(updatedZones);
-    }
+    setConfirmDialog({
+      msg: 'هل أنتِ متأكدة من رغبتكِ في حذف خيار وطريقة التوصيل المحددة؟',
+      onConfirm: () => {
+        const updatedZones = shippingZones.map(z => {
+          if (z.id === zoneId) {
+            return {
+              ...z,
+              methods: z.methods.filter((m: any) => m.id !== methodId)
+            };
+          }
+          return z;
+        });
+        saveShippingZones(updatedZones);
+      }
+    });
   };
 
   const handleUpdateGateway = (gatewayKey: string, updatedFields: any) => {
@@ -489,7 +518,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 8 * 1024 * 1024) {
-        alert('حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 8 ميجابايت.');
+        showAdminToast('حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 8 ميجابايت.', 'error');
         return;
       }
       const reader = new FileReader();
@@ -584,20 +613,23 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
   // Delete product safely
   const handleDeleteProduct = (id: string, name: string) => {
-    if (confirm(`هل أنت متأكد من رغبتك بحذف المنتج [${name}] نهائياً من العرض؟`)) {
-      const updated = products.filter(p => p.id !== id);
-      setProducts(updated);
-      saveStoredData({ products: updated });
+    setConfirmDialog({
+      msg: `هل أنت متأكد من رغبتك بحذف المنتج [${name}] نهائياً من العرض؟`,
+      onConfirm: () => {
+        const updated = products.filter(p => p.id !== id);
+        setProducts(updated);
+        saveStoredData({ products: updated });
 
-      addOperationLog(
-        `حذف منتج ${name}`,
-        `تم إلغاء عرض المنتج من السجلات.`,
-        'إدارة السلع الماسية',
-        'product',
-        'warning'
-      );
-      loadData();
-    }
+        addOperationLog(
+          `حذف منتج ${name}`,
+          `تم إلغاء عرض المنتج من السجلات.`,
+          'إدارة السلع الماسية',
+          'product',
+          'warning'
+        );
+        loadData();
+      }
+    });
   };
 
   // Save edited product
@@ -618,17 +650,17 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       try {
         body = await res.json();
       } catch {
-        alert('⚠️ الخادم أرجع استجابة غير صالحة. تحقق من إعداد BEHOLD_FEED_ID في متغيرات البيئة.');
+        showAdminToast('⚠️ الخادم أرجع استجابة غير صالحة. تحقق من إعداد BEHOLD_FEED_ID في متغيرات البيئة.', 'error');
         return;
       }
       if (!res.ok) {
-        alert(`⚠️ فشل الاتصال بإنستقرام: ${body?.error || `خطأ ${res.status}`}`);
+        showAdminToast(`⚠️ فشل الاتصال بإنستقرام: ${body?.error || `خطأ ${res.status}`}`, 'error');
         return;
       }
       // Server normalises Behold response to a flat array
       const posts: any[] = Array.isArray(body) ? body : [];
       if (posts.length === 0) {
-        alert('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد.\nتأكد من أن الـ Feed ID صحيح وأن الحساب به منشورات.');
+        showAdminToast('⚠️ لا توجد صور في هذه المجموعة على إنستقرام بعد.', 'info');
         return;
       }
       const data = getStoredData();
@@ -682,13 +714,13 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
       saveStoredData({ products: newProducts });
       setProducts(newProducts);
       if (added > 0) {
-        alert(`✅ تم استيراد ${added} منتج جديد من إنستقرام كمسودة — عدّليهم وأضيفي السعر قبل النشر`);
+        showAdminToast(`تم استيراد ${added} منتج جديد من إنستقرام كمسودة — عدّليهم وأضيفي السعر قبل النشر`, 'success');
       } else {
-        alert('ℹ️ كل الصور موجودة مسبقاً في المنتجات');
+        showAdminToast('كل الصور موجودة مسبقاً في المنتجات', 'info');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      alert(`⚠️ تعذّر الاتصال بإنستقرام: ${msg}`);
+      showAdminToast(`تعذّر الاتصال بإنستقرام: ${msg}`, 'error');
     } finally {
       setIsImportingFromIG(false);
     }
@@ -716,6 +748,76 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     loadData();
   };
 
+  // Add new coupon
+  const handleAddCoupon = () => {
+    if (!newCouponCode.trim()) {
+      showAdminToast('يرجى إدخال كود الكوبون', 'error');
+      return;
+    }
+    const newCoupon: Coupon = {
+      code: newCouponCode.toUpperCase().trim(),
+      type: newCouponType,
+      discount: newCouponDiscount,
+      expiryDate: newCouponExpiry || undefined,
+      isActive: newCouponActive,
+      usageCount: 0,
+    };
+    const updated = [...coupons, newCoupon];
+    setCoupons(updated);
+    saveStoredData({ coupons: updated });
+    addOperationLog('إضافة كوبون', `تم إضافة كوبون [${newCoupon.code}]`, 'المشرف', 'system', 'success');
+    showAdminToast(`تم إضافة الكوبون ${newCoupon.code} بنجاح`, 'success');
+    setNewCouponCode('');
+    setNewCouponType('percentage');
+    setNewCouponDiscount(10);
+    setNewCouponMinOrder('');
+    setNewCouponExpiry('');
+    setNewCouponActive(true);
+  };
+
+  // Category handlers
+  const handleAddCategory = () => {
+    if (!newCatName.trim()) {
+      showAdminToast('يرجى إدخال اسم التصنيف', 'error');
+      return;
+    }
+    const slug = newCatName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+    const newCat = {
+      id: slug || `cat-${Date.now()}`,
+      name: newCatName.trim(),
+      slug: slug || `cat-${Date.now()}`,
+      count: 0,
+      description: newCatDesc.trim() || undefined,
+    } as Category;
+    const updated = [...categories, newCat];
+    setCategories(updated);
+    saveStoredData({ categories: updated });
+    showAdminToast(`تم إضافة التصنيف "${newCat.name}"`, 'success');
+    setNewCatName('');
+    setNewCatDesc('');
+  };
+
+  const handleDeleteCategory = (id: string) => {
+    setConfirmDialog({
+      msg: `هل أنتِ متأكدة من حذف التصنيف؟ سيتم إزالته نهائياً.`,
+      onConfirm: () => {
+        const updated = categories.filter(c => c.id !== id);
+        setCategories(updated);
+        saveStoredData({ categories: updated });
+        showAdminToast('تم حذف التصنيف', 'info');
+      }
+    });
+  };
+
+  const handleUpdateCategory = () => {
+    if (!editingCat) return;
+    const updated = categories.map(c => c.id === editingCat.id ? editingCat : c);
+    setCategories(updated);
+    saveStoredData({ categories: updated });
+    setEditingCat(null);
+    showAdminToast('تم تحديث التصنيف', 'success');
+  };
+
   // Toggle Coupon Active rule
   const handleToggleCoupon = (code: string) => {
     const updated = coupons.map(c => {
@@ -729,6 +831,16 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
     loadData();
   };
 
+  // Dashboard chart helpers
+  const getMonthlyStats = (orderList: any[]) => {
+    const months: Record<string, number> = {};
+    orderList.forEach(o => {
+      const m = o.date?.substring(0, 7) || '';
+      if (m) months[m] = (months[m] || 0) + (o.total || 0);
+    });
+    return Object.entries(months).sort(([a],[b]) => a.localeCompare(b)).slice(-6);
+  };
+
   // Dashboard Stats Calculations
   const totalRevenue = orders.filter(o => o.paymentStatus === 'paid').reduce((sum, o) => sum + o.total, 0);
   const pendingOrdersCount = orders.filter(o => o.shippingStatus === 'pending' || o.shippingStatus === 'processing').length;
@@ -737,7 +849,46 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
   return (
     <div className="min-h-screen bg-[#FAF5F2] text-slate-800 flex flex-col font-sans" dir="rtl" id="almaasa-backend-panel">
-      
+
+      {/* Toast Notification */}
+      {adminToast && (
+        <div style={{
+          position: 'fixed', top: 20, right: 20, zIndex: 9999,
+          background: adminToast.type === 'error' ? '#DC2626' : adminToast.type === 'info' ? '#1D4ED8' : '#059669',
+          color: '#fff', padding: '12px 20px', borderRadius: 8,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.2)', fontFamily: "'Cairo', sans-serif",
+          fontSize: 14, maxWidth: 320, direction: 'rtl', display: 'flex', alignItems: 'center', gap: 8
+        }}>
+          <span style={{flex: 1}}>{adminToast.msg}</span>
+          <button onClick={() => setAdminToast(null)} style={{marginRight: 8, background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16, lineHeight: 1}}>×</button>
+        </div>
+      )}
+
+      {/* Confirm Dialog */}
+      {confirmDialog && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 10000,
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 12, padding: 24, maxWidth: 340, width: '90%',
+            fontFamily: "'Cairo', sans-serif", direction: 'rtl', textAlign: 'center'
+          }}>
+            <p style={{marginBottom: 20, fontSize: 15, color: '#241419'}}>{confirmDialog.msg}</p>
+            <div style={{display: 'flex', gap: 12, justifyContent: 'center'}}>
+              <button
+                onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null); }}
+                style={{background: '#DC2626', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 24px', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14}}
+              >تأكيد</button>
+              <button
+                onClick={() => setConfirmDialog(null)}
+                style={{background: '#F3F4F6', color: '#374151', border: 'none', borderRadius: 8, padding: '8px 24px', cursor: 'pointer', fontFamily: 'inherit', fontSize: 14}}
+              >إلغاء</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SECURITY GUEST LOGIN GUARD */}
       {!isAdminAuth ? (
         <div className="flex-1 flex items-center justify-center p-4 min-h-[90vh]">
@@ -891,7 +1042,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
               </button>
               <button onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold text-rose-400 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer">
-                <LogIn className="w-4 h-4 rotate-180" />
+                <LogOut className="w-4 h-4" />
                 تسجيل الخروج
               </button>
             </div>
@@ -956,9 +1107,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 {/* A. Stats Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { label: 'إجمالي المبيعات', value: `${totalRevenue.toFixed(2)} د.ب`, growth: '+12.1%', icon: Wallet, color: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' },
+                    { label: 'إجمالي المبيعات', value: `${totalRevenue.toFixed(2)} د.ب`, growth: '—', icon: Wallet, color: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' }, // TODO: compute from real data
                     { label: 'إجمالي الطلبات', value: `${orders.length} طلب`, growth: `+${pendingOrdersCount} جديد`, icon: ShoppingBag, color: 'bg-rose-50 text-[#9A2D55]', border: 'border-rose-100' },
-                    { label: 'العملاء الجدد', value: `${totalClientsCount} عميل`, growth: '+8.3%', icon: Users, color: 'bg-blue-50 text-blue-600', border: 'border-blue-100' },
+                    { label: 'العملاء الجدد', value: `${totalClientsCount} عميل`, growth: '—', icon: Users, color: 'bg-blue-50 text-blue-600', border: 'border-blue-100' }, // TODO: compute from real data
                     { label: 'المخزون المنخفض', value: `${lowStockProductsCount} منتج`, growth: lowStockProductsCount > 0 ? '⚠️ يحتاج تجديد' : '✓ مستوى جيد', icon: BadgeAlert, color: lowStockProductsCount > 0 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600', border: lowStockProductsCount > 0 ? 'border-amber-100' : 'border-emerald-100' },
                   ].map(({ label, value, growth, icon: Icon, color, border }) => (
                     <div key={label} className={`bg-white border ${border} rounded-2xl p-4 shadow-sm`}>
@@ -984,34 +1135,50 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                         <h3 className="font-black text-sm text-slate-800">المبيعات</h3>
                         <p className="text-[10px] text-slate-400 font-medium">آخر 30 يوم</p>
                       </div>
-                      <span className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full">↑ +12.1% من الشهر الماضي</span>
+                      <span className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-3 py-1 rounded-full">آخر 6 أشهر</span>{/* TODO: compute growth from real data */}
                     </div>
-                    <div className="h-48 w-full relative">
-                      <svg className="w-full h-full" viewBox="0 0 500 160" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#9A2D55" stopOpacity="0.15" />
-                            <stop offset="100%" stopColor="#9A2D55" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-                        <line x1="0" y1="40" x2="500" y2="40" stroke="#f8f4f6" strokeWidth="1" />
-                        <line x1="0" y1="80" x2="500" y2="80" stroke="#f8f4f6" strokeWidth="1" />
-                        <line x1="0" y1="120" x2="500" y2="120" stroke="#f8f4f6" strokeWidth="1" />
-                        <text x="0" y="38" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">20K</text>
-                        <text x="0" y="78" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">15K</text>
-                        <text x="0" y="118" fontSize="10" fill="#cbd5e1" fontFamily="sans-serif">10K</text>
-                        <path d="M30,140 L80,130 L130,100 L180,115 L230,70 L280,90 L330,50 L380,65 L430,30 L480,15"
-                          fill="none" stroke="#9A2D55" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M30,140 L80,130 L130,100 L180,115 L230,70 L280,90 L330,50 L380,65 L430,30 L480,15 L480,155 L30,155 Z"
-                          fill="url(#salesGrad)" />
-                        {[[230,70],[330,50],[480,15]].map(([cx,cy],i) => (
-                          <circle key={i} cx={cx} cy={cy} r="4" fill="#9A2D55" stroke="white" strokeWidth="2" />
-                        ))}
-                      </svg>
-                    </div>
-                    <div className="flex justify-between text-[10px] text-slate-400 font-medium mt-1 px-1">
-                      {['1 مايو','5 مايو','10 مايو','15 مايو','20 مايو','25 مايو','30 مايو'].map(d => <span key={d}>{d}</span>)}
-                    </div>
+                    {(() => {
+                      const monthlyData = getMonthlyStats(orders);
+                      const maxVal = Math.max(...monthlyData.map(([,v]) => v), 1);
+                      const chartW = 460, chartH = 140, pad = 20;
+                      const pts = monthlyData.map(([,v], i) => {
+                        const x = pad + (monthlyData.length > 1 ? (i / (monthlyData.length - 1)) : 0.5) * (chartW - 2*pad);
+                        const y = pad + (1 - v/maxVal) * (chartH - 2*pad);
+                        return [x, y] as [number, number];
+                      });
+                      const svgPath = pts.length > 1 ? `M${pts.map(([x,y])=>`${x},${y}`).join(' L')}` : '';
+                      const fillPath = pts.length > 1 ? `${svgPath} L${pts[pts.length-1][0]},${chartH-4} L${pts[0][0]},${chartH-4} Z` : '';
+                      return (
+                        <div className="h-48 w-full relative">
+                          <svg className="w-full h-full" viewBox={`0 0 500 ${chartH}`} preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#9A2D55" stopOpacity="0.15" />
+                                <stop offset="100%" stopColor="#9A2D55" stopOpacity="0" />
+                              </linearGradient>
+                            </defs>
+                            <line x1="0" y1="35" x2="500" y2="35" stroke="#f8f4f6" strokeWidth="1" />
+                            <line x1="0" y1="75" x2="500" y2="75" stroke="#f8f4f6" strokeWidth="1" />
+                            <line x1="0" y1="115" x2="500" y2="115" stroke="#f8f4f6" strokeWidth="1" />
+                            {svgPath ? (
+                              <>
+                                <path d={fillPath} fill="url(#salesGrad)" />
+                                <path d={svgPath} fill="none" stroke="#9A2D55" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                {pts.map(([x,y],i) => <circle key={i} cx={x} cy={y} r="4" fill="#9A2D55" stroke="white" strokeWidth="2" />)}
+                              </>
+                            ) : (
+                              <text x="250" y="70" textAnchor="middle" fontSize="11" fill="#cbd5e1" fontFamily="sans-serif">لا توجد بيانات مبيعات بعد</text>
+                            )}
+                          </svg>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-medium mt-1 px-1">
+                            {monthlyData.length > 0
+                              ? monthlyData.map(([m]) => <span key={m}>{m}</span>)
+                              : ['—','—','—','—','—','—'].map((d,i) => <span key={i}>{d}</span>)
+                            }
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* B2: Category Donut */}
@@ -1033,22 +1200,44 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                         <text x="60" y="68" textAnchor="middle" fontSize="8" fill="#9B8178" fontFamily="sans-serif">طلب</text>
                       </svg>
                     </div>
-                    <div className="space-y-2">
-                      {[
-                        { label: 'مخاوير', pct: '45%', color: 'bg-[#9A2D55]' },
-                        { label: 'أقمشة', pct: '30%', color: 'bg-[#C4956A]' },
-                        { label: 'تصاميم', pct: '15%', color: 'bg-[#e8d5c4]' },
-                        { label: 'أخرى', pct: '10%', color: 'bg-slate-200' },
-                      ].map(({ label, pct, color }) => (
-                        <div key={label} className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2.5 h-2.5 rounded-full ${color} shrink-0`} />
-                            <span className="text-slate-600 font-medium">{label}</span>
-                          </div>
-                          <span className="font-bold text-slate-700">{pct}</span>
+                    {(() => {
+                      // Compute category breakdown from orders or fallback to products
+                      const counts: Record<string, number> = {};
+                      orders.forEach(o => (o.items || []).forEach((item: any) => {
+                        const cat = item.product?.category || 'أخرى';
+                        counts[cat] = (counts[cat] || 0) + (item.quantity || 1);
+                      }));
+                      // Fallback to products if no order items
+                      if (Object.keys(counts).length === 0) {
+                        products.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
+                      }
+                      const total = Object.values(counts).reduce((a,b) => a+b, 0) || 1;
+                      const palette = ['#9A2D55','#C4956A','#e8d5c4','#94a3b8','#10b981','#f59e0b'];
+                      const entries = Object.entries(counts).sort(([,a],[,b]) => b-a).slice(0,5);
+                      const catMap: Record<string, string> = {
+                        'available':'متوفر', 'with-sheilah':'مع شيلة', 'kids':'أطفال',
+                        'mother-daughter':'أم وبنت', 'accessories':'اكسسوارات'
+                      };
+                      return (
+                        <div className="space-y-2">
+                          {entries.map(([cat, cnt], i) => {
+                            const pct = Math.round((cnt/total)*100);
+                            return (
+                              <div key={cat} className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{background: palette[i % palette.length]}} />
+                                  <span className="text-slate-600 font-medium">{catMap[cat] || cat}</span>
+                                </div>
+                                <span className="font-bold text-slate-700">{pct}%</span>
+                              </div>
+                            );
+                          })}
+                          {entries.length === 0 && (
+                            <p className="text-xs text-slate-400 text-center">لا توجد بيانات بعد</p>
+                          )}
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -1086,11 +1275,13 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                 ord.shippingStatus === 'delivered' ? 'bg-emerald-100 text-emerald-700' :
                                 ord.shippingStatus === 'shipped' ? 'bg-blue-100 text-blue-700' :
                                 ord.shippingStatus === 'processing' ? 'bg-amber-100 text-amber-700' :
+                                ord.shippingStatus === 'cancelled' ? 'bg-red-100 text-red-700' :
                                 'bg-rose-100 text-[#9A2D55]'
                               }`}>
-                                {ord.shippingStatus === 'delivered' ? 'مكتمل' :
-                                 ord.shippingStatus === 'shipped' ? 'قيد الشحن' :
-                                 ord.shippingStatus === 'processing' ? 'قيد التجهيز' : 'ملغي'}
+                                {ord.shippingStatus === 'delivered' ? 'تم التوصيل' :
+                                 ord.shippingStatus === 'shipped' ? 'تم الشحن' :
+                                 ord.shippingStatus === 'processing' ? 'جاري التجهيز' :
+                                 ord.shippingStatus === 'cancelled' ? 'ملغي' : 'قيد المعالجة'}
                               </span>
                             </td>
                           </tr>
@@ -1140,7 +1331,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                             { label: 'مكتمل', count: orders.filter(o=>o.shippingStatus==='delivered').length, color: 'bg-emerald-500' },
                             { label: 'قيد التجهيز', count: orders.filter(o=>o.shippingStatus==='processing').length, color: 'bg-amber-400' },
                             { label: 'قيد الشحن', count: orders.filter(o=>o.shippingStatus==='shipped').length, color: 'bg-blue-500' },
-                            { label: 'ملغي', count: orders.filter(o=>o.shippingStatus==='pending').length, color: 'bg-[#9A2D55]' },
+                            { label: 'قيد المعالجة', count: orders.filter(o=>o.shippingStatus==='pending').length, color: 'bg-[#9A2D55]' },
                           ].map(({ label, count, color }) => (
                             <div key={label} className="flex items-center justify-between">
                               <div className="flex items-center gap-1.5">
@@ -1158,18 +1349,24 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="bg-white rounded-2xl border border-slate-100 p-4">
                       <h3 className="font-black text-sm text-slate-800 mb-3">أفضل المنتجات مبيعاً</h3>
                       <div className="space-y-3">
-                        {products.slice(0, 3).map((p, i) => (
+                        {products.slice(0, 3).map((p, i) => {
+                          const soldCount = orders.reduce((sum: number, o: any) => {
+                            const item = o.items?.find((it: any) => it.product?.id === p.id);
+                            return sum + (item ? item.quantity : 0);
+                          }, 0);
+                          return (
                           <div key={p.id} className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#F8EDE8] shrink-0">
                               <img src={p.image} alt={p.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[11px] font-bold text-slate-700 truncate">{p.name}</p>
-                              <p className="text-[10px] text-slate-400">{p.reviewCount} مبيع</p>
+                              <p className="text-[10px] text-slate-400">{soldCount} مبيع</p>
                             </div>
                             <span className="text-xs font-black text-[#9A2D55] shrink-0">{p.price.toFixed(0)} د.ب</span>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
@@ -1191,14 +1388,21 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     type="text" 
                     placeholder="ابحثي باسم الزبونة أو رقم الهاتف أو كود تتبع الشحن..."
                     value={orderSearch}
-                    onChange={(e) => setOrderSearch(e.target.value)}
+                    onChange={(e) => { setOrderSearch(e.target.value); setOrdersPage(1); }}
                     className="flex-1 bg-[#FAF6F6] border rounded-xl px-4 py-2.5 text-xs font-semibold focus:outline-none"
                   />
-                  <button className="bg-slate-900 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs">تحديث</button>
                 </div>
 
                 {/* High density Orders Table */}
-                <div className="bg-white border rounded-2xl overflow-hidden shadow-2xs">
+                {(() => {
+                  const filteredOrders = orders.filter(o => !orderSearch ||
+                    o.customer.name.toLowerCase().includes(orderSearch.toLowerCase()) ||
+                    o.trackingCode.toLowerCase().includes(orderSearch.toLowerCase()) ||
+                    o.customer.phone.includes(orderSearch)
+                  );
+                  const pagedOrders = filteredOrders.slice((ordersPage - 1) * ORDERS_PER_PAGE, ordersPage * ORDERS_PER_PAGE);
+                  return (<>
+                <div className="bg-white border rounded-2xl shadow-2xs" style={{overflowX: 'auto'}}>
                   <table className="w-full text-right text-xs">
                     <thead>
                       <tr className="bg-slate-50 text-slate-500 border-b border-slate-100">
@@ -1212,13 +1416,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 font-bold">
-                      {orders
-                        .filter(o => !orderSearch || 
-                           o.customer.name.toLowerCase().includes(orderSearch.toLowerCase()) || 
-                           o.trackingCode.toLowerCase().includes(orderSearch.toLowerCase()) || 
-                           o.customer.phone.includes(orderSearch)
-                        )
-                        .map((order) => (
+                      {pagedOrders.length === 0 ? (
+                        <tr><td colSpan={7} className="p-10 text-center text-slate-400 text-sm font-medium">لا توجد طلبات مطابقة</td></tr>
+                      ) : pagedOrders.map((order) => (
                           <tr key={order.id} className="hover:bg-[#FAF6F6]/50">
                             <td className="p-3 font-mono text-slate-800">{order.id}</td>
                             <td className="p-3">
@@ -1241,9 +1441,15 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                               </select>
                             </td>
                             <td className="p-3">
-                              <select 
-                                value={order.shippingStatus} 
-                                onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value as Order['shippingStatus'])}
+                              <select
+                                value={order.shippingStatus}
+                                onChange={(e) => {
+                                  const newStatus = e.target.value as Order['shippingStatus'];
+                                  setConfirmDialog({
+                                    msg: `تأكيد تغيير الحالة إلى "${newStatus}"؟`,
+                                    onConfirm: () => handleUpdateOrderStatus(order.id, newStatus)
+                                  });
+                                }}
                                 className={`p-1.5 rounded-lg text-[10px] font-bold focus:outline-none border ${
                                   order.shippingStatus === 'delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                                   order.shippingStatus === 'shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
@@ -1255,6 +1461,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                 <option value="processing">جاري التفصيل والقص</option>
                                 <option value="shipped">تم تسليم الشاحن ✈️</option>
                                 <option value="delivered">تمت التسوية والتسليم✓</option>
+                                <option value="cancelled">ملغي</option>
                               </select>
                             </td>
                             <td className="p-3">
@@ -1281,6 +1488,15 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     </tbody>
                   </table>
                 </div>
+                {filteredOrders.length > ORDERS_PER_PAGE && (
+                  <div style={{display:'flex', gap:8, justifyContent:'center', padding:'16px 0', direction:'rtl'}}>
+                    <button disabled={ordersPage === 1} onClick={() => setOrdersPage(p => p - 1)} style={{background: ordersPage === 1 ? '#f1f5f9' : '#1e293b', color: ordersPage === 1 ? '#94a3b8' : '#fff', border:'none', borderRadius:8, padding:'6px 16px', fontSize:13, cursor: ordersPage === 1 ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>السابق</button>
+                    <span style={{padding:'6px 12px', fontSize:13, color:'#475569', fontWeight:600}}>صفحة {ordersPage} من {Math.ceil(filteredOrders.length / ORDERS_PER_PAGE)}</span>
+                    <button disabled={ordersPage >= Math.ceil(filteredOrders.length / ORDERS_PER_PAGE)} onClick={() => setOrdersPage(p => p + 1)} style={{background: ordersPage >= Math.ceil(filteredOrders.length / ORDERS_PER_PAGE) ? '#f1f5f9' : '#1e293b', color: ordersPage >= Math.ceil(filteredOrders.length / ORDERS_PER_PAGE) ? '#94a3b8' : '#fff', border:'none', borderRadius:8, padding:'6px 16px', fontSize:13, cursor: ordersPage >= Math.ceil(filteredOrders.length / ORDERS_PER_PAGE) ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>التالي</button>
+                  </div>
+                )}
+                </>);
+                })()}
 
               </div>
             )}
@@ -1310,6 +1526,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 <div className="bg-white border rounded-2xl p-5">
                   <h3 className="font-bold text-slate-800 mb-4 text-xs border-b pb-2">دفتر المعاملات والمدخول من بوابات الدفع الخليجية</h3>
                   <div className="space-y-3">
+                    {orders.filter(o => o.paymentStatus === 'paid').length === 0 && (
+                      <p className="text-center text-slate-400 text-sm py-8 font-medium">لا توجد مبيعات بعد</p>
+                    )}
                     {orders.filter(o => o.paymentStatus === 'paid').map((ticket) => (
                       <div key={ticket.id} className="bg-slate-50 border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between text-xs gap-3">
                         <div>
@@ -1334,6 +1553,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
               <div className="space-y-6">
                 <div className="bg-white border rounded-2xl p-5">
                   <h3 className="font-bold text-slate-800 text-xs mb-4">قائمة وسجلات المشترين وبوليسيات الاتصال</h3>
+                  {Array.from(new Set(orders.map(o => o.customer.phone))).length === 0 && (
+                    <p className="text-center text-slate-400 text-sm py-8 font-medium">لا يوجد عملاء بعد</p>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Array.from(new Set(orders.map(o => o.customer.phone))).map((phoneNum, idx) => {
                       const clientOrders = orders.filter(o => o.customer.phone === phoneNum);
@@ -1405,6 +1627,31 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 ========================================= */}
             {activeMenu === 'categories' && (
               <div className="space-y-6">
+                {/* Add Category Form */}
+                <div className="bg-white border rounded-2xl p-5">
+                  <h3 className="font-bold text-slate-800 text-xs mb-4">إضافة تصنيف جديد</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-[10px] text-slate-400 font-bold block mb-1">اسم التصنيف *</label>
+                      <input type="text" value={newCatName} onChange={e => setNewCatName(e.target.value)}
+                        placeholder="مخاوير العيد"
+                        className="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-slate-400 font-bold block mb-1">الوصف (اختياري)</label>
+                      <input type="text" value={newCatDesc} onChange={e => setNewCatDesc(e.target.value)}
+                        placeholder="وصف مختصر للتصنيف"
+                        className="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none" />
+                    </div>
+                    <div className="flex items-end">
+                      <button onClick={handleAddCategory}
+                        className="w-full bg-[#9A2D55] hover:bg-[#802446] text-white font-extrabold text-xs px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer">
+                        <Plus className="w-3.5 h-3.5" /> إضافة تصنيف
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="bg-white border rounded-2xl p-5">
                   <div className="flex items-center justify-between border-b pb-2 mb-4">
                     <h3 className="font-bold text-slate-800 text-xs">إدارة أقسام وتصنيفات مخاوير ألماسة</h3>
@@ -1413,11 +1660,40 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
 
                   <div className="space-y-3">
                     {categories.map((cat) => (
-                      <div key={cat.id} className="bg-[#FAF6F6] rounded-xl p-3 flex justify-between items-center text-xs">
-                        <strong className="text-slate-800">{cat.name}</strong>
-                        <span className="text-[#9A2D55] font-mono font-bold bg-white border px-3 py-1 rounded-lg">
-                          يحتوي {products.filter(p => p.category === cat.id || cat.id === 'all').length} منتج
-                        </span>
+                      <div key={cat.id} className="bg-[#FAF6F6] rounded-xl p-3 text-xs">
+                        {editingCat && editingCat.id === cat.id ? (
+                          <div className="flex flex-col sm:flex-row gap-2 items-center">
+                            <input value={editingCat.name} onChange={e => setEditingCat({...editingCat, name: e.target.value})}
+                              className="flex-1 bg-white border rounded-lg px-2 py-1 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                            <input value={editingCat.description || ''} onChange={e => setEditingCat({...editingCat, description: e.target.value})}
+                              placeholder="الوصف"
+                              className="flex-1 bg-white border rounded-lg px-2 py-1 text-xs focus:outline-none" />
+                            <div className="flex gap-1">
+                              <button onClick={handleUpdateCategory} className="bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-lg cursor-pointer">حفظ</button>
+                              <button onClick={() => setEditingCat(null)} className="bg-slate-200 text-slate-700 text-[10px] font-bold px-3 py-1 rounded-lg cursor-pointer">إلغاء</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <strong className="text-slate-800">{cat.name}</strong>
+                              {(cat as any).description && <p className="text-[10px] text-slate-400 mt-0.5">{(cat as any).description}</p>}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[#9A2D55] font-mono font-bold bg-white border px-3 py-1 rounded-lg">
+                                {products.filter(p => p.category === cat.id || cat.id === 'all').length} منتج
+                              </span>
+                              <button onClick={() => setEditingCat({...cat})}
+                                className="text-slate-500 hover:text-slate-800 border border-slate-200 px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer flex items-center gap-1">
+                                <Pencil className="w-3 h-3" /> تعديل
+                              </button>
+                              <button onClick={() => handleDeleteCategory(cat.id)}
+                                className="bg-rose-50 text-rose-600 hover:bg-rose-100 px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer flex items-center gap-1">
+                                <Trash2 className="w-3 h-3" /> حذف
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1509,11 +1785,16 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                   <CheckCircle className="w-3 h-3" /> نشر
                                 </button>
                               )}
+                              <a href="/" target="_blank" rel="noopener" title="معاينة في المتجر"
+                                style={{display:'inline-flex',alignItems:'center',padding:'2px 6px',borderRadius:6,background:'#f1f5f9',color:'#64748b',textDecoration:'none'}}
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
                               <button
                                 onClick={() => setEditingProduct({ ...prod })}
                                 className="text-[#9A2D55] hover:text-[#802446] font-bold flex items-center gap-1 cursor-pointer"
                               >
-                                <Check className="w-3.5 h-3.5" /> تعديل
+                                <Pencil className="w-3.5 h-3.5" /> تعديل
                               </button>
                               <button
                                 onClick={() => handleDeleteProduct(prod.id, prod.name)}
@@ -1578,12 +1859,13 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                     });
                                     setProducts(nextProds);
                                     saveStoredData({ products: nextProds });
+                                    showAdminToast('تم تحديث المخزون', 'success');
                                   }}
                                   className="text-[10px] bg-rose-50 text-[#9A2D55] px-1.5 py-0.5 rounded border border-rose-100 font-bold hover:bg-rose-100 cursor-pointer"
                                 >
                                   +5 قطع
                                 </button>
-                                <button 
+                                <button
                                   onClick={() => {
                                     const nextProds = products.map(p => {
                                       if (p.id === prod.id) {
@@ -1593,6 +1875,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                                     });
                                     setProducts(nextProds);
                                     saveStoredData({ products: nextProds });
+                                    showAdminToast('تم تحديث المخزون', 'success');
                                   }}
                                   className="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded hover:bg-slate-200 cursor-pointer"
                                 >
@@ -1617,6 +1900,9 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 <div className="bg-white border rounded-2xl p-5">
                   <h3 className="font-bold text-slate-800 text-xs mb-4">آراء عملاء مخاوير ألماسة (تعديل وحجب وعرض مباشر)</h3>
                   <div className="space-y-4">
+                    {reviews.length === 0 && (
+                      <p className="text-center text-slate-400 text-sm py-8 font-medium">لا توجد تقييمات بعد</p>
+                    )}
                     {reviews.map((rev) => (
                       <div key={rev.id} className="bg-slate-50 border rounded-2xl p-4 text-xs space-y-2">
                         <div className="flex justify-between items-center bg-white p-2 rounded-xl border">
@@ -1659,7 +1945,61 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <span className="text-[10px] bg-rose-50 text-[#9A2D55] px-2 py-0.5 rounded font-bold">النشط: {coupons.filter(c => c.isActive).length} كوبونات</span>
                   </div>
 
+                  {/* Add Coupon Form */}
+                  <div className="bg-slate-50 border border-dashed border-[#9A2D55]/30 rounded-xl p-4 mb-4 space-y-3">
+                    <h4 className="font-bold text-slate-700 text-xs mb-2">إضافة كوبون جديد</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">كود الكوبون *</label>
+                        <input
+                          type="text"
+                          value={newCouponCode}
+                          onChange={e => setNewCouponCode(e.target.value.toUpperCase())}
+                          placeholder="ALMAASA20"
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">نوع الخصم</label>
+                        <select value={newCouponType} onChange={e => setNewCouponType(e.target.value as 'percentage'|'fixed')}
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none">
+                          <option value="percentage">نسبة مئوية %</option>
+                          <option value="fixed">مبلغ ثابت</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">قيمة الخصم *</label>
+                        <input type="number" min={0} value={newCouponDiscount} onChange={e => setNewCouponDiscount(Number(e.target.value))}
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#9A2D55]" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">حد أقصى للاستخدام (اختياري)</label>
+                        <input type="number" min={0} value={newCouponMinOrder} onChange={e => setNewCouponMinOrder(e.target.value)}
+                          placeholder="مثال: 50"
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-bold block mb-1">تاريخ الانتهاء (اختياري)</label>
+                        <input type="date" value={newCouponExpiry} onChange={e => setNewCouponExpiry(e.target.value)}
+                          className="w-full bg-white border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none" />
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <label className="flex items-center gap-2 text-xs font-bold cursor-pointer mt-4">
+                          <input type="checkbox" checked={newCouponActive} onChange={e => setNewCouponActive(e.target.checked)} />
+                          <span>فعال</span>
+                        </label>
+                      </div>
+                    </div>
+                    <button onClick={handleAddCoupon}
+                      className="bg-[#9A2D55] hover:bg-[#802446] text-white font-extrabold text-xs px-5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer">
+                      <Plus className="w-3.5 h-3.5" /> إضافة الكوبون
+                    </button>
+                  </div>
+
                   <div className="space-y-3">
+                    {coupons.length === 0 && (
+                      <p className="text-center text-slate-400 text-sm py-6 font-medium">لا توجد كوبونات بعد. أضيفي أول كوبون أعلاه</p>
+                    )}
                     {coupons.map((coupon) => (
                       <div key={coupon.code} className="bg-[#FAF6F6] border rounded-xl p-4 flex items-center justify-between text-xs gap-3 font-semibold">
                         <div>
@@ -1718,7 +2058,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="space-y-4">
                       {/* Top status & toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label dir="ltr" className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={paymentGateways.tap.enabled}
@@ -1771,7 +2111,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                             }}
                             className="bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded font-sans font-bold cursor-pointer transition-colors"
                           >
-                            {copiedTextId === 'tap-wh' ? 'تم النسخ!' : 'عرض'}
+                            {copiedTextId === 'tap-wh' ? 'تم النسخ!' : 'نسخ'}
                           </button>
                         </div>
                       </div>
@@ -1801,7 +2141,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="space-y-4">
                       {/* Top status & toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label dir="ltr" className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={paymentGateways.cod.enabled}
@@ -1854,7 +2194,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="space-y-4">
                       {/* Top status & toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label dir="ltr" className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={paymentGateways.bankTransfer.enabled}
@@ -1915,7 +2255,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                     <div className="space-y-4">
                       {/* Top status & toggle */}
                       <div className="flex items-center justify-between">
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label dir="ltr" className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={paymentGateways.vpay.enabled}
@@ -1968,7 +2308,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                             }}
                             className="bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded font-sans font-bold cursor-pointer transition-colors"
                           >
-                            {copiedTextId === 'vpay-wh' ? 'تم النسخ!' : 'عرض'}
+                            {copiedTextId === 'vpay-wh' ? 'تم النسخ!' : 'نسخ'}
                           </button>
                         </div>
                       </div>
@@ -2863,7 +3203,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                 {/* Print Invoice Button / Print */}
                 <div className="pt-4 border-t flex justify-end gap-2">
                   <button 
-                    onClick={() => { setSelectedOrder(null); alert('جاري توجيه الأمر للطابعة المركزية للمعمل...'); }}
+                    onClick={() => { setSelectedOrder(null); showAdminToast('جاري توجيه الأمر للطابعة المركزية للمعمل...', 'info'); }}
                     className="bg-slate-900 text-white font-extrabold px-6 py-2.5 rounded-xl text-xs flex items-center gap-1 cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5" /> طباعة الفاتورة والوصل 🧾
@@ -2931,7 +3271,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                   </button>
 
                   <button 
-                    onClick={() => { setShowShippingLabel(null); alert('جاري إطلاق الأمر وجمل البوليسية لخطوط الشحن Aramex...'); }}
+                    onClick={() => { setShowShippingLabel(null); showAdminToast('جاري إطلاق الأمر وجمل البوليسية لخطوط الشحن Aramex...', 'info'); }}
                     className="bg-[#9A2D55] text-white px-6 py-2 rounded-xl font-extrabold cursor-pointer"
                   >
                     تفويض وإرسال البوليسية 🖨️
@@ -2970,7 +3310,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       onChange={e => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        if (file.size > 8 * 1024 * 1024) { alert('الصورة أكبر من 8MB'); return; }
+                        if (file.size > 8 * 1024 * 1024) { showAdminToast('الصورة أكبر من 8MB', 'error'); return; }
                         const reader = new FileReader();
                         reader.onload = ev => setEditingProduct({...editingProduct, image: ev.target?.result as string});
                         reader.readAsDataURL(file);
@@ -2990,7 +3330,7 @@ const handleAuthSubmit = async (e: React.FormEvent) => {
                       <label className="text-xs font-bold text-slate-600">الوصف</label>
                       <button
                         onClick={async () => {
-                          if (!editingProduct.name.trim()) { alert('اكتبي اسم المنتج أولاً'); return; }
+                          if (!editingProduct.name.trim()) { showAdminToast('اكتبي اسم المنتج أولاً', 'info'); return; }
                           const cat = categories.find(c => c.id === editingProduct.category);
                           setEditingProduct({...editingProduct, description: '⏳ جاري التوليد...'});
                           try {
