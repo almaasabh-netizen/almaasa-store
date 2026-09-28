@@ -1,28 +1,66 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, Download, Eye, ChevronDown } from 'lucide-react';
+import { Search, Download, Eye, ChevronDown, Truck, CreditCard, Wallet, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getStoredData, saveStoredData } from '../../data';
 import { statusColors } from '../theme';
+import { FilterBar, type Filter, type FilterFieldDef } from '@/components/ui/filter-token-bar';
 
-const STATUSES = ['الكل','new','processing','shipping','delivered','cancelled','returned'];
-const STATUS_LABELS: Record<string,string> = { 'الكل':'الكل', new:'جديد', processing:'قيد التجهيز', shipping:'تم الشحن', delivered:'تم التسليم', cancelled:'ملغي', returned:'مُرتجع' };
+const STATUS_LABELS: Record<string,string> = { new:'جديد', pending:'قيد المعالجة', processing:'قيد التجهيز', shipping:'تم الشحن', shipped:'تم الشحن', delivered:'تم التسليم', cancelled:'ملغي', returned:'مُرتجع' };
+const PAYMENT_STATUS_LABELS: Record<string,string> = { pending:'بانتظار الدفع', paid:'مدفوع', failed:'فشل' };
+const PAYMENT_METHOD_LABELS: Record<string,string> = { benefit:'BenefitPay', knet:'KNET', card:'بطاقة', applepay:'Apple Pay', cash:'نقداً' };
+
+const OPERATORS = [
+  { value: 'is', label: 'هو' },
+  { value: 'is_not', label: 'ليس' },
+  { value: 'is_any', label: 'أحد', multi: true },
+];
+
+const orderValue = (o: any, field: string): string => {
+  if (field === 'status') return o.shippingStatus || o.status || '';
+  if (field === 'payment') return o.paymentStatus || '';
+  if (field === 'method') return o.paymentMethod || '';
+  if (field === 'country') return o.customer?.country || '';
+  return '';
+};
+
+// Option lists come from the known labels plus any value that actually appears in the data.
+const optionsFor = (orders: any[], field: string, labels: Record<string,string>) => {
+  const values = new Set([...Object.keys(labels), ...orders.map(o => orderValue(o, field)).filter(Boolean)]);
+  return [...values].map(v => ({ value: v, label: labels[v] ?? v }));
+};
+
+const matches = (o: any, f: Filter) => {
+  if (f.values.length === 0) return true;
+  const v = orderValue(o, f.field);
+  return f.operator === 'is_not' ? !f.values.includes(v) : f.values.includes(v);
+};
 
 export default function Orders() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('الكل');
+  const [filters, setFilters] = useState<Filter[]>([]);
   const [data, setData] = useState(() => getStoredData());
+
+  const filterFields: FilterFieldDef[] = useMemo(() => {
+    const all = data.orders || [];
+    return [
+      { id: 'status', label: 'حالة الشحن', icon: <Truck className="w-3.5 h-3.5" />, operators: OPERATORS, options: optionsFor(all, 'status', STATUS_LABELS) },
+      { id: 'payment', label: 'حالة الدفع', icon: <Wallet className="w-3.5 h-3.5" />, operators: OPERATORS, options: optionsFor(all, 'payment', PAYMENT_STATUS_LABELS) },
+      { id: 'method', label: 'طريقة الدفع', icon: <CreditCard className="w-3.5 h-3.5" />, operators: OPERATORS, options: optionsFor(all, 'method', PAYMENT_METHOD_LABELS) },
+      { id: 'country', label: 'الدولة', icon: <Globe className="w-3.5 h-3.5" />, operators: OPERATORS, options: optionsFor(all, 'country', {}) },
+    ];
+  }, [data.orders]);
 
   const orders = useMemo(() => {
     let list = [...(data.orders || [])].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    if (statusFilter !== 'الكل') list = list.filter((o: any) => (o.shippingStatus || o.status) === statusFilter);
+    list = list.filter((o: any) => filters.every(f => matches(o, f)));
     if (search) list = list.filter((o: any) => {
       const name = o.customer?.name || o.customerName || '';
       const phone = o.customer?.phone || o.customerPhone || '';
       return name.includes(search) || o.id?.includes(search) || phone.includes(search);
     });
     return list;
-  }, [data.orders, statusFilter, search]);
+  }, [data.orders, filters, search]);
 
   const updateStatus = (id: string, status: string) => {
     const updated = { ...data, orders: data.orders.map((o: any) => o.id === id ? { ...o, status, shippingStatus: status } : o) };
@@ -40,25 +78,15 @@ export default function Orders() {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث باسم العميل أو رقم الطلب..."
             className="bg-transparent text-sm flex-1 outline-none" style={{ color: '#5A4047' }} dir="rtl" />
         </div>
-        <div className="flex gap-1.5 flex-wrap">
-          {STATUSES.map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition-colors"
-              style={{
-                background: statusFilter === s ? '#D79AA8' : '#FFFFFF',
-                color: statusFilter === s ? 'white' : '#5A4047',
-                border: '1px solid #F0DDE0'
-              }}>
-              {STATUS_LABELS[s]}
-            </button>
-          ))}
-        </div>
         <button className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold mr-auto"
           style={{ background: '#FFFFFF', border: '1px solid #F0DDE0', color: '#5A4047' }}>
           <Download className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />
           تصدير
         </button>
       </div>
+
+      <FilterBar fields={filterFields} value={filters} onChange={setFilters}
+        addLabel="فلتر" emptyLabel="إضافة فلتر" aria-label="فلاتر الطلبات" />
 
       {/* Summary badges */}
       <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
@@ -67,7 +95,7 @@ export default function Orders() {
           return (
             <div key={k} className="rounded-xl p-3 text-center cursor-pointer hover:shadow-sm transition-shadow"
               style={{ background: v.bg, border: `1px solid ${v.text}22` }}
-              onClick={() => setStatusFilter(k)}>
+              onClick={() => setFilters([{ id: `status-${k}`, field: 'status', operator: 'is', values: [k] }])}>
               <p className="text-lg font-black" style={{ color: v.text }}>{count}</p>
               <p className="text-[10px] font-medium" style={{ color: v.text }}>{v.label}</p>
             </div>

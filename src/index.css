@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+/* dark: variants follow the .dark class the admin toggles, not the OS setting */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* shadcn-style tokens used by components in src/components/ui, mapped to the brand palette */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --background: #F9F6F4;
+  --foreground: #241419;
+  --card: #FFFFFF;
+  --card-foreground: #241419;
+  --muted-foreground: #9A8A85;
+  --border: rgba(154, 45, 85, 0.12);
+  --ring: #9A2D55;
+}
+
+.dark {
+  --background: #160B10;
+  --foreground: #FAF7F3;
+  --card: #241419;
+  --card-foreground: #FAF7F3;
+  --muted-foreground: #B8A5A0;
+  --border: rgba(250, 247, 243, 0.12);
+  --ring: #C4A882;
+}
+
 /* ─── ALMAASA DESIGN TOKENS ───────────────────────────────── */
 :root {
   /* Brand */

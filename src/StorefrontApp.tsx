@@ -5,7 +5,7 @@ import Storefront from './components/Storefront';
 
 export default function StorefrontApp() {
   const navigate = useNavigate();
-  const [customerTab, setCustomerTab] = useState<'home' | 'shop' | 'product' | 'cart' | 'about' | 'contact' | 'tracking'>('home');
+  const [customerTab, setCustomerTab] = useState<'home' | 'shop' | 'cart' | 'about' | 'contact' | 'tracking'>('home');
 
   useEffect(() => {
     if (window.location.hash === '#admin') {

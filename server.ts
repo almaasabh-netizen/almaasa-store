@@ -3,7 +3,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
-import { timingSafeEqual } from "crypto";
+import { timingSafeEqual, createHash } from "crypto";
 import rateLimit from "express-rate-limit";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
@@ -23,14 +23,26 @@ const JWT_SECRET = process.env.JWT_SECRET || (() => {
 const TOKEN_COOKIE = "ama_admin_token";
 const COOKIE_MAX_AGE = 8 * 60 * 60 * 1000; // 8 hours in ms
 
+// Hashing to a fixed length avoids timingSafeEqual throwing on unequal lengths.
+function safeStringEqual(a: string, b: string): boolean {
+  const ha = createHash("sha256").update(a).digest();
+  const hb = createHash("sha256").update(b).digest();
+  return timingSafeEqual(ha, hb);
+}
+
+// Tokens are bound to the current password, so changing ADMIN_PASSWORD revokes them all.
+function passwordFingerprint(): string {
+  return createHash("sha256").update(process.env.ADMIN_PASSWORD || "").digest("hex").slice(0, 16);
+}
+
 function signToken(): string {
-  return jwt.sign({ role: "admin" }, JWT_SECRET, { expiresIn: "8h" });
+  return jwt.sign({ role: "admin", pv: passwordFingerprint() }, JWT_SECRET, { expiresIn: "8h" });
 }
 
 function verifyToken(token: string): boolean {
   try {
     const payload = jwt.verify(token, JWT_SECRET) as any;
-    return payload?.role === "admin";
+    return payload?.role === "admin" && payload?.pv === passwordFingerprint();
   } catch {
     return false;
   }
@@ -50,25 +62,46 @@ async function startServer() {
   const PORT = Number(process.env.PORT) || 3000;
   const isProd = process.env.NODE_ENV === "production";
 
+  // Render sits one proxy hop in front; rate limiting must key on the real client IP.
+  app.set("trust proxy", 1);
+  app.disable("x-powered-by");
+
   // ── Security headers ─────────────────────────────────────────
-  const allowedOrigins = [
-    "https://almaasa-store.onrender.com",
-    "http://localhost:3000",
-    "http://localhost:5173",
-  ];
+  const allowedOrigins = isProd
+    ? ["https://almaasa-store.onrender.com"]
+    : ["https://almaasa-store.onrender.com", "http://localhost:3000", "http://localhost:5173"];
 
   app.use((req, res, next) => {
     const origin = req.headers.origin;
-    if (origin && allowedOrigins.includes(origin)) {
+    const originAllowed = !!origin && allowedOrigins.includes(origin);
+    res.setHeader("Vary", "Origin");
+    if (originAllowed) {
       res.setHeader("Access-Control-Allow-Origin", origin);
       res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-    if (req.method === "OPTIONS") return res.sendStatus(204);
+    res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(self)");
+    // Dev is excluded: Vite HMR needs inline scripts, eval and a websocket.
+    if (isProd) {
+      res.setHeader("Content-Security-Policy", [
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: https:",
+        "connect-src 'self' https://feeds.behold.so",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "object-src 'none'",
+      ].join("; "));
+      res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    }
+    if (req.method === "OPTIONS") return res.sendStatus(origin && !originAllowed ? 403 : 204);
     next();
   });
 
@@ -110,15 +143,8 @@ async function startServer() {
       }
 
       // Timing-safe comparison — prevents timing attacks
-      const emailNorm = email.trim().toLowerCase();
-      const adminEmailNorm = adminEmail.trim().toLowerCase();
-      const emailBuf = Buffer.from(emailNorm.padEnd(256));
-      const adminEmailBuf = Buffer.from(adminEmailNorm.padEnd(256));
-      const passBuf = Buffer.from(password.padEnd(256));
-      const adminPassBuf = Buffer.from(adminPassword.padEnd(256));
-
-      const emailMatch = timingSafeEqual(emailBuf, adminEmailBuf);
-      const passwordMatch = timingSafeEqual(passBuf, adminPassBuf);
+      const emailMatch = safeStringEqual(email.trim().toLowerCase(), adminEmail.trim().toLowerCase());
+      const passwordMatch = safeStringEqual(password, adminPassword);
 
       if (emailMatch && passwordMatch) {
         const token = signToken();
