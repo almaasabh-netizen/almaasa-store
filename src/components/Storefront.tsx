@@ -66,12 +66,6 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   const [shippingZones, setShippingZones] = useState<any[]>([]);
   const [selectedShippingMethod, setSelectedShippingMethod] = useState<any>(null);
   const [benefitPhone, setBenefitPhone] = useState('');
-  const [knetCardNum, setKnetCardNum] = useState('');
-  const [knetPin, setKnetPin] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
   const [isPaying, setIsPaying] = useState(false);
   const [newOrder, setNewOrder] = useState<Order | null>(null);
 
