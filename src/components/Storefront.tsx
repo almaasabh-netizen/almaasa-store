@@ -207,8 +207,13 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
     setCouponError('');
     if (!couponCode.trim()) return;
     const found = coupons.find(c => c.code.toUpperCase() === couponCode.trim().toUpperCase() && c.isActive);
-    if (found) { setActiveCoupon(found); addToast(`كوبون ${found.code} مفعّل`); }
-    else { setCouponError('الكوبون غير فعال أو غير صحيح.'); setActiveCoupon(null); }
+    const reject = (msg: string) => { setCouponError(msg); setActiveCoupon(null); };
+    if (!found) return reject('الكوبون غير فعال أو غير صحيح.');
+    if (found.expiryDate && new Date(`${found.expiryDate}T23:59:59`) < new Date()) return reject('انتهت صلاحية هذا الكوبون.');
+    if (found.maxUsage && found.usageCount >= found.maxUsage) return reject('وصل هذا الكوبون للحد الأقصى من الاستخدام.');
+    if (found.minOrder && calculatedSubtotal < found.minOrder) return reject(`هذا الكوبون يتطلب طلباً بقيمة ${found.minOrder} د.ب على الأقل.`);
+    setActiveCoupon(found);
+    addToast(`كوبون ${found.code} مفعّل`);
   };
 
   /* ── CALCULATIONS ───────────────────────────────────────────── */

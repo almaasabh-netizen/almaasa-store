@@ -4,7 +4,7 @@ import { getStoredData, saveStoredData } from '../../data';
 import ConfirmModal from '../components/ConfirmModal';
 import Toast, { useToast } from '../components/Toast';
 
-type Category = { id: string; name: string; nameEn: string; image: string; order: number };
+import type { Category } from '../../types';
 
 export default function Categories() {
   const [data, setData] = useState(() => getStoredData());
@@ -21,7 +21,8 @@ export default function Categories() {
     if (id) {
       updated = { ...data, categories: categories.map((c) => c.id === id ? { ...c, ...form } : c) };
     } else {
-      updated = { ...data, categories: [...categories, { ...form, id: `cat_${Date.now()}` }] };
+      const id = `cat_${Date.now()}`;
+      updated = { ...data, categories: [...categories, { ...form, id, slug: id, count: 0 }] };
     }
     saveStoredData(updated);
     setData(updated);

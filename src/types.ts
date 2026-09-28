@@ -52,14 +52,14 @@ export interface Order {
   total: number;
   paymentMethod: 'benefit' | 'knet' | 'card' | 'applepay' | 'cash';
   paymentStatus: 'pending' | 'paid' | 'failed';
-  shippingStatus: 'pending' | 'processing' | 'shipped' | 'delivered';
+  shippingStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   date: string;
   notes?: string;
   timeline: {
     title: string;
     description: string;
     date: string;
-    status: 'pending' | 'processing' | 'shipped' | 'delivered';
+    status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   }[];
 }
 
@@ -79,6 +79,8 @@ export interface Category {
   slug: string;
   image?: string;
   count: number;
+  nameEn?: string;
+  order?: number;
 }
 
 export interface Coupon {
@@ -89,6 +91,7 @@ export interface Coupon {
   usageCount: number;
   maxUsage?: number;
   expiryDate?: string;
+  minOrder?: number;
 }
 
 export interface SizeGuide {

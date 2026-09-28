@@ -74,7 +74,7 @@ function summarize(
   options: FilterOption[] | undefined,
   values: string[]
 ): { text: string; empty: boolean; glyphs: React.ReactNode[] } {
-  if (!values.length) return { text: "Select…", empty: true, glyphs: [] };
+  if (!values.length) return { text: "اختاري…", empty: true, glyphs: [] };
   const find = (v: string) => options?.find((o) => o.value === v);
   const label = (v: string) => find(v)?.label ?? v;
 
@@ -84,7 +84,7 @@ function summarize(
     .slice(0, 3) as React.ReactNode[];
   if (values.length === 1) return { text: label(values[0]), empty: false, glyphs };
   if (values.length <= 3)
-    return { text: values.map(label).join(", "), empty: false, glyphs };
+    return { text: values.map(label).join("، "), empty: false, glyphs };
   return {
     text: `${label(values[0])} +${values.length - 1}`,
     empty: false,
@@ -105,6 +105,7 @@ function Popover({ anchorKey, onClose, children, labelledBy }: PopoverProps) {
   const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
 
   const [dark, setDark] = React.useState(false);
+  const [dir, setDir] = React.useState("ltr");
   const [pos, setPos] = React.useState<{ top: number; left: number } | null>(
     null
   );
@@ -115,6 +116,7 @@ function Popover({ anchorKey, onClose, children, labelledBy }: PopoverProps) {
     );
     setAnchor(el);
     setDark(!!el?.closest(".dark"));
+    setDir(el ? getComputedStyle(el).direction : "ltr");
   }, [anchorKey]);
 
   const keyRef = React.useRef(anchorKey);
@@ -137,7 +139,8 @@ function Popover({ anchorKey, onClose, children, labelledBy }: PopoverProps) {
       const w = el.offsetWidth;
       const h = el.offsetHeight;
       const gap = 6;
-      let left = a.left;
+      const rtl = getComputedStyle(anchor).direction === "rtl";
+      let left = rtl ? a.right - w : a.left;
       let top = a.bottom + gap;
       left = Math.min(left, window.innerWidth - w - 8);
       left = Math.max(8, left);
@@ -177,7 +180,7 @@ function Popover({ anchorKey, onClose, children, labelledBy }: PopoverProps) {
   }, [anchor, onClose]);
 
   return createPortal(
-    <div className={dark ? "dark" : ""} style={{ display: "contents" }}>
+    <div className={dark ? "dark" : ""} dir={dir} style={{ display: "contents" }}>
       <motion.div
         ref={ref}
         role="dialog"
@@ -227,7 +230,7 @@ function SearchList({
   loading,
   error,
   searchable = true,
-  placeholder = "Filter…",
+  placeholder = "بحث…",
   onQuery,
   onPick,
   onRetry,
@@ -326,28 +329,28 @@ function SearchList({
       >
         {loading && (
           <li className="flex items-center gap-2 px-2 py-3 text-[13px] text-zinc-500 dark:text-zinc-400">
-            <Spinner /> Loading options…
+            <Spinner /> جارٍ تحميل الخيارات…
           </li>
         )}
 
         {error && !loading && (
           <li className="px-2 py-2.5 text-[13px]">
             <p className="text-zinc-600 dark:text-zinc-300">
-              Couldn’t load options.
+              تعذّر تحميل الخيارات.
             </p>
             <button
               type="button"
               onClick={onRetry}
               className="mt-1 rounded-md px-1.5 py-0.5 text-[13px] font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-2 hover:decoration-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 dark:text-zinc-100 dark:decoration-zinc-600"
             >
-              Try again
+              إعادة المحاولة
             </button>
           </li>
         )}
 
         {!loading && !error && filtered.length === 0 && (
           <li className="px-2 py-3 text-[13px] text-zinc-500 dark:text-zinc-400">
-            No matches
+            لا توجد نتائج
           </li>
         )}
 
@@ -392,7 +395,7 @@ function SearchList({
                 )}
                 <span className="truncate">{item.label}</span>
                 {!multi && item.selected && (
-                  <span className="ml-auto text-zinc-500 dark:text-zinc-400">
+                  <span className="ms-auto text-zinc-500 dark:text-zinc-400">
                     <CheckIcon />
                   </span>
                 )}
@@ -457,7 +460,7 @@ const Segment = React.forwardRef<HTMLButtonElement, SegmentProps>(
           active
             ? "bg-zinc-200/70 dark:bg-white/[0.12]"
             : "hover:bg-zinc-200/60 dark:hover:bg-white/[0.08]",
-          role === "field" ? "rounded-l-md font-medium" : "",
+          role === "field" ? "rounded-s-md font-medium" : "",
           "data-[flash]:animate-[fb-flash_620ms_ease-out]",
         ].join(" ")}
       >
@@ -478,11 +481,11 @@ export function FilterBar({
   fields,
   value,
   onChange,
-  addLabel = "Filter",
-  emptyLabel = "Add filter",
+  addLabel = "فلتر",
+  emptyLabel = "إضافة فلتر",
   disabled,
   className,
-  "aria-label": ariaLabel = "Filters",
+  "aria-label": ariaLabel = "الفلاتر",
 }: FilterBarProps) {
   const reduce = useReducedMotion();
   const [open, setOpen] = React.useState<OpenState>(null);
@@ -800,7 +803,7 @@ export function FilterBar({
                 onFocus={fieldItem.onFocus}
                 anchorKey={`${filter.id}:field`}
                 active={open?.kind === "field" && open.filterId === filter.id}
-                ariaLabel={`Field: ${field?.label ?? filter.field}. Edit field.`}
+                ariaLabel={`الحقل: ${field?.label ?? filter.field}. تعديل الحقل.`}
                 onOpen={() => {
                   setOpen({ kind: "field", filterId: filter.id });
                 }}
@@ -826,7 +829,7 @@ export function FilterBar({
                 anchorKey={`${filter.id}:operator`}
                 muted
                 active={open?.kind === "operator" && open.filterId === filter.id}
-                ariaLabel={`Operator: ${op?.label ?? filter.operator}. Edit operator.`}
+                ariaLabel={`الشرط: ${op?.label ?? filter.operator}. تعديل الشرط.`}
                 onOpen={() => {
                   setOpen({ kind: "operator", filterId: filter.id });
                 }}
@@ -848,7 +851,7 @@ export function FilterBar({
                 muted={summary.empty}
                 active={open?.kind === "value" && open.filterId === filter.id}
                 flash={isFlashing}
-                ariaLabel={`Value: ${summary.empty ? "none selected" : summary.text}. Edit value.`}
+                ariaLabel={`القيمة: ${summary.empty ? "لم يُحدَّد شيء" : summary.text}. تعديل القيمة.`}
                 onOpen={() => {
                   setOpen({ kind: "value", filterId: filter.id });
                 }}
@@ -879,7 +882,7 @@ export function FilterBar({
                 tabIndex={removeItem.tabIndex}
                 onFocus={removeItem.onFocus}
                 onClick={() => removeFilter(filter.id, removeItem.idx)}
-                aria-label={`Remove ${field?.label ?? filter.field} filter`}
+                aria-label={`إزالة فلتر ${field?.label ?? filter.field}`}
                 className="flex items-center px-1.5 text-zinc-400 transition-colors hover:bg-zinc-200/60 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500/70 active:scale-[0.98] dark:text-zinc-500 dark:hover:bg-white/[0.08] dark:hover:text-zinc-200"
               >
                 <CloseIcon />
@@ -922,9 +925,9 @@ export function FilterBar({
         <button
           type="button"
           onClick={clearAll}
-          className="ml-0.5 rounded-md px-2 py-[6px] text-[13px] leading-none text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100"
+          className="ms-0.5 rounded-md px-2 py-[6px] text-[13px] leading-none text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100"
         >
-          Clear
+          مسح الكل
         </button>
       )}
 
