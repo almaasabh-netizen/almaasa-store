@@ -1,32 +1,73 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Wallet, ShoppingBag, Users, TrendingUp, Package, AlertTriangle, Star } from 'lucide-react';
 import { getStoredData } from '../../data';
 import { statusColors } from '../theme';
+import DraggableWidgetGrid, { type WidgetItem } from '@/components/ui/draggable-widget-grid';
+
+type WidgetId = 'revenue' | 'orders' | 'customers' | 'avg' | 'status' | 'top' | 'recent' | 'stock' | 'products' | 'reviews';
+
+// 16 cells total, so the layout tiles exactly at 4 columns.
+const DEFAULT_LAYOUT: WidgetItem[] = [
+  { id: 'revenue', size: 'sm', label: 'إجمالي المبيعات' },
+  { id: 'orders', size: 'sm', label: 'إجمالي الطلبات' },
+  { id: 'customers', size: 'sm', label: 'العملاء' },
+  { id: 'avg', size: 'sm', label: 'متوسط الطلب' },
+  { id: 'recent', size: 'lg', label: 'آخر الطلبات' },
+  { id: 'status', size: 'wide', label: 'توزيع حالات الطلبات' },
+  { id: 'stock', size: 'sm', label: 'تنبيهات المخزون' },
+  { id: 'products', size: 'sm', label: 'المنتجات' },
+  { id: 'top', size: 'tall', label: 'أفضل المنتجات' },
+  { id: 'reviews', size: 'tall', label: 'التقييمات الأخيرة' },
+];
+
+const LAYOUT_KEY = 'ama_dashboard_layout';
+
+// Restore the saved order; unknown ids are dropped and new widgets appended.
+function initialLayout(): WidgetItem[] {
+  try {
+    const saved: string[] = JSON.parse(localStorage.getItem(LAYOUT_KEY) || '[]');
+    const byId = new Map(DEFAULT_LAYOUT.map(w => [w.id, w]));
+    const ordered = saved.map(id => byId.get(id)).filter(Boolean) as WidgetItem[];
+    return [...ordered, ...DEFAULT_LAYOUT.filter(w => !saved.includes(w.id))];
+  } catch {
+    return DEFAULT_LAYOUT;
+  }
+}
+
+function saveLayout(items: WidgetItem[]) {
+  try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(items.map(i => i.id))); } catch { /* storage unavailable */ }
+}
+
+function Shell({ title, icon, action, children }: { title: string; icon?: React.ReactNode; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="flex h-full flex-col gap-3 p-4" style={{ fontFamily: "'Cairo', sans-serif" }}>
+      <header className="flex items-center justify-between gap-2">
+        <h3 className="flex items-center gap-2 truncate text-[13px] font-bold text-foreground">
+          {icon && <span className="text-muted-foreground">{icon}</span>}
+          {title}
+        </h3>
+        {action}
+      </header>
+      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+    </section>
+  );
+}
+
+function Stat({ title, value, unit, icon, tint }: { title: string; value: string | number; unit?: string; icon: React.ReactNode; tint: string }) {
+  return (
+    <Shell title={title}>
+      <div className="mt-auto flex items-end justify-between gap-2">
+        <p className="text-[28px] leading-none font-bold text-foreground tabular-nums">
+          {value}{unit && <span className="text-[13px] font-normal text-muted-foreground"> {unit}</span>}
+        </p>
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl" style={{ background: tint }}>{icon}</span>
+      </div>
+    </Shell>
+  );
+}
 
 const CARD_BORDER = '1px solid rgba(154,45,85,.12)';
-
-function StatCard({ title, value, suffix = '', bg, icon }: { title: string; value: string | number; suffix?: string; bg: string; icon: React.ReactNode }) {
-  return (
-    <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-      <div style={{ width: 42, height: 42, borderRadius: 10, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        {icon}
-      </div>
-      <div>
-        <div style={{ fontSize: 20, fontWeight: 700, color: '#241419', lineHeight: 1.2 }}>{value}{suffix}</div>
-        <div style={{ fontSize: 11, color: '#9a8a85', marginTop: 3 }}>{title}</div>
-      </div>
-    </div>
-  );
-}
-
-function MiniBar({ value, max, color }: { value: number; max: number; color: string }) {
-  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
-  return (
-    <div style={{ height: 6, background: '#F3EAE2', borderRadius: 3, overflow: 'hidden', marginTop: 4 }}>
-      <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 3, transition: 'width .4s' }} />
-    </div>
-  );
-}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -39,8 +80,13 @@ export default function Dashboard() {
   const uniqueCustomers = new Set(orders.map((o: any) => o.customer?.phone || o.customerPhone).filter(Boolean)).size;
   const avgOrder = orders.length > 0 ? totalRevenue / orders.length : 0;
 
-  const topProducts = [...products].filter(p => !p.isDraft).sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 5);
+  const soldCount = (id: string) => orders.reduce((n: number, o: any) =>
+    n + (o.items || []).filter((i: any) => i.product?.id === id).reduce((q: number, i: any) => q + (i.quantity || 0), 0), 0);
+  const topProducts = [...products].filter(p => !p.isDraft).map(p => ({ ...p, sold: soldCount(p.id) }))
+    .sort((a, b) => b.sold - a.sold).slice(0, 5);
   const lowStock = products.filter(p => p.stock > 0 && p.stock <= 5);
+  const outOfStock = products.filter(p => p.stock === 0).length;
+  const drafts = products.filter(p => p.isDraft).length;
   const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6);
   const isEmpty = orders.length === 0 && products.length === 0;
 
@@ -50,14 +96,128 @@ export default function Dashboard() {
     label: statusColors[status]?.label ?? status,
     value: count as number,
     color: statusColors[status]?.text ?? '#9A2D55',
-    bg: statusColors[status]?.bg ?? '#F6DCE4',
   }));
-
   const maxStatus = Math.max(...statusDist.map(s => s.value), 1);
 
   const statusBadgeStyle = (status: string) => {
     const c = statusColors[status] || { bg: '#F6DCE4', text: '#9A2D55', label: status };
-    return { background: c.bg, color: c.text, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' as const };
+    return { background: c.bg, color: c.text, padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 600, whiteSpace: 'nowrap' as const };
+  };
+
+  const viewAll = (to: string, label = 'عرض الكل') => (
+    <button onClick={() => navigate(to)} className="shrink-0 text-[11px] text-[#9A2D55] hover:underline">{label}</button>
+  );
+
+  const widgets: Record<WidgetId, React.ReactNode> = {
+    revenue: <Stat title="إجمالي المبيعات" value={totalRevenue.toFixed(0)} unit="د.ب" tint="#F6DCE4" icon={<Wallet className="size-5 text-[#9A2D55]" />} />,
+    orders: <Stat title="إجمالي الطلبات" value={orders.length} tint="#EBF5FF" icon={<ShoppingBag className="size-5 text-blue-500" />} />,
+    customers: <Stat title="العملاء" value={uniqueCustomers} tint="#F0FDF4" icon={<Users className="size-5 text-green-500" />} />,
+    avg: <Stat title="متوسط الطلب" value={avgOrder.toFixed(2)} unit="د.ب" tint="#FFF7ED" icon={<TrendingUp className="size-5 text-orange-500" />} />,
+
+    products: (
+      <Shell title="المنتجات" icon={<Package className="size-4" />} action={viewAll('/admin/products')}>
+        <p className="text-[28px] leading-none font-bold text-foreground tabular-nums">{products.length}</p>
+        <dl className="mt-auto space-y-1 text-[12px]">
+          <div className="flex justify-between"><dt className="text-muted-foreground">مسودات</dt><dd className="font-semibold text-foreground">{drafts}</dd></div>
+          <div className="flex justify-between"><dt className="text-muted-foreground">نفدت الكمية</dt><dd className="font-semibold text-foreground">{outOfStock}</dd></div>
+        </dl>
+      </Shell>
+    ),
+
+    stock: (
+      <Shell title="تنبيهات المخزون" icon={<AlertTriangle className={`size-4 ${lowStock.length ? 'text-orange-500' : ''}`} />} action={viewAll('/admin/inventory')}>
+        {lowStock.length > 0 ? (
+          <ul className="space-y-1.5 overflow-hidden">
+            {lowStock.slice(0, 3).map(p => (
+              <li key={p.id} className="flex items-center justify-between gap-2 text-[11px]">
+                <span className="truncate text-foreground">{p.name}</span>
+                <span className="shrink-0 rounded-full bg-red-50 px-2 py-0.5 font-bold text-red-500">{p.stock}</span>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="mt-auto text-[12px] text-muted-foreground">لا توجد منتجات على وشك النفاد</p>}
+      </Shell>
+    ),
+
+    status: (
+      <Shell title="توزيع حالات الطلبات">
+        {statusDist.length > 0 ? (
+          <div className="mt-auto space-y-2">
+            {statusDist.slice(0, 5).map(s => (
+              <div key={s.label} className="flex items-center gap-3 text-[12px]">
+                <span className="w-24 shrink-0 truncate text-foreground">{s.label}</span>
+                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F3EAE2]">
+                  <span className="block h-full rounded-full" style={{ width: `${(s.value / maxStatus) * 100}%`, background: s.color }} />
+                </span>
+                <span className="w-6 shrink-0 text-left font-bold text-foreground tabular-nums">{s.value}</span>
+              </div>
+            ))}
+          </div>
+        ) : <p className="m-auto text-[13px] text-muted-foreground">لا توجد بيانات بعد</p>}
+      </Shell>
+    ),
+
+    top: (
+      <Shell title="أفضل المنتجات" action={viewAll('/admin/products')}>
+        {topProducts.length > 0 ? (
+          <ol className="space-y-3 overflow-hidden">
+            {topProducts.map((p, i) => (
+              <li key={p.id} className="flex items-center gap-2.5">
+                <span className="w-5 shrink-0 text-center text-[11px] font-bold text-[#B08D57]">#{i + 1}</span>
+                {p.image && <img src={p.image} alt="" referrerPolicy="no-referrer" className="size-9 shrink-0 rounded-lg object-cover ring-1 ring-border" />}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[11px] font-semibold text-foreground">{p.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{p.sold} مبيع · {p.price} د.ب</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : <p className="m-auto text-[12px] text-muted-foreground">أضيفي منتجات لتظهر هنا</p>}
+      </Shell>
+    ),
+
+    recent: (
+      <Shell title="آخر الطلبات" icon={<ShoppingBag className="size-4" />} action={viewAll('/admin/orders', 'عرض الكل ←')}>
+        {recentOrders.length > 0 ? (
+          <ul className="divide-y divide-[rgba(154,45,85,.07)] overflow-hidden">
+            {recentOrders.map((o: any) => {
+              const status = o.shippingStatus || o.status || 'new';
+              return (
+                <li key={o.id}>
+                  <button onClick={() => navigate(`/admin/orders/${o.id}`)} className="flex w-full items-center gap-3 py-2.5 text-right hover:bg-[#FFF8F8]">
+                    <span className="w-16 shrink-0 text-[12px] font-semibold text-[#9A2D55]">#{o.id?.slice(-6)}</span>
+                    <span className="min-w-0 flex-1 truncate text-[12px] text-foreground">{o.customer?.name || o.customerName || '—'}</span>
+                    <span style={statusBadgeStyle(status)}>{statusColors[status]?.label ?? status}</span>
+                    <span className="w-20 shrink-0 text-left text-[12px] font-semibold text-foreground tabular-nums">{o.total?.toFixed(2)} د.ب</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        ) : <p className="m-auto text-[13px] text-muted-foreground">لا توجد طلبات بعد</p>}
+      </Shell>
+    ),
+
+    reviews: (
+      <Shell title="التقييمات الأخيرة" icon={<Star className="size-4" />} action={<span className="text-[11px] text-muted-foreground">{reviews.length} تقييم</span>}>
+        {reviews.length > 0 ? (
+          <ul className="space-y-3 overflow-hidden">
+            {reviews.slice(0, 4).map((r: any) => (
+              <li key={r.id} className="flex items-start gap-2">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#F6DCE4] text-[11px] font-bold text-[#9A2D55]">{r.customerName?.charAt(0)}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-1 text-[11px] font-bold text-foreground">
+                    <span className="truncate">{r.customerName}</span>
+                    <span className="shrink-0 text-[#F5A623]" aria-label={`${r.rating} من 5`}>{'★'.repeat(r.rating || 0)}</span>
+                  </p>
+                  <p className="line-clamp-2 text-[11px] text-muted-foreground">{r.comment}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="m-auto text-[12px] text-muted-foreground">لا توجد تقييمات بعد</p>}
+      </Shell>
+    ),
   };
 
   return (
@@ -80,158 +240,16 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Stats row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
-        <StatCard title="إجمالي المبيعات" value={totalRevenue.toFixed(0)} suffix=" د.ب" bg="#F6DCE4" icon={
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A2D55" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-          </svg>
-        } />
-        <StatCard title="إجمالي الطلبات" value={orders.length} bg="#EBF5FF" icon={
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
-          </svg>
-        } />
-        <StatCard title="العملاء" value={uniqueCustomers} bg="#F0FDF4" icon={
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-        } />
-        <StatCard title="متوسط الطلب" value={avgOrder.toFixed(2)} suffix=" د.ب" bg="#FFF7ED" icon={
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F97316" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-          </svg>
-        } />
-      </div>
+      <p className="text-xs text-muted-foreground">اسحبي البطاقات لترتيب لوحة التحكم كما تحبين. يُحفظ الترتيب على هذا الجهاز.</p>
 
-      {/* Charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 14 }} className="dashboard-charts">
-        {/* Status distribution */}
-        <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, padding: '18px 20px' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, color: '#241419', margin: '0 0 16px' }}>توزيع حالات الطلبات</h3>
-          {statusDist.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {statusDist.map((s, i) => (
-                <div key={i}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-                    <span style={{ fontSize: 12, color: '#241419' }}>{s.label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#241419' }}>{s.value}</span>
-                  </div>
-                  <MiniBar value={s.value} max={maxStatus} color={s.color} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9a8a85', fontSize: 13 }}>لا توجد بيانات بعد</div>
-          )}
-        </div>
-
-        {/* Top products */}
-        <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, padding: '18px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, color: '#241419', margin: 0 }}>أفضل المنتجات</h3>
-            <button onClick={() => navigate('/admin/products')} style={{ fontSize: 11, color: '#9A2D55', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>عرض الكل</button>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {topProducts.length > 0 ? topProducts.map((p, i) => (
-              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#B08D57', width: 18, flexShrink: 0, textAlign: 'center' }}>#{i + 1}</span>
-                {p.image && <img src={p.image} alt={p.name} referrerPolicy="no-referrer" style={{ width: 34, height: 34, borderRadius: 8, objectFit: 'cover', flexShrink: 0, border: CARD_BORDER }} />}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 11, fontWeight: 600, color: '#241419', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</p>
-                  <p style={{ fontSize: 10, color: '#9a8a85', margin: 0 }}>{p.price} د.ب</p>
-                </div>
-              </div>
-            )) : <p style={{ fontSize: 12, color: '#9a8a85', textAlign: 'center', padding: '16px 0' }}>أضف منتجات لتظهر هنا</p>}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 14 }} className="dashboard-bottom">
-        {/* Recent orders */}
-        <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid rgba(154,45,85,.08)' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, color: '#241419', margin: 0 }}>آخر الطلبات</h3>
-            <button onClick={() => navigate('/admin/orders')} style={{ fontSize: 11, color: '#9A2D55', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>عرض الكل ←</button>
-          </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right', fontFamily: "'Cairo', sans-serif" }}>
-              <thead>
-                <tr style={{ background: '#F3EAE2' }}>
-                  {['رقم الطلب', 'العميل', 'المبلغ', 'الحالة', 'التاريخ'].map(h => (
-                    <th key={h} style={{ padding: '10px 16px', fontSize: 11, fontWeight: 600, color: '#6b5a5f' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrders.length === 0 ? (
-                  <tr><td colSpan={5} style={{ padding: '32px 16px', textAlign: 'center', fontSize: 12, color: '#9a8a85' }}>لا توجد طلبات بعد</td></tr>
-                ) : recentOrders.map((o: any, i) => {
-                  const status = o.shippingStatus || o.status || 'new';
-                  const customer = o.customer?.name || o.customerName || '—';
-                  return (
-                    <tr key={o.id} style={{ borderTop: i > 0 ? '1px solid rgba(154,45,85,.07)' : 'none', cursor: 'pointer' }} onClick={() => navigate(`/admin/orders/${o.id}`)}>
-                      <td style={{ padding: '10px 16px', fontSize: 12, fontWeight: 600, color: '#9A2D55' }}>#{o.id?.slice(-6)}</td>
-                      <td style={{ padding: '10px 16px', fontSize: 12, color: '#241419' }}>{customer}</td>
-                      <td style={{ padding: '10px 16px', fontSize: 12, fontWeight: 600, color: '#241419' }}>{o.total?.toFixed(2)} د.ب</td>
-                      <td style={{ padding: '10px 16px' }}>
-                        <span style={statusBadgeStyle(status)}>{statusColors[status]?.label ?? status}</span>
-                      </td>
-                      <td style={{ padding: '10px 16px', fontSize: 11, color: '#9a8a85' }}>{o.date?.substring(0, 10)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Right column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Low stock */}
-          <div style={{ background: lowStock.length > 0 ? '#FFF7ED' : '#FFFFFF', border: `1px solid ${lowStock.length > 0 ? '#FED7AA' : 'rgba(154,45,85,.12)'}`, borderRadius: 12, padding: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <span style={{ fontSize: 16 }}>{lowStock.length > 0 ? '⚠️' : '📦'}</span>
-              <h3 style={{ fontSize: 12, fontWeight: 700, color: '#241419', margin: 0 }}>تنبيهات المخزون</h3>
-            </div>
-            {lowStock.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {lowStock.slice(0, 4).map(p => (
-                  <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <p style={{ fontSize: 11, color: '#241419', margin: 0, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</p>
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10, background: '#FEF2F2', color: '#EF4444', flexShrink: 0, marginRight: 6 }}>{p.stock} متبقي</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p style={{ fontSize: 11, color: '#9a8a85', margin: 0 }}>لا توجد منتجات على وشك النفاد ✓</p>
-            )}
-          </div>
-
-          {/* Reviews */}
-          <div style={{ background: '#FFFFFF', border: CARD_BORDER, borderRadius: 12, padding: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <h3 style={{ fontSize: 12, fontWeight: 700, color: '#241419', margin: 0 }}>التقييمات الأخيرة</h3>
-              <span style={{ fontSize: 11, color: '#9a8a85' }}>{reviews.length} تقييم</span>
-            </div>
-            {reviews.slice(0, 3).map((r: any) => (
-              <div key={r.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#F6DCE4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', fontWeight: 700, fontSize: 11, flexShrink: 0 }}>
-                  {r.customerName?.charAt(0)}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: '#241419' }}>{r.customerName}</span>
-                    <span style={{ fontSize: 10, color: '#F5A623' }}>{'★'.repeat(r.rating || 0)}</span>
-                  </div>
-                  <p style={{ fontSize: 10, color: '#9a8a85', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.comment}</p>
-                </div>
-              </div>
-            ))}
-            {reviews.length === 0 && <p style={{ fontSize: 11, color: '#9a8a85', textAlign: 'center', padding: '8px 0' }}>لا توجد تقييمات بعد</p>}
-          </div>
-        </div>
+      {/* Grid math assumes left-to-right columns; widget content stays RTL. */}
+      <div dir="ltr">
+        <DraggableWidgetGrid
+          items={initialLayout()}
+          onChange={saveLayout}
+          radius={14}
+          renderItem={(item) => <div dir="rtl" className="h-full">{widgets[item.id as WidgetId]}</div>}
+        />
       </div>
     </div>
   );
