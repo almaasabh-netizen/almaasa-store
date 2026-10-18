@@ -26,7 +26,7 @@ export default function Inventory() {
           { label: 'مخزون منخفض', value: lowStock.length, color: '#F59E0B', bg: '#FFF7ED' },
           { label: 'نفد المخزون', value: outOfStock.length, color: '#EF4444', bg: '#FEF2F2' },
         ].map(s => (
-          <div key={s.label} className="rounded-2xl p-4 text-center" style={{ background: s.bg, border: `1px solid ${s.color}33` }}>
+          <div key={s.label} className="rounded-[20px] p-4 text-center" style={{ background: s.bg }}>
             <p className="text-2xl font-black" style={{ color: s.color }}>{s.value}</p>
             <p className="text-xs font-medium mt-1" style={{ color: s.color }}>{s.label}</p>
           </div>
@@ -34,7 +34,7 @@ export default function Inventory() {
       </div>
 
       {lowStock.length > 0 && (
-        <div className="rounded-2xl p-4" style={{ background: '#FFF7ED', border: '1px solid #FED7AA' }}>
+        <div className="rounded-[20px] p-4" style={{ background: '#FFF7ED' }}>
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle className="w-4 h-4" style={{ color: '#F59E0B' }} />
             <p className="font-black text-sm" style={{ color: '#5A4047' }}>منتجات تحتاج تجديد المخزون</p>
@@ -49,7 +49,7 @@ export default function Inventory() {
         </div>
       )}
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+      <div className="rounded-[28px] overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
         <table className="w-full text-right">
           <thead>
             <tr style={{ background: '#FFF8F8' }}>
@@ -65,7 +65,7 @@ export default function Inventory() {
               <tr key={p.id} className="border-t" style={{ borderColor: '#F0DDE0' }}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    {p.image ? <img src={p.image} alt={p.name} referrerPolicy="no-referrer" className="w-9 h-9 rounded-xl object-cover shrink-0" /> : <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#F3E6E8' }}><Package className="w-4 h-4" style={{ color: '#D79AA8' }} /></div>}
+                    {p.image ? <img src={p.image} alt={p.name} referrerPolicy="no-referrer" className="w-9 h-9 rounded-xl object-cover shrink-0" /> : <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#F3E6E8' }}><Package className="w-4 h-4" style={{ color: '#D79AA8' }} /></div>}
                     <p className="text-xs font-bold" style={{ color: '#5A4047' }}>{p.name}</p>
                   </div>
                 </td>
@@ -73,7 +73,7 @@ export default function Inventory() {
                 <td className="px-4 py-3">
                   {editing === p.id ? (
                     <input type="number" value={editVal} onChange={e => setEditVal(Number(e.target.value))} min={0}
-                      className="w-20 rounded-lg px-2 py-1 text-sm outline-none" style={{ border: '1px solid #D79AA8', color: '#5A4047' }} dir="ltr" autoFocus />
+                      className="w-20 rounded-full px-2 py-1 text-sm outline-none" style={{ border: '1px solid #D79AA8', color: '#5A4047' }} dir="ltr" autoFocus />
                   ) : (
                     <span className="font-black text-sm" style={{ color: '#5A4047' }}>{p.stock || 0}</span>
                   )}
@@ -87,11 +87,11 @@ export default function Inventory() {
                 <td className="px-4 py-3">
                   {editing === p.id ? (
                     <div className="flex gap-1">
-                      <button onClick={() => saveStock(p.id)} className="p-1.5 rounded-lg" style={{ background: '#F0FDF4' }}><Save className="w-3.5 h-3.5" style={{ color: '#22C55E' }} /></button>
-                      <button onClick={() => setEditing(null)} className="p-1.5 rounded-lg" style={{ background: '#FEF2F2' }}><X className="w-3.5 h-3.5" style={{ color: '#EF4444' }} /></button>
+                      <button onClick={() => saveStock(p.id)} className="p-1.5 rounded-full" style={{ background: '#F0FDF4' }}><Save className="w-3.5 h-3.5" style={{ color: '#22C55E' }} /></button>
+                      <button onClick={() => setEditing(null)} className="p-1.5 rounded-full" style={{ background: '#FEF2F2' }}><X className="w-3.5 h-3.5" style={{ color: '#EF4444' }} /></button>
                     </div>
                   ) : (
-                    <button onClick={() => { setEditing(p.id); setEditVal(p.stock || 0); }} className="p-1.5 rounded-lg hover:bg-[#F3E6E8]">
+                    <button onClick={() => { setEditing(p.id); setEditVal(p.stock || 0); }} className="p-1.5 rounded-full hover:bg-[#F3E6E8]">
                       <Edit2 className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />
                     </button>
                   )}

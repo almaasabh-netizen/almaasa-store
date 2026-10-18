@@ -11,7 +11,7 @@ export default function OrdersTable({ orders, limit, showViewAll }: Props) {
   const shown = limit ? orders.slice(0, limit) : orders;
 
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid #F0DDE0', background: '#FFFFFF' }}>
+    <div className="rounded-[28px] overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
       <div className="overflow-x-auto">
         <table className="w-full text-right">
           <thead>
@@ -56,7 +56,7 @@ export default function OrdersTable({ orders, limit, showViewAll }: Props) {
                     <span className="text-xs" style={{ color: '#D79AA8' }}>{order.date?.substring(0,10)}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <button className="p-1.5 rounded-lg hover:bg-[#F3E6E8] transition-colors" onClick={e => { e.stopPropagation(); navigate(`/admin/orders/${order.id}`); }}>
+                    <button className="p-1.5 rounded-full hover:bg-[#F3E6E8] transition-colors" onClick={e => { e.stopPropagation(); navigate(`/admin/orders/${order.id}`); }}>
                       <Eye className="w-4 h-4" style={{ color: '#D79AA8' }} />
                     </button>
                   </td>

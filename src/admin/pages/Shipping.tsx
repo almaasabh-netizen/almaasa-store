@@ -92,7 +92,7 @@ export default function Shipping() {
         </div>
         {!adding && (
           <button onClick={() => setAdding(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold"
             style={{ background: '#D79AA8', color: 'white' }}>
             <Plus className="w-4 h-4" /> إضافة مناطق
           </button>
@@ -100,7 +100,7 @@ export default function Shipping() {
       </div>
 
       {adding && (
-        <div className="rounded-2xl p-5 space-y-5" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+        <div className="rounded-[28px] p-5 space-y-5" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
           <div className="flex items-center justify-between">
             <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>اختر المناطق</h3>
             <button onClick={selectAll} className="flex items-center gap-1.5 text-xs font-bold"
@@ -116,7 +116,7 @@ export default function Shipping() {
               const checked = selected.includes(area);
               return (
                 <button key={area} onClick={() => toggleArea(area)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-right transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium text-right transition-all"
                   style={{
                     background: checked ? '#F3E6E8' : '#FFF8F8',
                     border: `1px solid ${checked ? '#D79AA8' : '#F0DDE0'}`,
@@ -138,7 +138,7 @@ export default function Shipping() {
           </div>
 
           {selected.length > 0 && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold"
+            <div className="flex items-center gap-2 px-3 py-2 rounded-[20px] text-xs font-bold"
               style={{ background: '#F3E6E8', color: '#C77D8A' }}>
               ✓ تم اختيار {selected.length} منطقة
             </div>
@@ -166,12 +166,12 @@ export default function Shipping() {
 
           <div className="flex gap-2">
             <button onClick={() => { setAdding(false); setSelected([]); }}
-              className="flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold"
+              className="flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold"
               style={{ background: '#F3E6E8', color: '#C77D8A' }}>
               <X className="w-3.5 h-3.5" /> إلغاء
             </button>
             <button onClick={save} disabled={selected.length === 0}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold disabled:opacity-50"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold disabled:opacity-50"
               style={{ background: '#D79AA8', color: 'white' }}>
               <Save className="w-3.5 h-3.5" />
               حفظ {selected.length > 0 ? `(${selected.length} مناطق)` : ''}
@@ -180,7 +180,7 @@ export default function Shipping() {
         </div>
       )}
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+      <div className="rounded-[28px] overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
         {zones.length === 0 && !adding ? (
           <div className="py-16 text-center">
             <Truck className="w-10 h-10 mx-auto mb-3" style={{ color: '#D79AA8' }} />
@@ -231,11 +231,11 @@ export default function Shipping() {
                       <td className="px-4 py-2">
                         <div className="flex gap-1 justify-end">
                           <button onClick={saveEdit}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold"
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold"
                             style={{ background: '#D79AA8', color: 'white' }}>
                             <Save className="w-3 h-3" /> حفظ
                           </button>
-                          <button onClick={() => setEditId(null)} className="p-1.5 rounded-lg"
+                          <button onClick={() => setEditId(null)} className="p-1.5 rounded-full"
                             style={{ background: '#F3E6E8', color: '#C77D8A' }}>
                             <X className="w-3.5 h-3.5" />
                           </button>
@@ -255,15 +255,15 @@ export default function Shipping() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1 justify-end">
-                          <button onClick={() => startEdit(z)} className="p-1.5 rounded-lg hover:bg-[#F3E6E8]">
+                          <button onClick={() => startEdit(z)} className="p-1.5 rounded-full hover:bg-[#F3E6E8]">
                             <Pencil className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />
                           </button>
                           <button onClick={() => toggle(z.id)}
-                            className="px-2.5 py-1 rounded-lg text-[11px] font-bold"
+                            className="px-2.5 py-1 rounded-full text-[11px] font-bold"
                             style={{ background: z.active ? '#FEF2F2' : '#F0FDF4', color: z.active ? '#EF4444' : '#22C55E' }}>
                             {z.active ? 'تعطيل' : 'تفعيل'}
                           </button>
-                          <button onClick={() => del(z.id)} className="p-1.5 rounded-lg hover:bg-[#FEF2F2]">
+                          <button onClick={() => del(z.id)} className="p-1.5 rounded-full hover:bg-[#FEF2F2]">
                             <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
                           </button>
                         </div>

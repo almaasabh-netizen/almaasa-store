@@ -35,7 +35,7 @@ export default function Marketing() {
     <div className="space-y-4" dir="rtl">
       <div className="flex items-center justify-between">
         <h2 className="font-black text-lg" style={{ color: '#5A4047' }}>حملات التسويق</h2>
-        <button onClick={() => setAdding(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>
+        <button onClick={() => setAdding(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>
           <Plus className="w-4 h-4" /> حملة جديدة
         </button>
       </div>
@@ -46,8 +46,8 @@ export default function Marketing() {
           { label: 'واتساب', icon: <MessageSquare className="w-5 h-5" />, color: '#22C55E', bg: '#F0FDF4', count: campaigns.filter(c => c.type === 'whatsapp').length },
           { label: 'إشعارات', icon: <Bell className="w-5 h-5" />, color: '#F59E0B', bg: '#FFF7ED', count: campaigns.filter(c => c.type === 'push').length },
         ].map(s => (
-          <div key={s.label} className="rounded-2xl p-4 flex items-center gap-3" style={{ background: s.bg, border: `1px solid ${s.color}33` }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: s.color + '22', color: s.color }}>{s.icon}</div>
+          <div key={s.label} className="rounded-[20px] p-4 flex items-center gap-3" style={{ background: s.bg }}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: s.color + '22', color: s.color }}>{s.icon}</div>
             <div>
               <p className="font-black text-lg" style={{ color: s.color }}>{s.count}</p>
               <p className="text-xs" style={{ color: s.color }}>{s.label}</p>
@@ -57,18 +57,18 @@ export default function Marketing() {
       </div>
 
       {adding && (
-        <div className="rounded-2xl p-5 space-y-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+        <div className="rounded-[28px] p-5 space-y-4" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
           <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>إنشاء حملة</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>عنوان الحملة</label>
               <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-                className="w-full rounded-xl px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
+                className="w-full rounded-full px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>نوع الحملة</label>
               <select value={form.type} onChange={e => setForm({ ...form, type: e.target.value as any })}
-                className="w-full rounded-xl px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}>
+                className="w-full rounded-full px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}>
                 <option value="email">بريد إلكتروني</option>
                 <option value="whatsapp">واتساب</option>
                 <option value="push">إشعار</option>
@@ -78,24 +78,24 @@ export default function Marketing() {
           <div>
             <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>نص الرسالة</label>
             <textarea rows={4} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
-              className="w-full rounded-xl px-3 py-2 text-sm outline-none resize-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
+              className="w-full rounded-[20px] px-3 py-2 text-sm outline-none resize-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setAdding(false)} className="px-4 py-2 rounded-xl text-xs font-bold" style={{ background: '#F3E6E8', color: '#C77D8A' }}>إلغاء</button>
-            <button onClick={save} className="px-4 py-2 rounded-xl text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>حفظ كمسودة</button>
+            <button onClick={() => setAdding(false)} className="px-4 py-2 rounded-full text-xs font-bold" style={{ background: '#F3E6E8', color: '#C77D8A' }}>إلغاء</button>
+            <button onClick={save} className="px-4 py-2 rounded-full text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>حفظ كمسودة</button>
           </div>
         </div>
       )}
 
       <div className="space-y-3">
         {campaigns.length === 0 ? (
-          <div className="py-16 text-center rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+          <div className="py-16 text-center rounded-[28px]" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
             <Megaphone className="w-8 h-8 mx-auto mb-2" style={{ color: '#D79AA8' }} />
             <p className="text-sm font-bold" style={{ color: '#5A4047' }}>لا توجد حملات بعد</p>
           </div>
         ) : campaigns.map(c => (
-          <div key={c.id} className="rounded-2xl p-4 flex items-center gap-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+          <div key={c.id} className="rounded-[28px] p-4 flex items-center gap-4" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
               style={{ background: typeColor(c.type) + '20', color: typeColor(c.type) }}>
               {typeIcon(c.type)}
             </div>
@@ -112,7 +112,7 @@ export default function Marketing() {
               {c.status === 'sent' ? 'مُرسل' : 'مسودة'}
             </span>
             {c.status === 'draft' && (
-              <button onClick={() => send(c.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0"
+              <button onClick={() => send(c.id)} className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold shrink-0"
                 style={{ background: '#D79AA8', color: 'white' }}>
                 <Send className="w-3 h-3" /> إرسال
               </button>

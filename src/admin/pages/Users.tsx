@@ -45,41 +45,41 @@ export default function Users() {
     <div className="max-w-3xl space-y-4" dir="rtl">
       <div className="flex items-center justify-between">
         <h2 className="font-black text-lg" style={{ color: '#5A4047' }}>المستخدمون</h2>
-        <button onClick={() => setAdding(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>
+        <button onClick={() => setAdding(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>
           <Plus className="w-4 h-4" /> إضافة مستخدم
         </button>
       </div>
 
       {adding && (
-        <div className="rounded-2xl p-5 space-y-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+        <div className="rounded-[28px] p-5 space-y-4" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
           <h3 className="font-black text-sm" style={{ color: '#5A4047' }}>مستخدم جديد</h3>
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>الاسم</label>
               <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                className="w-full rounded-xl px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
+                className="w-full rounded-full px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>البريد الإلكتروني</label>
               <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
-                className="w-full rounded-xl px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} dir="ltr" />
+                className="w-full rounded-full px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} dir="ltr" />
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>الصلاحية</label>
               <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value as Role })}
-                className="w-full rounded-xl px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}>
+                className="w-full rounded-full px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}>
                 {Object.entries(ROLES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
               </select>
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setAdding(false)} className="px-4 py-2 rounded-xl text-xs font-bold" style={{ background: '#F3E6E8', color: '#C77D8A' }}>إلغاء</button>
-            <button onClick={save} className="px-4 py-2 rounded-xl text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>حفظ</button>
+            <button onClick={() => setAdding(false)} className="px-4 py-2 rounded-full text-xs font-bold" style={{ background: '#F3E6E8', color: '#C77D8A' }}>إلغاء</button>
+            <button onClick={save} className="px-4 py-2 rounded-full text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>حفظ</button>
           </div>
         </div>
       )}
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+      <div className="rounded-[28px] overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
         {users.length === 0 ? (
           <div className="py-16 text-center">
             <Shield className="w-8 h-8 mx-auto mb-2" style={{ color: '#D79AA8' }} />
@@ -103,7 +103,7 @@ export default function Users() {
               style={{ background: u.active ? '#DCFCE7' : '#F3F4F6', color: u.active ? '#16A34A' : '#6B7280' }}>
               {u.active ? 'نشط' : 'معطل'}
             </button>
-            <button onClick={() => del(u.id)} className="p-1.5 rounded-lg hover:bg-[#FEF2F2] shrink-0">
+            <button onClick={() => del(u.id)} className="p-1.5 rounded-full hover:bg-[#FEF2F2] shrink-0">
               <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
             </button>
           </div>

@@ -225,8 +225,8 @@ export default function Dashboard() {
 
       {isEmpty && (
         <div style={{
-          borderRadius: 12, padding: '24px 20px', display: 'flex', alignItems: 'center', gap: 16,
-          background: '#FFF0F4', border: CARD_BORDER,
+          borderRadius: 28, padding: '24px 20px', display: 'flex', alignItems: 'center', gap: 16,
+          background: '#FFF0F4',
         }}>
           <span style={{ fontSize: 36, flexShrink: 0 }}>✨</span>
           <div style={{ flex: 1 }}>
@@ -234,8 +234,8 @@ export default function Dashboard() {
             <p style={{ fontSize: 12, color: '#9a8a85', marginTop: 4 }}>ابدئي بإضافة منتجاتك وتهيئة المتجر</p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-            <button onClick={() => navigate('/admin/products/new')} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#9A2D55', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>أضف منتج</button>
-            <button onClick={() => navigate('/admin/settings')} style={{ padding: '8px 16px', borderRadius: 8, border: CARD_BORDER, background: '#FFFFFF', color: '#241419', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>الإعدادات</button>
+            <button onClick={() => navigate('/admin/products/new')} style={{ padding: '8px 16px', borderRadius: 999, border: 'none', background: '#9A2D55', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>أضف منتج</button>
+            <button onClick={() => navigate('/admin/settings')} style={{ padding: '8px 16px', borderRadius: 999, border: CARD_BORDER, background: '#FFFFFF', color: '#241419', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>الإعدادات</button>
           </div>
         </div>
       )}
@@ -247,7 +247,7 @@ export default function Dashboard() {
         <DraggableWidgetGrid
           items={initialLayout()}
           onChange={saveLayout}
-          radius={14}
+          radius={28}
           renderItem={(item) => <div dir="rtl" className="h-full">{widgets[item.id as WidgetId]}</div>}
         />
       </div>

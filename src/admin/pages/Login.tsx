@@ -66,7 +66,7 @@ export default function Login() {
         <div style={{
           background: 'rgba(255,255,255,0.04)',
           border: '1px solid rgba(196,168,130,0.2)',
-          borderRadius: 20,
+          borderRadius: 28,
           padding: '40px 36px 36px',
           backdropFilter: 'blur(16px)',
         }}>
@@ -113,7 +113,7 @@ export default function Login() {
                   padding: '12px 14px',
                   background: 'rgba(255,255,255,0.07)',
                   border: `1px solid ${error ? 'rgba(220,80,80,0.5)' : 'rgba(196,168,130,0.25)'}`,
-                  borderRadius: 10,
+                  borderRadius: 999,
                   color: '#FAF7F3',
                   fontSize: 14,
                   outline: 'none',
@@ -144,7 +144,7 @@ export default function Login() {
                     padding: '12px 44px 12px 14px',
                     background: 'rgba(255,255,255,0.07)',
                     border: `1px solid ${error ? 'rgba(220,80,80,0.5)' : 'rgba(196,168,130,0.25)'}`,
-                    borderRadius: 10,
+                    borderRadius: 999,
                     color: '#FAF7F3',
                     fontSize: 14,
                     outline: 'none',
@@ -176,7 +176,7 @@ export default function Login() {
               <div style={{
                 background: 'rgba(220,60,60,0.15)',
                 border: '1px solid rgba(220,60,60,0.3)',
-                borderRadius: 8,
+                borderRadius: 20,
                 padding: '10px 14px',
                 marginBottom: 20,
                 color: '#FF9090',
@@ -198,7 +198,7 @@ export default function Login() {
                   ? 'rgba(154,45,85,0.5)'
                   : 'linear-gradient(135deg, #9A2D55, #7A1F3F)',
                 border: 'none',
-                borderRadius: 10,
+                borderRadius: 999,
                 color: '#FAF7F3',
                 fontSize: 15,
                 fontWeight: 700,

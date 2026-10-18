@@ -66,14 +66,14 @@ export default function HeroBanners() {
           <p className="text-xs mt-0.5" style={{ color: '#D79AA8' }}>صور وتفاصيل السلايدر الرئيسي في الواجهة</p>
         </div>
         <button onClick={add}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold"
+          className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold"
           style={{ background: '#D79AA8', color: 'white' }}>
           <Plus className="w-4 h-4" /> إضافة بانر
         </button>
       </div>
 
       {banners.length === 0 && (
-        <div className="py-20 text-center rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+        <div className="py-20 text-center rounded-[28px]" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
           <ImageIcon className="w-10 h-10 mx-auto mb-3" style={{ color: '#D79AA8' }} />
           <p className="font-bold text-sm" style={{ color: '#5A4047' }}>لا توجد بانرات بعد</p>
           <p className="text-xs mt-1" style={{ color: '#D79AA8' }}>اضغط "إضافة بانر" لإنشاء أول سلايد</p>
@@ -82,7 +82,7 @@ export default function HeroBanners() {
 
       <div className="space-y-4">
         {banners.map((b, i) => (
-          <div key={b.id} className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: `2px solid ${editing === b.id ? '#D79AA8' : '#F0DDE0'}` }}>
+          <div key={b.id} className="rounded-[28px] overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
             {/* Header row */}
             <div className="flex items-center gap-3 px-4 py-3" style={{ background: '#FFF8F8', borderBottom: '1px solid #F0DDE0' }}>
               <span className="w-6 h-6 rounded-full text-xs font-black flex items-center justify-center shrink-0"
@@ -92,24 +92,24 @@ export default function HeroBanners() {
               </p>
               <div className="flex items-center gap-1">
                 <button onClick={() => move(b.id, -1)} disabled={i === 0}
-                  className="p-1.5 rounded-lg disabled:opacity-30 hover:bg-[#F3E6E8]">
+                  className="p-1.5 rounded-full disabled:opacity-30 hover:bg-[#F3E6E8]">
                   <MoveUp className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />
                 </button>
                 <button onClick={() => move(b.id, 1)} disabled={i === banners.length - 1}
-                  className="p-1.5 rounded-lg disabled:opacity-30 hover:bg-[#F3E6E8]">
+                  className="p-1.5 rounded-full disabled:opacity-30 hover:bg-[#F3E6E8]">
                   <MoveDown className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />
                 </button>
-                <button onClick={() => toggleActive(b.id)} className="p-1.5 rounded-lg hover:bg-[#F3E6E8]">
+                <button onClick={() => toggleActive(b.id)} className="p-1.5 rounded-full hover:bg-[#F3E6E8]">
                   {b.active
                     ? <Eye className="w-3.5 h-3.5" style={{ color: '#22C55E' }} />
                     : <EyeOff className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />}
                 </button>
                 <button onClick={() => setEditing(editing === b.id ? null : b.id)}
-                  className="px-3 py-1 rounded-lg text-xs font-bold"
+                  className="px-3 py-1 rounded-full text-xs font-bold"
                   style={{ background: editing === b.id ? '#D79AA8' : '#F3E6E8', color: editing === b.id ? 'white' : '#C77D8A' }}>
                   {editing === b.id ? 'إغلاق' : 'تعديل'}
                 </button>
-                <button onClick={() => del(b.id)} className="p-1.5 rounded-lg hover:bg-[#FEF2F2]">
+                <button onClick={() => del(b.id)} className="p-1.5 rounded-full hover:bg-[#FEF2F2]">
                   <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
                 </button>
               </div>
@@ -122,8 +122,8 @@ export default function HeroBanners() {
                 <div className="md:row-span-2">
                   <label className="block text-xs font-bold mb-2" style={{ color: '#5A4047' }}>صورة البانر</label>
                   <div
-                    className="relative rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-                    style={{ background: '#F3E6E8', minHeight: 220, border: '2px dashed #D79AA8' }}
+                    className="relative rounded-[20px] overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                    style={{ background: '#F3E6E8', minHeight: 220 }}
                     onClick={() => fileRefs.current[b.id]?.click()}>
                     {b.image ? (
                       <img src={b.image} alt="banner" className="w-full h-full object-cover" style={{ minHeight: 220 }} />
@@ -150,7 +150,7 @@ export default function HeroBanners() {
                       value={b.image.startsWith('data:') ? '' : b.image}
                       onChange={e => patch(b.id, 'image', e.target.value)}
                       placeholder="أو الصق رابط صورة URL..."
-                      className="w-full rounded-xl px-3 py-2 text-xs outline-none"
+                      className="w-full rounded-full px-3 py-2 text-xs outline-none"
                       style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}
                       dir="ltr"
                     />
@@ -162,14 +162,14 @@ export default function HeroBanners() {
                   <div>
                     <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>العنوان الفرعي (صغير)</label>
                     <input value={b.subtitle} onChange={e => patch(b.id, 'subtitle', e.target.value)}
-                      className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
+                      className="w-full rounded-full px-3 py-2.5 text-sm outline-none"
                       style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}
                       placeholder="مثال: أناقة تنبض بالأنوثة" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>العنوان الرئيسي</label>
                     <textarea rows={3} value={b.title} onChange={e => patch(b.id, 'title', e.target.value)}
-                      className="w-full rounded-xl px-3 py-2.5 text-sm outline-none resize-none"
+                      className="w-full rounded-[20px] px-3 py-2.5 text-sm outline-none resize-none"
                       style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}
                       placeholder={'مخاوير راقية\nلتألقي في كل مناسبة'} />
                     <p className="text-[10px] mt-1" style={{ color: '#D79AA8' }}>اضغط Enter للسطر الثاني</p>
@@ -177,7 +177,7 @@ export default function HeroBanners() {
                   <div>
                     <label className="block text-xs font-bold mb-1.5" style={{ color: '#5A4047' }}>الوصف</label>
                     <input value={b.desc} onChange={e => patch(b.id, 'desc', e.target.value)}
-                      className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
+                      className="w-full rounded-full px-3 py-2.5 text-sm outline-none"
                       style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }}
                       placeholder="تصاميم فاخرة بأقمشة ناعمة..." />
                   </div>
@@ -186,7 +186,7 @@ export default function HeroBanners() {
                 {/* Preview */}
                 <div>
                   <label className="block text-xs font-bold mb-2" style={{ color: '#5A4047' }}>معاينة</label>
-                  <div className="rounded-xl overflow-hidden relative" style={{ background: '#F9F0EE', height: 120 }}>
+                  <div className="rounded-[20px] overflow-hidden relative" style={{ background: '#F9F0EE', height: 120 }}>
                     {b.image
                       ? <img src={b.image} alt="" className="absolute inset-0 w-full h-full object-cover object-top" />
                       : <div className="absolute inset-0" style={{ background: '#E8D5C8' }} />}
@@ -206,7 +206,7 @@ export default function HeroBanners() {
       </div>
 
       {banners.length > 0 && (
-        <div className="flex items-center gap-2 p-4 rounded-2xl" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+        <div className="flex items-center gap-2 p-4 rounded-[20px]" style={{ background: '#F0FDF4' }}>
           <Save className="w-4 h-4 shrink-0" style={{ color: '#22C55E' }} />
           <p className="text-xs font-bold" style={{ color: '#16A34A' }}>
             التغييرات تُحفظ تلقائياً — يظهر في الموقع مباشرة عند فتح الصفحة

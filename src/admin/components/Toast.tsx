@@ -41,8 +41,8 @@ export default function Toast({ toasts, onRemove }: ToastProps) {
         const Icon = icons[t.type];
         const c = colors[t.type];
         return (
-          <div key={t.id} className="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-bold animate-in fade-in slide-in-from-top-2"
-            style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.text }}>
+          <div key={t.id} className="flex items-center gap-3 px-4 py-3 rounded-[20px] shadow-lg text-sm font-bold animate-in fade-in slide-in-from-top-2"
+            style={{ background: c.bg, color: c.text }}>
             <Icon className="w-4 h-4 shrink-0" style={{ color: c.icon }} />
             <span className="flex-1">{t.text}</span>
             <button onClick={() => onRemove(t.id)} className="shrink-0 opacity-50 hover:opacity-100">

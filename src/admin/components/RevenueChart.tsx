@@ -23,7 +23,7 @@ function buildChartData() {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
     return (
-      <div className="rounded-xl p-3 shadow-lg text-right" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+      <div className="rounded-[20px] p-3 shadow-lg text-right" style={{ background: '#FFFFFF' }}>
         <p className="text-xs font-bold mb-1" style={{ color: '#5A4047' }}>{label}</p>
         {payload.map((p: any, i: number) => (
           <p key={i} className="text-xs" style={{ color: p.color }}>

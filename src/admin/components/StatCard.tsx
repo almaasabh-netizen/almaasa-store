@@ -14,10 +14,10 @@ interface StatCardProps {
 export default function StatCard({ title, value, change, icon, iconBg = '#F3E6E8', suffix, prefix }: StatCardProps) {
   const isPositive = (change ?? 0) >= 0;
   return (
-    <div className="rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow"
-      style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+    <div className="rounded-[28px] p-5 flex flex-col gap-3 hover:shadow-md transition-shadow"
+      style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
       <div className="flex items-center justify-between">
-        <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: iconBg }}>
+        <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: iconBg }}>
           {icon}
         </div>
         {change !== undefined && (
