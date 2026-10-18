@@ -72,13 +72,13 @@ export default function Orders() {
     <div className="space-y-4" dir="rtl">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 flex-1 min-w-48"
+        <div className="flex items-center gap-2 rounded-full px-3 py-2.5 flex-1 min-w-48"
           style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
           <Search className="w-4 h-4 shrink-0" style={{ color: '#D79AA8' }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث باسم العميل أو رقم الطلب..."
             className="bg-transparent text-sm flex-1 outline-none" style={{ color: '#5A4047' }} dir="rtl" />
         </div>
-        <button className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold mr-auto"
+        <button className="flex items-center gap-1.5 px-3 py-2.5 rounded-full text-xs font-bold mr-auto"
           style={{ background: '#FFFFFF', border: '1px solid #F0DDE0', color: '#5A4047' }}>
           <Download className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />
           تصدير
@@ -93,8 +93,8 @@ export default function Orders() {
         {Object.entries(statusColors).map(([k, v]) => {
           const count = (data.orders || []).filter((o: any) => (o.shippingStatus || o.status) === k).length;
           return (
-            <div key={k} className="rounded-xl p-3 text-center cursor-pointer hover:shadow-sm transition-shadow"
-              style={{ background: v.bg, border: `1px solid ${v.text}22` }}
+            <div key={k} className="rounded-[20px] p-3 text-center cursor-pointer hover:shadow-sm transition-shadow"
+              style={{ background: v.bg }}
               onClick={() => setFilters([{ id: `status-${k}`, field: 'status', operator: 'is', values: [k] }])}>
               <p className="text-lg font-black" style={{ color: v.text }}>{count}</p>
               <p className="text-[10px] font-medium" style={{ color: v.text }}>{v.label}</p>
@@ -104,7 +104,7 @@ export default function Orders() {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+      <div className="rounded-[28px] overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
         {orders.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-4xl mb-3">🛍️</p>
@@ -158,8 +158,8 @@ export default function Orders() {
                             {sc.label}
                             <ChevronDown className="w-3 h-3" />
                           </button>
-                          <div className="absolute top-full right-0 mt-1 rounded-xl shadow-xl z-10 hidden group-hover:block"
-                            style={{ background: '#FFFFFF', border: '1px solid #F0DDE0', minWidth: 140 }}>
+                          <div className="absolute top-full right-0 mt-1 rounded-[20px] shadow-xl z-10 hidden group-hover:block"
+                            style={{ background: '#FFFFFF', minWidth: 140 }}>
                             {Object.entries(statusColors).map(([k, v]) => (
                               <button key={k} onClick={() => updateStatus(order.id, k)}
                                 className="w-full text-right px-3 py-2 text-xs font-medium hover:bg-[#FFF8F8] transition-colors"
@@ -174,7 +174,7 @@ export default function Orders() {
                         <span className="text-xs" style={{ color: '#D79AA8' }}>{order.date?.substring(0,10)}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <button className="p-1.5 rounded-lg hover:bg-[#F3E6E8] transition-colors"
+                        <button className="p-1.5 rounded-full hover:bg-[#F3E6E8] transition-colors"
                           onClick={() => navigate(`/admin/orders/${order.id}`)}>
                           <Eye className="w-4 h-4" style={{ color: '#D79AA8' }} />
                         </button>

@@ -57,7 +57,7 @@ export default function Categories() {
       <div className="flex items-center justify-between">
         <h2 className="font-black text-lg" style={{ color: '#5A4047' }}>التصنيفات</h2>
         <button onClick={() => { setAdding(true); setForm({ name: '', nameEn: '', image: '', order: 0 }); }}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold"
           style={{ background: '#D79AA8', color: 'white' }}>
           <Plus className="w-4 h-4" /> إضافة تصنيف
         </button>
@@ -67,7 +67,7 @@ export default function Categories() {
         <FormRow form={form} setForm={setForm} onSave={() => save()} onCancel={() => setAdding(false)} />
       )}
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+      <div className="rounded-[28px] overflow-hidden" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
         {categories.length === 0 && !adding ? (
           <div className="py-16 text-center">
             <p className="text-3xl mb-2">🗂️</p>
@@ -89,10 +89,10 @@ export default function Categories() {
                 <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#F3E6E8', color: '#C77D8A' }}>
                   {(data.products || []).filter((p: any) => p.category === c.id || p.category === c.name).length} منتج
                 </span>
-                <button onClick={() => startEdit(c)} className="p-1.5 rounded-lg hover:bg-[#F3E6E8]">
+                <button onClick={() => startEdit(c)} className="p-1.5 rounded-full hover:bg-[#F3E6E8]">
                   <Edit2 className="w-3.5 h-3.5" style={{ color: '#D79AA8' }} />
                 </button>
-                <button onClick={() => setConfirmDel(c.id)} className="p-1.5 rounded-lg hover:bg-[#FEF2F2]">
+                <button onClick={() => setConfirmDel(c.id)} className="p-1.5 rounded-full hover:bg-[#FEF2F2]">
                   <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
                 </button>
               </div>
@@ -114,24 +114,24 @@ function FormRow({ form, setForm, onSave, onCancel }: any) {
   };
 
   return (
-    <div className="rounded-xl p-4 space-y-3" style={{ background: '#FFF8F8', border: '1px solid #F0DDE0' }}>
+    <div className="rounded-[20px] p-4 space-y-3" style={{ background: '#FFF8F8' }}>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-bold mb-1" style={{ color: '#5A4047' }}>الاسم (عربي)</label>
           <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-            className="w-full rounded-xl px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: 'white', color: '#5A4047' }} />
+            className="w-full rounded-full px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: 'white', color: '#5A4047' }} />
         </div>
         <div>
           <label className="block text-xs font-bold mb-1" style={{ color: '#5A4047' }}>الاسم (إنجليزي)</label>
           <input value={form.nameEn} onChange={e => setForm({ ...form, nameEn: e.target.value })}
-            className="w-full rounded-xl px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: 'white', color: '#5A4047' }} dir="ltr" />
+            className="w-full rounded-full px-3 py-2 text-sm outline-none" style={{ border: '1px solid #F0DDE0', background: 'white', color: '#5A4047' }} dir="ltr" />
         </div>
       </div>
       <div>
         <label className="block text-xs font-bold mb-1" style={{ color: '#5A4047' }}>صورة التصنيف</label>
         <div className="flex gap-2 items-center">
           <div
-            className="w-16 h-16 rounded-xl overflow-hidden flex items-center justify-center cursor-pointer shrink-0"
+            className="w-16 h-16 rounded-[20px] overflow-hidden flex items-center justify-center cursor-pointer shrink-0"
             style={{ background: '#F3E6E8', border: '2px dashed #D79AA8' }}
             onClick={() => fileRef.current?.click()}>
             {form.image
@@ -140,7 +140,7 @@ function FormRow({ form, setForm, onSave, onCancel }: any) {
           </div>
           <div className="flex-1 space-y-1.5">
             <button onClick={() => fileRef.current?.click()} type="button"
-              className="text-xs font-bold px-3 py-1.5 rounded-lg"
+              className="text-xs font-bold px-3 py-1.5 rounded-full"
               style={{ background: '#F3E6E8', color: '#C77D8A' }}>
               رفع صورة
             </button>
@@ -149,15 +149,15 @@ function FormRow({ form, setForm, onSave, onCancel }: any) {
             <input value={form.image?.startsWith('data:') ? '' : form.image}
               onChange={e => setForm({ ...form, image: e.target.value })}
               placeholder="أو الصق رابط URL..."
-              className="w-full rounded-xl px-3 py-1.5 text-xs outline-none" style={{ border: '1px solid #F0DDE0', background: 'white', color: '#5A4047' }} dir="ltr" />
+              className="w-full rounded-full px-3 py-1.5 text-xs outline-none" style={{ border: '1px solid #F0DDE0', background: 'white', color: '#5A4047' }} dir="ltr" />
           </div>
         </div>
       </div>
       <div className="flex gap-2">
-        <button onClick={onCancel} className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold" style={{ background: '#F3E6E8', color: '#C77D8A' }}>
+        <button onClick={onCancel} className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: '#F3E6E8', color: '#C77D8A' }}>
           <X className="w-3 h-3" /> إلغاء
         </button>
-        <button onClick={onSave} className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>
+        <button onClick={onSave} className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: '#D79AA8', color: 'white' }}>
           <Save className="w-3 h-3" /> حفظ
         </button>
       </div>

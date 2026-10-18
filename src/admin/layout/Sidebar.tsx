@@ -72,7 +72,6 @@ const RAIL_OPEN = 232;
 const ROSE = '#9A2D55';
 const INK2 = '#7A6065';
 const INK3 = '#C5AFAF';
-const LINE = 'rgba(26,13,17,.07)';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -90,14 +89,13 @@ export default function Sidebar() {
         width: expanded ? RAIL_OPEN : RAIL_W,
         minHeight: '100vh',
         background: '#FFFFFF',
-        borderLeft: `1px solid ${LINE}`,
         display: 'flex',
         flexDirection: 'column',
         fontFamily: "'Cairo', sans-serif",
         flexShrink: 0,
         overflow: 'hidden',
         transition: 'width .22s cubic-bezier(.4,0,.2,1)',
-        boxShadow: expanded ? '4px 0 24px rgba(26,13,17,.08)' : 'none',
+        boxShadow: expanded ? '4px 0 24px rgba(26,13,17,.08)' : '0 0 0 rgba(0,0,0,0)',
         zIndex: 10,
         position: 'relative',
       }}
@@ -105,7 +103,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div style={{
         height: 56, display: 'flex', alignItems: 'center', gap: 12,
-        padding: '0 16px', borderBottom: `1px solid ${LINE}`,
+        padding: '0 16px',
         flexShrink: 0, overflow: 'hidden', whiteSpace: 'nowrap',
       }}>
         <div style={{ width: 26, height: 26, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ROSE, fontFamily: "'Amiri', serif", fontSize: 18 }}>◆</div>
@@ -134,7 +132,7 @@ export default function Sidebar() {
                   end={item.exact}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '9px 16px', textDecoration: 'none',
+                    margin: '1px 6px', padding: '9px 13px', borderRadius: 999, textDecoration: 'none',
                     color: active ? ROSE : INK2,
                     background: active ? 'rgba(154,45,85,.08)' : 'transparent',
                     fontWeight: active ? 700 : 500,
@@ -147,13 +145,6 @@ export default function Sidebar() {
                   onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(154,45,85,.06)'; }}
                   onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                 >
-                  {/* Active stripe */}
-                  <span style={{
-                    position: 'absolute', left: 0, top: '20%', bottom: '20%',
-                    width: 3, borderRadius: '0 2px 2px 0',
-                    background: ROSE, opacity: active ? 1 : 0,
-                    transition: 'opacity .15s',
-                  }} />
                   {/* Icon */}
                   <span style={{ width: 20, height: 20, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon name={item.icon} />
@@ -174,12 +165,12 @@ export default function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: `1px solid ${LINE}`, padding: '10px 10px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+      <div style={{ padding: '10px 10px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
         <a
           href="/"
           style={{
             display: 'flex', alignItems: 'center', gap: 12,
-            padding: '8px 6px', borderRadius: 8, textDecoration: 'none',
+            padding: '8px 6px', borderRadius: 999, textDecoration: 'none',
             color: INK2, fontSize: 12.5, fontWeight: 500,
             marginBottom: 4,
           }}

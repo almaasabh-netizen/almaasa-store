@@ -37,7 +37,7 @@ export default function Support() {
     <div className="space-y-4" dir="rtl">
       <div className="grid grid-cols-3 gap-4">
         {(['open','inprogress','closed'] as const).map(s => (
-          <div key={s} className="rounded-2xl p-4 text-center cursor-pointer" style={{ background: STATUS[s].bg, border: `1px solid ${STATUS[s].color}33` }} onClick={() => setFilter(s)}>
+          <div key={s} className="rounded-[20px] p-4 text-center cursor-pointer" style={{ background: STATUS[s].bg }} onClick={() => setFilter(s)}>
             <p className="text-2xl font-black" style={{ color: STATUS[s].color }}>{tickets.filter(t => t.status === s).length}</p>
             <p className="text-xs font-medium mt-1" style={{ color: STATUS[s].color }}>{STATUS[s].label}</p>
           </div>
@@ -47,7 +47,7 @@ export default function Support() {
       <div className="flex gap-2">
         {(['all','open','inprogress','closed'] as const).map(f => (
           <button key={f} onClick={() => setFilter(f)}
-            className="px-3 py-1.5 rounded-xl text-xs font-bold"
+            className="px-3 py-1.5 rounded-full text-xs font-bold"
             style={{ background: filter === f ? '#D79AA8' : '#FFFFFF', color: filter === f ? 'white' : '#5A4047', border: '1px solid #F0DDE0' }}>
             {f === 'all' ? 'الكل' : STATUS[f].label}
           </button>
@@ -55,7 +55,7 @@ export default function Support() {
       </div>
 
       {shown.length === 0 ? (
-        <div className="py-16 text-center rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+        <div className="py-16 text-center rounded-[28px]" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
           <MessageSquare className="w-8 h-8 mx-auto mb-2" style={{ color: '#D79AA8' }} />
           <p className="text-sm font-bold" style={{ color: '#5A4047' }}>لا توجد تذاكر دعم</p>
           <p className="text-xs mt-1" style={{ color: '#D79AA8' }}>ستظهر استفسارات العملاء هنا</p>
@@ -66,8 +66,8 @@ export default function Support() {
             const S = STATUS[t.status];
             const P = PRIORITY[t.priority];
             return (
-              <div key={t.id} className="rounded-2xl p-4 cursor-pointer hover:shadow-sm transition-shadow"
-                style={{ background: '#FFFFFF', border: `1px solid ${selected === t.id ? '#D79AA8' : '#F0DDE0'}` }}
+              <div key={t.id} className="rounded-[28px] p-4 cursor-pointer hover:shadow-sm transition-shadow"
+                style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}
                 onClick={() => setSelected(selected === t.id ? null : t.id)}>
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-sm shrink-0"
@@ -89,7 +89,7 @@ export default function Support() {
                     <div className="flex gap-2">
                       {(['open','inprogress','closed'] as const).map(s => (
                         <button key={s} onClick={e => { e.stopPropagation(); updateStatus(t.id, s); }}
-                          className="px-3 py-1 rounded-xl text-xs font-bold"
+                          className="px-3 py-1 rounded-full text-xs font-bold"
                           style={{ background: t.status === s ? STATUS[s].color : STATUS[s].bg, color: t.status === s ? 'white' : STATUS[s].color }}>
                           {STATUS[s].label}
                         </button>

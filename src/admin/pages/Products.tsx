@@ -138,7 +138,7 @@ export default function Products() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 flex-1 min-w-48" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+        <div className="flex items-center gap-2 rounded-full px-3 py-2.5 flex-1 min-w-48" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
           <Search className="w-4 h-4 shrink-0" style={{ color: '#D79AA8' }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث باسم المنتج أو الكود..."
             className="bg-transparent text-sm flex-1 outline-none" style={{ color: '#5A4047' }} dir="rtl" />
@@ -146,7 +146,7 @@ export default function Products() {
         <div className="flex gap-1.5 flex-wrap">
           {categories.map(c => (
             <button key={c} onClick={() => setCategoryFilter(c)}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold transition-colors"
+              className="px-3 py-1.5 rounded-full text-xs font-bold transition-colors"
               style={{ background: categoryFilter === c ? '#D79AA8' : '#FFFFFF', color: categoryFilter === c ? 'white' : '#5A4047', border: '1px solid #F0DDE0' }}>
               {c}
             </button>
@@ -154,18 +154,18 @@ export default function Products() {
         </div>
         <div className="flex gap-2 mr-auto">
           <button onClick={deleteWithoutImages}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold"
             style={{ background: '#FEF2F2', color: '#EF4444', border: '1px solid #FECACA' }}>
             <Trash2 className="w-4 h-4" /> حذف بدون صور
           </button>
           <button onClick={importFromInstagram} disabled={isImporting}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-60"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold disabled:opacity-60"
             style={{ background: 'linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)', color: 'white' }}>
             <Instagram className="w-4 h-4" />
             {isImporting ? 'جاري الاستيراد...' : 'استيراد من إنستقرام'}
           </button>
           <button onClick={() => navigate('/admin/products/new')}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold"
             style={{ background: '#D79AA8', color: 'white' }}>
             <Plus className="w-4 h-4" /> إضافة منتج
           </button>
@@ -175,21 +175,21 @@ export default function Products() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {products.length === 0 ? (
           <div className="col-span-full py-24 text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-5" style={{ background: '#F3E6E8' }}>
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-[20px] mb-5" style={{ background: '#F3E6E8' }}>
               <Package className="w-10 h-10" style={{ color: '#D79AA8' }} />
             </div>
             <p className="font-black text-base mb-1" style={{ color: '#5A4047' }}>لا توجد منتجات بعد</p>
             <p className="text-sm mb-6" style={{ color: '#D79AA8' }}>ابدئي بإضافة أول منتج لمتجرك</p>
             <button onClick={() => navigate('/admin/products/new')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white transition-colors hover:opacity-90"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-white transition-colors hover:opacity-90"
               style={{ background: '#D79AA8' }}>
               <Plus className="w-4 h-4" />
               أضف أول منتج
             </button>
           </div>
         ) : products.map((p: any) => (
-          <div key={p.id} className="rounded-2xl overflow-hidden group relative"
-            style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+          <div key={p.id} className="rounded-[28px] overflow-hidden group relative"
+            style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
             <div className="relative">
               {p.image ? (
                 <img src={p.image} alt={p.name} referrerPolicy="no-referrer"
@@ -204,15 +204,15 @@ export default function Products() {
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                 <button onClick={() => navigate(`/admin/products/${p.id}`)}
-                  className="p-2 rounded-xl shadow-lg" style={{ background: 'white' }}>
+                  className="p-2 rounded-full shadow-lg" style={{ background: 'white' }}>
                   <Edit2 className="w-3.5 h-3.5" style={{ color: '#C77D8A' }} />
                 </button>
                 <button onClick={() => toggleDraft(p.id)}
-                  className="p-2 rounded-xl shadow-lg" style={{ background: 'white' }}>
+                  className="p-2 rounded-full shadow-lg" style={{ background: 'white' }}>
                   {p.isDraft ? <Eye className="w-3.5 h-3.5" style={{ color: '#22C55E' }} /> : <EyeOff className="w-3.5 h-3.5" style={{ color: '#F59E0B' }} />}
                 </button>
                 <button onClick={() => deleteProduct(p.id, p.name)}
-                  className="p-2 rounded-xl shadow-lg" style={{ background: 'white' }}>
+                  className="p-2 rounded-full shadow-lg" style={{ background: 'white' }}>
                   <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
                 </button>
               </div>
@@ -227,17 +227,17 @@ export default function Products() {
               </div>
               <div className="flex gap-2 mt-2">
                 <button onClick={() => navigate(`/admin/products/${p.id}`)}
-                  className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-xl text-xs font-bold transition-colors hover:opacity-80"
+                  className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-full text-xs font-bold transition-colors hover:opacity-80"
                   style={{ background: '#F3E6E8', color: '#C77D8A' }}>
                   <Edit2 className="w-3 h-3" /> تعديل
                 </button>
                 <button onClick={() => toggleDraft(p.id)}
-                  className="p-1.5 rounded-xl transition-colors hover:opacity-80"
+                  className="p-1.5 rounded-full transition-colors hover:opacity-80"
                   style={{ background: '#F3E6E8' }}>
                   {p.isDraft ? <Eye className="w-3.5 h-3.5" style={{ color: '#22C55E' }} /> : <EyeOff className="w-3.5 h-3.5" style={{ color: '#F59E0B' }} />}
                 </button>
                 <button onClick={() => deleteProduct(p.id, p.name)}
-                  className="p-1.5 rounded-xl transition-colors hover:opacity-80"
+                  className="p-1.5 rounded-full transition-colors hover:opacity-80"
                   style={{ background: '#FEF2F2' }}>
                   <Trash2 className="w-3.5 h-3.5" style={{ color: '#EF4444' }} />
                 </button>

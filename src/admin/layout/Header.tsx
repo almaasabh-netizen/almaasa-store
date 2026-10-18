@@ -31,7 +31,7 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
   return (
     <header style={{
       height: 56, flexShrink: 0,
-      background: '#FFFFFF', borderBottom: `1px solid ${LINE}`,
+      background: '#FFFFFF',
       display: 'flex', alignItems: 'center', gap: 10,
       padding: '0 20px',
       fontFamily: "'Cairo', sans-serif",
@@ -44,7 +44,7 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
         style={{
           width: 32, height: 32, display: 'flex', alignItems: 'center',
           justifyContent: 'center', border: 'none', background: 'transparent',
-          cursor: 'pointer', color: INK2, borderRadius: 6, flexShrink: 0,
+          cursor: 'pointer', color: INK2, borderRadius: 999, flexShrink: 0,
         }}
         aria-label="فتح القائمة"
       >
@@ -70,7 +70,7 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
           style={{
             width: 34, height: 34, display: 'flex', alignItems: 'center',
             justifyContent: 'center', border: 'none', background: 'transparent',
-            cursor: 'pointer', color: INK2, borderRadius: 8,
+            cursor: 'pointer', color: INK2, borderRadius: 999,
             transition: 'background .15s',
           }}
           title={darkMode ? 'الوضع النهاري' : 'الوضع الليلي'}
@@ -96,7 +96,7 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
           style={{
             width: 34, height: 34, display: 'flex', alignItems: 'center',
             justifyContent: 'center', border: 'none', background: 'transparent',
-            cursor: 'pointer', color: INK2, borderRadius: 8,
+            cursor: 'pointer', color: INK2, borderRadius: 999,
             transition: 'background .15s',
           }}
           title="بحث"
@@ -113,7 +113,7 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
           style={{
             width: 34, height: 34, display: 'flex', alignItems: 'center',
             justifyContent: 'center', border: 'none', background: 'transparent',
-            cursor: 'pointer', color: INK2, borderRadius: 8, position: 'relative',
+            cursor: 'pointer', color: INK2, borderRadius: 999, position: 'relative',
             transition: 'background .15s',
           }}
           title="الإشعارات"
@@ -152,7 +152,7 @@ export default function Header({ darkMode, onToggleDark, onMenuOpen, title }: He
           style={{
             width: 34, height: 34, display: 'flex', alignItems: 'center',
             justifyContent: 'center', border: 'none', background: 'transparent',
-            cursor: 'pointer', color: INK2, borderRadius: 8,
+            cursor: 'pointer', color: INK2, borderRadius: 999,
             transition: 'background .15s, color .15s',
           }}
           onMouseEnter={e => { e.currentTarget.style.background = 'rgba(220,60,60,.08)'; e.currentTarget.style.color = '#DC3030'; }}

@@ -6,7 +6,7 @@ const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+    <div className="rounded-[28px] p-5" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
       <h3 className="font-black text-sm mb-4" style={{ color: '#5A4047' }}>{title}</h3>
       {children}
     </div>
@@ -76,7 +76,7 @@ export default function Reports() {
           { label: 'متوسط هامش الربح', value: productsWithCost.length > 0 ? `${avgMargin.toFixed(1)}%` : 'أضف سعر التكلفة', color: '#8B5CF6', bg: '#F5F3FF' },
           { label: 'المنتجات النشطة', value: products.filter((p: any) => !p.isDraft).length, color: '#F59E0B', bg: '#FFF7ED' },
         ].map(s => (
-          <div key={s.label} className="rounded-2xl p-4" style={{ background: s.bg }}>
+          <div key={s.label} className="rounded-[20px] p-4" style={{ background: s.bg }}>
             <p className="text-2xl font-black" style={{ color: s.color }}>{s.value}</p>
             <p className="text-xs mt-1 font-medium" style={{ color: s.color }}>{s.label}</p>
           </div>

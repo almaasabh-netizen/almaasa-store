@@ -231,7 +231,7 @@ export default function OrderDetails() {
     <div className="space-y-5 max-w-5xl" dir="rtl">
       {/* Back + title */}
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/admin/orders')} className="p-2 rounded-xl hover:bg-[#F3E6E8] transition-colors">
+        <button onClick={() => navigate('/admin/orders')} className="p-2 rounded-full hover:bg-[#F3E6E8] transition-colors">
           <ArrowRight className="w-4 h-4" style={{ color: '#D79AA8' }} />
         </button>
         <div>
@@ -242,13 +242,13 @@ export default function OrderDetails() {
           <span className="px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: sc.bg, color: sc.text }}>{sc.label}</span>
           <div className="relative" ref={statusRef}>
             <button onClick={() => setStatusOpen(o => !o)}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold border hover:bg-[#F3E6E8] transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold border hover:bg-[#F3E6E8] transition-colors"
               style={{ color: '#5A4047', borderColor: '#F0DDE0' }}>
               تغيير الحالة <ChevronDown className="w-3 h-3" />
             </button>
             {statusOpen && (
-              <div className="absolute top-full left-0 mt-1 rounded-xl shadow-xl z-20"
-                style={{ background: '#FFFFFF', border: '1px solid #F0DDE0', minWidth: 150 }}>
+              <div className="absolute top-full left-0 mt-1 rounded-[20px] shadow-xl z-20"
+                style={{ background: '#FFFFFF', minWidth: 150 }}>
                 {Object.entries(statusColors).map(([k, v]) => (
                   <button key={k} onClick={() => { updateStatus(k); setStatusOpen(false); }}
                     className="w-full text-right px-3 py-2 text-xs font-medium hover:bg-[#FFF8F8] transition-colors"
@@ -257,7 +257,7 @@ export default function OrderDetails() {
               </div>
             )}
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
             style={{ background: '#F3E6E8', color: '#C77D8A' }} onClick={printInvoice}>
             <Printer className="w-3.5 h-3.5" /> طباعة الفاتورة
           </button>
@@ -266,7 +266,7 @@ export default function OrderDetails() {
 
       {/* Progress bar */}
       {order.status !== 'cancelled' && order.status !== 'returned' && (
-        <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+        <div className="rounded-[28px] p-5" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
           <p className="text-xs font-bold mb-4" style={{ color: '#D79AA8' }}>اضغط على الخطوة لتغيير حالة الطلب</p>
           <div className="flex items-center justify-between" dir="ltr">
             {STEPS.map((step, i) => {
@@ -296,7 +296,7 @@ export default function OrderDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Order items */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-2xl p-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+          <div className="rounded-[28px] p-4" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
             <h3 className="font-black text-sm mb-4" style={{ color: '#5A4047' }}>المنتجات المطلوبة</h3>
             <div className="space-y-3">
               {order.items?.map((item: any, i: number) => {
@@ -311,7 +311,7 @@ export default function OrderDetails() {
                   <div key={i} className="flex items-center gap-3 pb-3 border-b last:border-0 last:pb-0" style={{ borderColor: '#F0DDE0' }}>
                     {image
                       ? <img src={image} alt={name} className="w-14 h-14 rounded-xl object-cover object-top shrink-0" style={{ border: '1px solid #F0DDE0' }} />
-                      : <div className="w-14 h-14 rounded-xl shrink-0 flex items-center justify-center" style={{ background: '#F3E6E8', border: '1px solid #F0DDE0' }}>
+                      : <div className="w-14 h-14 rounded-[20px] shrink-0 flex items-center justify-center" style={{ background: '#F3E6E8', border: '1px solid #F0DDE0' }}>
                           <Package className="w-5 h-5" style={{ color: '#D79AA8' }} />
                         </div>
                     }
@@ -362,7 +362,7 @@ export default function OrderDetails() {
 
         {/* Customer + shipping info */}
         <div className="space-y-4">
-          <div className="rounded-2xl p-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+          <div className="rounded-[28px] p-4" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
             <h3 className="font-black text-sm mb-3" style={{ color: '#5A4047' }}>معلومات العميل</h3>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black"
@@ -388,22 +388,22 @@ export default function OrderDetails() {
           </div>
 
           {customerNotes && (
-            <div className="rounded-2xl p-4" style={{ background: '#FFF7ED', border: '1px solid #FED7AA' }}>
+            <div className="rounded-[20px] p-4" style={{ background: '#FFF7ED' }}>
               <p className="text-xs font-bold mb-1.5" style={{ color: '#F59E0B' }}>ملاحظات العميل</p>
               <p className="text-xs" style={{ color: '#5A4047' }}>{customerNotes}</p>
             </div>
           )}
 
           {/* Payment reference - compact */}
-          <div className="rounded-2xl p-4" style={{ background: '#FFFFFF', border: '1px solid #F0DDE0' }}>
+          <div className="rounded-[28px] p-4" style={{ boxShadow: '0 4px 6px -1px rgba(26,13,17,.07), 0 2px 4px -2px rgba(26,13,17,.06)', background: '#FFFFFF' }}>
             <p className="text-xs font-black mb-2" style={{ color: '#5A4047' }}>مرجع الدفع (للفاتورة)</p>
             <div className="flex gap-2">
               <input value={refCode} onChange={e => setRefCode(e.target.value)}
                 placeholder="رقم التحويل أو المرجع..." dir="ltr"
-                className="flex-1 rounded-xl px-3 py-2 text-sm outline-none"
+                className="flex-1 rounded-full px-3 py-2 text-sm outline-none"
                 style={{ border: '1px solid #F0DDE0', background: '#FFF8F8', color: '#5A4047' }} />
               <button onClick={saveRefCode}
-                className="px-3 py-2 rounded-xl text-xs font-bold"
+                className="px-3 py-2 rounded-full text-xs font-bold"
                 style={{ background: refSaved ? '#22C55E' : '#D79AA8', color: 'white' }}>
                 {refSaved ? '✓' : 'حفظ'}
               </button>

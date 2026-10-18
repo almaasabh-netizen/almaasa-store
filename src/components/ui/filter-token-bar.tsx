@@ -195,7 +195,7 @@ function Popover({ anchorKey, onClose, children, labelledBy }: PopoverProps) {
           left: pos?.left ?? -9999,
           zIndex: 60,
         }}
-        className="min-w-[13rem] max-w-[18rem] overflow-hidden rounded-lg border border-zinc-950/10 bg-white shadow-lg shadow-zinc-950/10 dark:border-white/10 dark:bg-zinc-900 dark:shadow-black/40"
+        className="min-w-[13rem] max-w-[18rem] overflow-hidden rounded-[20px] border border-zinc-950/10 bg-white shadow-lg shadow-zinc-950/10 dark:border-white/10 dark:bg-zinc-900 dark:shadow-black/40"
       >
         {children}
       </motion.div>
@@ -341,7 +341,7 @@ function SearchList({
             <button
               type="button"
               onClick={onRetry}
-              className="mt-1 rounded-md px-1.5 py-0.5 text-[13px] font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-2 hover:decoration-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 dark:text-zinc-100 dark:decoration-zinc-600"
+              className="mt-1 rounded-full px-1.5 py-0.5 text-[13px] font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-2 hover:decoration-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 dark:text-zinc-100 dark:decoration-zinc-600"
             >
               إعادة المحاولة
             </button>
@@ -368,7 +368,7 @@ function SearchList({
                 onMouseEnter={() => setActive(i)}
                 onClick={() => onPick(item.value)}
                 className={[
-                  "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[13px]",
+                  "flex cursor-pointer items-center gap-2 rounded-full px-2 py-1.5 text-[13px]",
                   isActive
                     ? "bg-zinc-100 dark:bg-white/10"
                     : "bg-transparent",
@@ -460,7 +460,7 @@ const Segment = React.forwardRef<HTMLButtonElement, SegmentProps>(
           active
             ? "bg-zinc-200/70 dark:bg-white/[0.12]"
             : "hover:bg-zinc-200/60 dark:hover:bg-white/[0.08]",
-          role === "field" ? "rounded-s-md font-medium" : "",
+          role === "field" ? "rounded-s-full font-medium" : "",
           "data-[flash]:animate-[fb-flash_620ms_ease-out]",
         ].join(" ")}
       >
@@ -794,7 +794,7 @@ export function FilterBar({
               animate={{ opacity: 1, scale: 1 }}
               exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
               transition={springy}
-              className="group flex items-stretch overflow-hidden rounded-md border border-zinc-950/[0.09] bg-zinc-100/80 dark:border-white/[0.08] dark:bg-white/[0.05]"
+              className="group flex items-stretch overflow-hidden rounded-full border border-zinc-950/[0.09] bg-zinc-100/80 dark:border-white/[0.08] dark:bg-white/[0.05]"
             >
               <Segment
                 role="field"
@@ -909,7 +909,7 @@ export function FilterBar({
               setOpen({ kind: "add" });
             }}
             className={[
-              "flex items-center gap-1 rounded-md border border-dashed px-2 py-[6px] text-[13px] font-medium leading-none transition-colors",
+              "flex items-center gap-1 rounded-full border border-dashed px-3 py-[6px] text-[13px] font-medium leading-none transition-colors",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 active:scale-[0.98]",
               "border-zinc-300 text-zinc-600 hover:border-zinc-400 hover:bg-zinc-100 hover:text-zinc-900",
               "dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100",
@@ -925,7 +925,7 @@ export function FilterBar({
         <button
           type="button"
           onClick={clearAll}
-          className="ms-0.5 rounded-md px-2 py-[6px] text-[13px] leading-none text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100"
+          className="ms-0.5 rounded-full px-3 py-[6px] text-[13px] leading-none text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100"
         >
           مسح الكل
         </button>
