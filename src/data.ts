@@ -6,7 +6,7 @@ const INITIAL_PRODUCTS: Product[] = [
     id: 'prod-1',
     name: 'مخور ملكي مطرز بالخرز اللامع - وردي هادئ',
     description: 'مخور تقليدي فاخر من قماش الحرير الناعم مطرز يدوياً بنقشات هندسية رقيقة وصمغ وحبات الخرز الكريستالية اللامعة. تصميم ناعم مريح للغاية ومناسب للأعياد والمناسبات السعيدة.',
-    category: 'available',
+    category: 'italian-silk',
     price: 32.0,
     originalPrice: 40.0,
     image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=600&auto=format&fit=crop', // Elegant soft fashion
@@ -86,7 +86,7 @@ const INITIAL_PRODUCTS: Product[] = [
     id: 'prod-5',
     name: 'بروش ألماسة الفضي مطعم بالكريستال الحر',
     description: 'بروش فاخر ومميز مستوحى من شكل الألماسة الأنيق ومطلي بالفضية اللامعة لمنح المخور هيبة وأناقة متكاملة.',
-    category: 'accessories',
+    category: 'liberty-cotton',
     price: 6.5,
     originalPrice: 8.0,
     image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=600&auto=format&fit=crop', // Luxury brooch jewel
@@ -105,7 +105,7 @@ const INITIAL_PRODUCTS: Product[] = [
     id: 'prod-6',
     name: 'مخور الأورجانزا الفاخر مع تطريز السيرما',
     description: 'أرقى أنواع أقمشة الأورجانزا الشفافة مطرز بكثافة باللون الذهبي البراق، يعطي طابعاً ملكياً مبهراً يلفت الأنظار وبأكمام منفوخة واسعة.',
-    category: 'available',
+    category: 'italian-silk',
     price: 45.0,
     image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=600&auto=format&fit=crop', // Beautiful luxury fabric
     stock: 4,
@@ -123,11 +123,13 @@ const INITIAL_PRODUCTS: Product[] = [
 
 const INITIAL_CATEGORIES: Category[] = [
   { id: 'all', name: 'الكل', slug: 'all', count: 6 },
-  { id: 'with-sheilah', name: 'مخاوير مع شيلة', slug: 'with-sheilah', count: 2 },
-  { id: 'kids', name: 'مخاوير الأطفال', slug: 'kids', count: 1 },
-  { id: 'available', name: 'المتوفر حالياً', slug: 'available', count: 2 },
+  { id: 'italian-silk', name: 'حرير ايطالي', slug: 'italian-silk', count: 2 },
+  { id: 'with-sheilah', name: 'مخور مع شيلة', slug: 'with-sheilah', count: 1 },
   { id: 'mother-daughter', name: 'طقم الأم والبنت', slug: 'mother-daughter', count: 1 },
-  { id: 'accessories', name: 'اكسسوارات', slug: 'accessories', count: 1 }
+  { id: 'liberty-cotton', name: 'قطن ليبرتي', slug: 'liberty-cotton', count: 1 },
+  { id: 'kids', name: 'مخور أطفال', slug: 'kids', count: 1 },
+  { id: 'bows', name: 'مخور الفيونكات', slug: 'bows', count: 0 },
+  { id: 'sale', name: 'خصومات', slug: 'sale', count: 0 }
 ];
 
 const INITIAL_SIZE_GUIDES: SizeGuide[] = [

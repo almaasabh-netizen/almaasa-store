@@ -282,6 +282,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
   });
 
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
+  const fmtBD = (n: number) => 'BD ' + (Number(n) || 0).toFixed(3);
   const wa = `https://wa.me/${(settings?.whatsappNumber || '97337037697').replace(/\D/g, '')}`;
   const ig = `https://instagram.com/${settings?.instagramUsername || 'almaasa.bh'}`;
 
@@ -289,7 +290,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
      RENDER
   ═══════════════════════════════════════════════════════════════ */
   return (
-    <div style={{ background: '#FBF7F2', fontFamily: "'Cairo', sans-serif", color: '#241419', minHeight: '100vh' }} dir="rtl">
+    <div style={{ background: '#FFFFFF', fontFamily: "'Cairo', sans-serif", color: '#241419', minHeight: '100vh' }} dir="rtl">
 
       {/* ── TOASTS ────────────────────────────────────────────── */}
       <div className="fixed top-5 right-5 z-[100] space-y-2 pointer-events-none">
@@ -299,7 +300,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }}
               className="pointer-events-auto px-4 py-3 rounded text-white text-xs font-semibold shadow-xl"
               style={{
-                background: t.type === 'success' ? '#9A2D55' : t.type === 'error' ? '#c0392b' : '#B08D57',
+                background: t.type === 'success' ? '#B05C83' : t.type === 'error' ? '#c0392b' : '#B05C83',
                 borderRadius: 999,
               }}
             >{t.msg}</motion.div>
@@ -311,7 +312,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           HEADER
       ══════════════════════════════════════════════════════════ */}
       <header style={{
-        background: '#FBF7F2',
+        background: '#FFFFFF',
         position: 'sticky', top: 0, zIndex: 40,
         boxShadow: isScrolled ? '0 2px 12px rgba(36,20,25,0.08)' : 'none',
         transition: 'box-shadow 0.3s',
@@ -320,7 +321,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           {/* Desktop nav row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: 1240, padding: '20px 40px', boxSizing: 'border-box' }}>
             {/* Logo */}
-            <button onClick={() => setActiveTab('home')} style={{ fontFamily: "'Amiri', serif", fontSize: 32, fontWeight: 700, color: '#9A2D55', textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <button onClick={() => setActiveTab('home')} style={{ fontFamily: "'Amiri', serif", fontSize: 32, fontWeight: 700, color: '#B05C83', textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>
               ألماسة
             </button>
 
@@ -334,12 +335,12 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 { label: 'تتبع طلبي', page: 'tracking' as Page },
               ].map(({ label, page }) => (
                 <button key={page} onClick={() => setActiveTab(page)} style={{
-                  color: activeTab === page ? '#9A2D55' : '#241419',
+                  color: activeTab === page ? '#B05C83' : '#241419',
                   textDecoration: 'none',
-                  borderBottom: activeTab === page ? '2px solid #B08D57' : '2px solid transparent',
+                  borderBottom: activeTab === page ? '2px solid #B05C83' : '2px solid transparent',
                   background: 'none', border: 'none', borderBottomWidth: 2,
                   borderBottomStyle: 'solid',
-                  borderBottomColor: activeTab === page ? '#B08D57' : 'transparent',
+                  borderBottomColor: activeTab === page ? '#B05C83' : 'transparent',
                   cursor: 'pointer', padding: '2px 0', fontSize: 15, fontWeight: 500,
                   fontFamily: "'Cairo', sans-serif",
                 }}>
@@ -350,12 +351,15 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
             {/* Cart + mobile menu */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {/* Cart */}
-              <button onClick={() => setActiveTab('cart')} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#241419', textDecoration: 'none', fontSize: 15, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>
+              {/* Cart — mauve pill */}
+              <button onClick={() => setActiveTab('cart')} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#fff', fontSize: 14, fontWeight: 700, background: '#B05C83', border: 'none', borderRadius: 999, padding: '9px 18px', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", boxShadow: 'rgba(176,92,131,.28) 0 4px 14px 0' }}>
+                <ShoppingBag style={{ width: 17, height: 17 }} />
                 <span>السلة</span>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: '#9A2D55', color: '#fff', fontSize: 11, fontWeight: 700 }}>
-                  {cartCount}
-                </span>
+                {cartCount > 0 && (
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 20, height: 20, borderRadius: '50%', background: '#fff', color: '#B05C83', fontSize: 11, fontWeight: 800, padding: '0 5px' }}>
+                    {cartCount}
+                  </span>
+                )}
               </button>
 
               {/* Mobile menu button */}
@@ -366,7 +370,28 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </div>
 
           {/* Divider */}
-          <div style={{ width: '100%', borderBottom: '1px solid rgba(154,45,85,.18)' }} />
+          <div style={{ width: '100%', borderBottom: '1px solid rgba(176,92,131,.14)' }} />
+
+          {/* Category pills bar (matches Unlabelled storefront) */}
+          {categories.filter(c => c.id !== 'all').length > 0 && (
+            <div style={{ width: '100%', background: '#FFFFFF', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+              <div style={{ display: 'flex', gap: 8, padding: '12px 20px', width: 'max-content', margin: '0 auto', maxWidth: 1240, boxSizing: 'border-box' }}>
+                <button onClick={() => { setActiveTab('shop'); setSelectedCategory('all'); }}
+                  style={{ flexShrink: 0, padding: '8px 18px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', background: (activeTab === 'shop' && selectedCategory === 'all') ? '#B05C83' : '#EEF0F5', color: (activeTab === 'shop' && selectedCategory === 'all') ? '#fff' : '#2E1F27', transition: 'background .15s,color .15s' }}>
+                  كل المنتجات
+                </button>
+                {categories.filter(c => c.id !== 'all').map(cat => {
+                  const on = activeTab === 'shop' && selectedCategory === cat.id;
+                  return (
+                    <button key={cat.id} onClick={() => { setActiveTab('shop'); setSelectedCategory(cat.id); }}
+                      style={{ flexShrink: 0, padding: '8px 18px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', background: on ? '#B05C83' : '#EEF0F5', color: on ? '#fff' : '#2E1F27', transition: 'background .15s,color .15s' }}>
+                      {cat.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Mobile nav dropdown */}
           {mobileMenuOpen && (
@@ -378,7 +403,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           <AnimatePresence>
             {mobileMenuOpen && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-                style={{ width: '100%', background: '#FBF7F2', overflow: 'hidden' }}>
+                style={{ width: '100%', background: '#FFFFFF', overflow: 'hidden' }}>
                 <div style={{ padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {[
                     { label: 'الرئيسية', page: 'home' as Page },
@@ -388,7 +413,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     { label: 'تتبع طلبي', page: 'tracking' as Page },
                   ].map(({ label, page }) => (
                     <button key={page} onClick={() => { setActiveTab(page); setMobileMenuOpen(false); }}
-                      style={{ textAlign: 'right', padding: '10px 12px', fontSize: 15, fontWeight: activeTab === page ? 600 : 400, color: activeTab === page ? '#9A2D55' : '#241419', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", borderRadius: 999 }}>
+                      style={{ textAlign: 'right', padding: '10px 12px', fontSize: 15, fontWeight: activeTab === page ? 600 : 400, color: activeTab === page ? '#B05C83' : '#241419', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", borderRadius: 999 }}>
                       {label}
                     </button>
                   ))}
@@ -405,7 +430,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
       {/* ── HOME PAGE ──────────────────────────────────────────── */}
       {activeTab === 'home' && (
-        <main className="_content-pb" style={{ background: '#FAF7F3', overflowX: 'hidden' }}>
+        <main className="_content-pb" style={{ background: '#FFFFFF', overflowX: 'hidden' }}>
 
           {/* ── CSS KEYFRAMES (injected once) ── */}
           <style>{`
@@ -430,50 +455,50 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             ._cbg{transition:transform .6s cubic-bezier(.22,.68,0,1.2)}
             ._catbtn:hover ._carrow{opacity:1!important;transform:translateY(0)!important}
             ._carrow{transition:opacity .2s,transform .2s}
-            ._rcard:hover{box-shadow:0 12px 40px rgba(22,11,16,.07)!important;transform:translateY(-3px)!important}
+            ._rcard:hover{box-shadow:0 12px 40px rgba(46,31,39,.07)!important;transform:translateY(-3px)!important}
           `}</style>
 
           {/* ── HERO ── */}
           <section className="_hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 'calc(100vh - 58px)' }}>
             {/* Text side */}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(40px,6vw,88px) clamp(24px,5vw,72px)', background: '#FAF7F3', position: 'relative' }}>
-              <div className="_anim1" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32, fontSize: 10, letterSpacing: '0.28em', fontWeight: 700, color: '#C4A882', textTransform: 'uppercase' }}>
-                <span style={{ width: 28, height: 1, background: '#C4A882', display: 'inline-block', flexShrink: 0 }}></span>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(40px,6vw,88px) clamp(24px,5vw,72px)', background: '#FFFFFF', position: 'relative' }}>
+              <div className="_anim1" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32, fontSize: 10, letterSpacing: '0.28em', fontWeight: 700, color: '#C9A3B8', textTransform: 'uppercase' }}>
+                <span style={{ width: 28, height: 1, background: '#C9A3B8', display: 'inline-block', flexShrink: 0 }}></span>
                 AUTUMN / WINTER 2026
               </div>
-              <h1 className="_anim2" style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(2.6rem,5.2vw,68px)', lineHeight: 1.12, color: '#160B10', margin: '0 0 26px', fontWeight: 400 }}>
+              <h1 className="_anim2" style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(2.6rem,5.2vw,68px)', lineHeight: 1.12, color: '#2E1F27', margin: '0 0 26px', fontWeight: 400 }}>
                 أزياء تُولد<br />
-                <em style={{ fontStyle: 'italic', color: '#9A2D55', display: 'block', fontSize: '1.1em' }}>من فخامة</em>
+                <em style={{ fontStyle: 'italic', color: '#B05C83', display: 'block', fontSize: '1.1em' }}>من فخامة</em>
               </h1>
               <p className="_anim3" style={{ fontSize: 14.5, color: '#6A4850', lineHeight: 2.0, margin: '0 0 48px', maxWidth: 380 }}>
                 مخاوير وأزياء نسائية مصممة بعناية استثنائية، تجمع بين الهوية الخليجية الراقية والتفاصيل العصرية الدقيقة.
               </p>
               <div className="_anim4" style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                <button onClick={() => setActiveTab('shop')} style={{ padding: '14px 40px', background: '#160B10', color: '#FFF', border: 'none', borderRadius: 999, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.07em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", transition: 'background .18s,transform .18s', position: 'relative', overflow: 'hidden' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#9A2D55'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#160B10'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
+                <button onClick={() => setActiveTab('shop')} style={{ padding: '14px 40px', background: '#B05C83', color: '#FFF', border: 'none', borderRadius: 999, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.07em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", transition: 'background .18s,transform .18s', position: 'relative', overflow: 'hidden' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#964F71'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#B05C83'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
                   تسوّقي المجموعة
                 </button>
-                <button onClick={() => setActiveTab('about')} style={{ padding: '14px 30px', background: '#FFF', color: '#160B10', border: '1px solid rgba(22,11,16,.08)', borderRadius: 999, boxShadow: 'rgba(22,11,16,.06) 0px 2px 8px 0px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", transition: 'border-color .18s,color .18s,transform .18s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#9A2D55'; (e.currentTarget as HTMLElement).style.color = '#9A2D55'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(22,11,16,.14)'; (e.currentTarget as HTMLElement).style.color = '#160B10'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
+                <button onClick={() => setActiveTab('about')} style={{ padding: '14px 30px', background: '#FFF', color: '#2E1F27', border: '1px solid rgba(46,31,39,.08)', borderRadius: 999, boxShadow: 'rgba(46,31,39,.06) 0px 2px 8px 0px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", transition: 'border-color .18s,color .18s,transform .18s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#B05C83'; (e.currentTarget as HTMLElement).style.color = '#B05C83'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(46,31,39,.14)'; (e.currentTarget as HTMLElement).style.color = '#2E1F27'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
                   اكتشفي أكثر
                 </button>
               </div>
               {/* Scroll indicator */}
               <div style={{ position: 'absolute', bottom: 32, right: 'clamp(24px,5vw,56px)', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
                 <span style={{ fontSize: 9, letterSpacing: '0.24em', color: '#B8989E', fontWeight: 700 }}>↓</span>
-                <span style={{ width: 1, background: 'linear-gradient(to bottom,#C4A882,transparent)', animationName: '_scrollPulse', animationDuration: '2s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite', height: 48, display: 'block' }}></span>
+                <span style={{ width: 1, background: 'linear-gradient(to bottom,#C9A3B8,transparent)', animationName: '_scrollPulse', animationDuration: '2s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite', height: 48, display: 'block' }}></span>
               </div>
             </div>
             {/* Image side */}
-            <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg,#EDE0D4,#E0CCBC)', margin: 16, borderRadius: 28, boxShadow: 'rgba(22,11,16,.08) 0px 4px 6px -1px, rgba(22,11,16,.06) 0px 2px 4px -2px' }}>
+            <div style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg,#EDE0D4,#E0CCBC)', margin: 16, borderRadius: 28, boxShadow: 'rgba(46,31,39,.08) 0px 4px 6px -1px, rgba(46,31,39,.06) 0px 2px 4px -2px' }}>
               <div style={{ position: 'absolute', inset: 0, transition: 'transform .8s cubic-bezier(.22,.68,0,1.2)', backgroundImage: products[0]?.image ? `url(${products[0].image})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1.03)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}>
-                {!products[0]?.image && <span style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(80px,12vw,160px)', color: 'rgba(154,45,85,.08)', fontStyle: 'italic', lineHeight: 1, userSelect: 'none' }}>◆</span>}
+                {!products[0]?.image && <span style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(80px,12vw,160px)', color: 'rgba(176,92,131,.08)', fontStyle: 'italic', lineHeight: 1, userSelect: 'none' }}>◆</span>}
               </div>
-              <div style={{ position: 'absolute', top: 28, left: 28, background: '#FFF', padding: '9px 16px', fontSize: 9.5, letterSpacing: '0.18em', fontWeight: 700, color: '#9A2D55', borderRadius: 999, boxShadow: 'rgba(22,11,16,.06) 0px 2px 8px 0px', zIndex: 2 }}>
+              <div style={{ position: 'absolute', top: 28, left: 28, background: '#FFF', padding: '9px 16px', fontSize: 9.5, letterSpacing: '0.18em', fontWeight: 700, color: '#B05C83', borderRadius: 999, boxShadow: 'rgba(46,31,39,.06) 0px 2px 8px 0px', zIndex: 2 }}>
                 NEW SEASON
               </div>
               <div style={{ position: 'absolute', bottom: 28, left: 28, fontFamily: "'Cormorant Garamond', serif", fontSize: 64, fontStyle: 'italic', fontWeight: 300, color: 'rgba(255,255,255,.18)', lineHeight: 1, zIndex: 2, pointerEvents: 'none' }}>01</div>
@@ -481,25 +506,25 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </section>
 
           {/* ── TICKER ── */}
-          <div style={{ overflow: 'hidden', borderTop: '1px solid rgba(22,11,16,.07)', borderBottom: '1px solid rgba(22,11,16,.07)', background: '#FFF', padding: '11px 0' }}>
+          <div style={{ overflow: 'hidden', borderTop: '1px solid rgba(46,31,39,.07)', borderBottom: '1px solid rgba(46,31,39,.07)', background: '#FFF', padding: '11px 0' }}>
             <div style={{ display: 'flex', width: 'max-content', whiteSpace: 'nowrap', animationName: '_ticker', animationDuration: '32s', animationTimingFunction: 'linear', animationIterationCount: 'infinite' }}>
               {['مجموعة الخريف ٢٠٢٦', 'AUTUMN COLLECTION', 'تصاميم حصرية', 'شحن مجاني فوق ٣٠ د.ب', 'EXCLUSIVE DESIGNS', 'مخاوير فاخرة', 'FREE SHIPPING +30 BD',
                 'مجموعة الخريف ٢٠٢٦', 'AUTUMN COLLECTION', 'تصاميم حصرية', 'شحن مجاني فوق ٣٠ د.ب', 'EXCLUSIVE DESIGNS', 'مخاوير فاخرة', 'FREE SHIPPING +30 BD'].map((t, i) => (
                 <React.Fragment key={i}>
                   <span style={{ fontSize: 11, letterSpacing: '0.16em', fontWeight: 600, color: '#B8989E', padding: '0 24px', textTransform: 'uppercase' }}>{t}</span>
-                  <span style={{ color: '#9A2D55', letterSpacing: 0, padding: '0 8px', fontSize: 11 }}>◆</span>
+                  <span style={{ color: '#B05C83', letterSpacing: 0, padding: '0 8px', fontSize: 11 }}>◆</span>
                 </React.Fragment>
               ))}
             </div>
           </div>
 
           {/* ── PRODUCTS ── */}
-          <section style={{ padding: '88px 44px', background: '#FAF7F3' }}>
+          <section style={{ padding: '88px 44px', background: '#FFFFFF' }}>
             <div style={{ maxWidth: 1360, margin: '0 auto' }}>
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 44 }}>
-                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 30, color: '#160B10', margin: 0, fontWeight: 400 }}>وصل حديثاً</h2>
+                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 30, color: '#2E1F27', margin: 0, fontWeight: 400 }}>وصل حديثاً</h2>
                 <button onClick={() => setActiveTab('shop')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11.5, fontWeight: 700, color: '#B8989E', fontFamily: "'Cairo', sans-serif", letterSpacing: '0.07em', textDecoration: 'underline', textUnderlineOffset: 4, transition: 'color .15s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#9A2D55'; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#B05C83'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#B8989E'; }}>
                   عرض المجموعة كاملة ←
                 </button>
@@ -512,18 +537,18 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   { id: 'p4', name: 'فستان سهرة راقٍ', price: 89, originalPrice: null, image: '', colors: [] },
                 ] as any[]).map((p: any, i) => (
                   <button key={p.id} onClick={() => p.price && handleProductClick(p)} className="_hpcard"
-                    style={{ background: '#FFF', border: 'none', borderRadius: 28, padding: 8, boxShadow: 'rgba(22,11,16,.08) 0px 4px 6px -1px, rgba(22,11,16,.06) 0px 2px 4px -2px', cursor: 'pointer', textAlign: 'right', display: 'flex', flexDirection: 'column', position: 'relative', transition: 'transform .3s cubic-bezier(.22,.68,0,1.2)', marginTop: i === 1 ? 48 : i === 3 ? 72 : 0 }}>
+                    style={{ background: '#FFF', border: 'none', borderRadius: 28, padding: 8, boxShadow: 'rgba(46,31,39,.08) 0px 4px 6px -1px, rgba(46,31,39,.06) 0px 2px 4px -2px', cursor: 'pointer', textAlign: 'right', display: 'flex', flexDirection: 'column', position: 'relative', transition: 'transform .3s cubic-bezier(.22,.68,0,1.2)', marginTop: i === 1 ? 48 : i === 3 ? 72 : 0 }}>
                     <div style={{ overflow: 'hidden', background: ['#EDE0D4','#E8DCCC','#E4D4C8','#EAE0D4'][i], position: 'relative', aspectRatio: '3/4', borderRadius: 20 }}>
                       <div className="_pimg-inner" style={{ width: '100%', height: '100%', backgroundImage: p.image ? `url(${p.image})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {!p.image && <span style={{ fontFamily: "'Amiri', serif", fontSize: 36, color: 'rgba(154,45,85,.13)', fontStyle: 'italic' }}>◆</span>}
+                        {!p.image && <span style={{ fontFamily: "'Amiri', serif", fontSize: 36, color: 'rgba(176,92,131,.13)', fontStyle: 'italic' }}>◆</span>}
                       </div>
-                      {p.originalPrice && <div style={{ position: 'absolute', top: 12, right: 12, background: '#B85C2E', color: '#FFF', fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', padding: '4px 10px', borderRadius: 999 }}>SALE</div>}
+                      {p.originalPrice && <div style={{ position: 'absolute', top: 12, right: 12, background: '#C76B93', color: '#FFF', fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', padding: '4px 10px', borderRadius: 999 }}>SALE</div>}
                     </div>
                     <div style={{ padding: '14px 10px 10px' }}>
-                      <div style={{ fontSize: 13.5, color: '#160B10', fontWeight: 500, marginBottom: 5, lineHeight: 1.4 }}>{p.name}</div>
+                      <div style={{ fontSize: 13.5, color: '#2E1F27', fontWeight: 500, marginBottom: 5, lineHeight: 1.4 }}>{p.name}</div>
                       <div>
-                        {p.originalPrice && <span style={{ fontSize: 11.5, color: '#B8989E', textDecoration: 'line-through', marginLeft: 6 }}>{typeof p.originalPrice === 'number' ? p.originalPrice.toFixed(2) : p.originalPrice}</span>}
-                        <span style={{ fontSize: 13, color: '#9A2D55', fontWeight: 700 }}>{p.price?.toFixed ? p.price.toFixed(2) : p.price} <small style={{ fontSize: 11, fontWeight: 500 }}>د.ب</small></span>
+                        {p.originalPrice && <span style={{ fontSize: 11.5, color: '#B8989E', textDecoration: 'line-through', marginLeft: 6 }}>{fmtBD(p.originalPrice)}</span>}
+                        <span style={{ fontSize: 13, color: '#B05C83', fontWeight: 800 }}>{fmtBD(p.price)}</span>
                       </div>
                     </div>
                   </button>
@@ -539,28 +564,27 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 onMouseEnter={e => { const bg = e.currentTarget.querySelector('._fbg') as HTMLElement; if (bg) bg.style.transform = 'scale(1.04)'; }}
                 onMouseLeave={e => { const bg = e.currentTarget.querySelector('._fbg') as HTMLElement; if (bg) bg.style.transform = 'scale(1)'; }}>
                 <div className="_fbg" style={{ position: 'absolute', inset: 0, backgroundImage: products[0]?.image ? `url(${products[0].image})` : undefined, backgroundSize: 'cover', backgroundPosition: 'center', transition: 'transform .7s cubic-bezier(.22,.68,0,1.2)' }}></div>
-                {!products[0]?.image && <span style={{ fontFamily: "'Amiri', serif", fontSize: 110, color: 'rgba(154,45,85,.09)', fontStyle: 'italic', position: 'relative', zIndex: 1, lineHeight: 1, userSelect: 'none' }}>◆</span>}
-                <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: "'Cormorant Garamond', serif", fontSize: 44, fontStyle: 'italic', fontWeight: 300, color: 'rgba(22,11,16,.16)', lineHeight: 1, zIndex: 2 }}>02</div>
+                {!products[0]?.image && <span style={{ fontFamily: "'Amiri', serif", fontSize: 110, color: 'rgba(176,92,131,.09)', fontStyle: 'italic', position: 'relative', zIndex: 1, lineHeight: 1, userSelect: 'none' }}>◆</span>}
+                <div style={{ position: 'absolute', bottom: 24, left: 24, fontFamily: "'Cormorant Garamond', serif", fontSize: 44, fontStyle: 'italic', fontWeight: 300, color: 'rgba(46,31,39,.16)', lineHeight: 1, zIndex: 2 }}>02</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(40px,6vw,80px) clamp(28px,5.5vw,72px)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 10, letterSpacing: '0.26em', fontWeight: 700, color: '#C4A882', textTransform: 'uppercase', marginBottom: 22 }}>
-                  <span style={{ width: 22, height: 1, background: '#C4A882', display: 'block' }}></span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 10, letterSpacing: '0.26em', fontWeight: 700, color: '#C9A3B8', textTransform: 'uppercase', marginBottom: 22 }}>
+                  <span style={{ width: 22, height: 1, background: '#C9A3B8', display: 'block' }}></span>
                   FEATURED PIECE
                 </div>
-                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(1.9rem,3.2vw,46px)', color: '#160B10', fontWeight: 400, lineHeight: 1.2, margin: '0 0 18px' }}>
+                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(1.9rem,3.2vw,46px)', color: '#2E1F27', fontWeight: 400, lineHeight: 1.2, margin: '0 0 18px' }}>
                   {products[0]?.name || 'مخوار المجموعة الخاصة'}
                 </h2>
-                <div style={{ width: 34, height: 1.5, background: '#C4A882', margin: '0 0 22px' }}></div>
+                <div style={{ width: 34, height: 1.5, background: '#C9A3B8', margin: '0 0 22px' }}></div>
                 <p style={{ fontSize: 14, color: '#6A4850', lineHeight: 2.0, margin: '0 0 28px', maxWidth: 380 }}>
                   {products[0]?.description || 'قطعة مصممة بأرقى الخامات، تجمع بين الأناقة الشرقية الأصيلة والتفاصيل العصرية الدقيقة — لإطلالة تتحدث عن ذوقكِ الرفيع.'}
                 </p>
-                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 34, fontStyle: 'italic', fontWeight: 300, color: '#9A2D55', marginBottom: 32, lineHeight: 1 }}>
-                  <small style={{ fontSize: 18, marginLeft: 4 }}>د.ب</small>
-                  {products[0]?.price?.toFixed(2) || '—'}
+                <div style={{ fontSize: 30, fontWeight: 800, color: '#B05C83', marginBottom: 32, lineHeight: 1, fontFamily: "'Cairo', sans-serif" }}>
+                  {products[0] ? fmtBD(products[0].price) : '—'}
                 </div>
-                <button onClick={() => products[0] && handleProductClick(products[0])} style={{ padding: '14px 40px', background: '#160B10', color: '#FFF', border: 'none', borderRadius: 999, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.07em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", width: 'fit-content', transition: 'background .18s,transform .18s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#9A2D55'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#160B10'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
+                <button onClick={() => products[0] && handleProductClick(products[0])} style={{ padding: '14px 40px', background: '#B05C83', color: '#FFF', border: 'none', borderRadius: 999, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.07em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", width: 'fit-content', transition: 'background .18s,transform .18s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#964F71'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#B05C83'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
                   تسوّقي هذه القطعة
                 </button>
               </div>
@@ -568,10 +592,10 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           )}
 
           {/* ── CATEGORIES ── */}
-          <section style={{ padding: '80px 44px', background: '#F3EDE7' }}>
+          <section style={{ padding: '80px 44px', background: '#F7F3F5' }}>
             <div style={{ maxWidth: 1360, margin: '0 auto' }}>
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 40 }}>
-                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 30, color: '#160B10', margin: 0, fontWeight: 400 }}>تسوّقي حسب الفئة</h2>
+                <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 30, color: '#2E1F27', margin: 0, fontWeight: 400 }}>تسوّقي حسب الفئة</h2>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr 1fr', gridTemplateRows: '250px 250px', gap: 12 }}>
                 {(categories.filter(c => c.id !== 'all').slice(0, 4).length > 0
@@ -585,10 +609,10 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                       <img src={cat.image} alt={cat.name} className="_cbg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     ) : (
                       <div className="_cbg" style={{ position: 'absolute', inset: 0, background: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontFamily: "'Amiri', serif", fontSize: i === 0 ? 72 : 44, color: 'rgba(154,45,85,.1)', fontStyle: 'italic', userSelect: 'none' }}>◆</span>
+                        <span style={{ fontFamily: "'Amiri', serif", fontSize: i === 0 ? 72 : 44, color: 'rgba(176,92,131,.1)', fontStyle: 'italic', userSelect: 'none' }}>◆</span>
                       </div>
                     )}
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top,rgba(22,11,16,.6) 0%,rgba(22,11,16,0) 55%)', transition: 'background .3s' }}></div>
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top,rgba(46,31,39,.6) 0%,rgba(46,31,39,0) 55%)', transition: 'background .3s' }}></div>
                     <span style={{ position: 'absolute', bottom: i === 0 ? 58 : 44, right: 20, fontSize: 9, letterSpacing: '0.2em', fontWeight: 700, color: 'rgba(255,255,255,.5)', textTransform: 'uppercase' }}>
                       {['COLLECTION I','COLLECTION II','COLLECTION III','COLLECTION IV'][i]}
                     </span>
@@ -601,17 +625,17 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </section>
 
           {/* ── BRAND PROMISE ── */}
-          <section className="_brand-grid" style={{ background: '#160B10', display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', padding: '88px 44px', gap: 0, minHeight: 380 }}>
+          <section className="_brand-grid" style={{ background: '#A85E7C', display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center', padding: '88px 44px', gap: 0, minHeight: 380 }}>
             <div style={{ paddingLeft: 0, paddingRight: 'clamp(24px,5vw,72px)' }}>
               <div style={{ fontSize: 10, letterSpacing: '0.28em', fontWeight: 700, color: 'rgba(255,255,255,.28)', textTransform: 'uppercase', marginBottom: 18 }}>OUR PROMISE</div>
               <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(2rem,3.2vw,44px)', color: '#FFF', fontWeight: 400, lineHeight: 1.22, margin: '0 0 18px' }}>
                 كل قطعة<br />
-                <em style={{ fontStyle: 'italic', color: '#C4A882' }}>تحكي قصة</em>
+                <em style={{ fontStyle: 'italic', color: '#C9A3B8' }}>تحكي قصة</em>
               </h2>
               <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,.5)', lineHeight: 2.0, margin: '0 0 34px', maxWidth: 400 }}>
                 في ألماسة، نؤمن أن الفخامة الحقيقية تكمن في التفاصيل الهادئة — في خيطٍ محكم، ونسيجٍ ناعم، وتصميمٍ يدوم. لهذا تُصنع كل قطعة بعناية استثنائية.
               </p>
-              <button onClick={() => setActiveTab('about')} style={{ padding: '14px 38px', background: '#FFF', color: '#160B10', border: 'none', borderRadius: 999, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", transition: 'background .18s,transform .18s' }}
+              <button onClick={() => setActiveTab('about')} style={{ padding: '14px 38px', background: '#FFF', color: '#2E1F27', border: 'none', borderRadius: 999, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", transition: 'background .18s,transform .18s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#E8D8C4'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#FFF'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
                 اقرئي قصتنا
@@ -625,7 +649,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 { num: '١٠٠٪', label: 'جودة مضمونة' },
               ].map((s, i) => (
                 <div key={i} style={{ background: 'rgba(255,255,255,.05)', padding: '32px 24px', borderRadius: 20, textAlign: 'center' }}>
-                  <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 40, fontStyle: 'italic', fontWeight: 300, color: '#C4A882', lineHeight: 1, marginBottom: 8 }}>{s.num}</div>
+                  <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 40, fontStyle: 'italic', fontWeight: 300, color: '#C9A3B8', lineHeight: 1, marginBottom: 8 }}>{s.num}</div>
                   <div style={{ fontSize: 11, color: 'rgba(255,255,255,.38)', fontWeight: 600, letterSpacing: '0.06em' }}>{s.label}</div>
                 </div>
               ))}
@@ -634,10 +658,10 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* ── REVIEWS ── */}
           {(reviews.length > 0 || true) && (
-            <section style={{ padding: '88px 44px', background: '#FAF7F3' }}>
+            <section style={{ padding: '88px 44px', background: '#FFFFFF' }}>
               <div style={{ maxWidth: 1360, margin: '0 auto' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 44 }}>
-                  <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 30, color: '#160B10', margin: 0, fontWeight: 400 }}>ماذا تقول عميلاتنا</h2>
+                  <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 30, color: '#2E1F27', margin: 0, fontWeight: 400 }}>ماذا تقول عميلاتنا</h2>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 22 }}>
                   {(reviews.length > 0 ? reviews.slice(0, 3) : [
@@ -645,14 +669,14 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     { id: 'r2', rating: 5, comment: 'المخوار تجاوز توقعاتي! الخامة ممتازة والخياطة دقيقة جداً. سأعود للطلب مجدداً.', customerName: 'سارة المنصوري — أبوظبي' },
                     { id: 'r3', rating: 4, comment: 'تجربة تسوق رائعة من البداية للنهاية. التصميم عصري ومريح في نفس الوقت.', customerName: 'لمياء الزهراني — الرياض' },
                   ] as any[]).map((r: any, i) => (
-                    <div key={r.id || i} className="_rcard" style={{ padding: '30px 26px', background: '#FFF', borderRadius: 28, boxShadow: 'rgba(22,11,16,.08) 0px 4px 6px -1px, rgba(22,11,16,.06) 0px 2px 4px -2px', transition: 'box-shadow .2s,transform .2s cubic-bezier(.22,.68,0,1.2)' }}>
+                    <div key={r.id || i} className="_rcard" style={{ padding: '30px 26px', background: '#FFF', borderRadius: 28, boxShadow: 'rgba(46,31,39,.08) 0px 4px 6px -1px, rgba(46,31,39,.06) 0px 2px 4px -2px', transition: 'box-shadow .2s,transform .2s cubic-bezier(.22,.68,0,1.2)' }}>
                       <div style={{ display: 'flex', gap: 3, marginBottom: 16 }}>
                         {Array.from({ length: 5 }).map((_, j) => (
-                          <span key={j} style={{ color: j < (r.rating || 5) ? '#C4A882' : '#E8E0D8', fontSize: 13 }}>★</span>
+                          <span key={j} style={{ color: j < (r.rating || 5) ? '#C9A3B8' : '#E8E0D8', fontSize: 13 }}>★</span>
                         ))}
                       </div>
                       <p style={{ fontSize: 13.5, color: '#6A4850', lineHeight: 1.9, margin: '0 0 18px', fontStyle: 'italic' }}>"{r.comment}"</p>
-                      <div style={{ fontSize: 11, color: '#9A2D55', fontWeight: 800, letterSpacing: '0.06em' }}>{r.customerName}</div>
+                      <div style={{ fontSize: 11, color: '#B05C83', fontWeight: 800, letterSpacing: '0.06em' }}>{r.customerName}</div>
                     </div>
                   ))}
                 </div>
@@ -661,14 +685,14 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           )}
 
           {/* ── NEWSLETTER ── */}
-          <section style={{ padding: '96px 44px', textAlign: 'center', background: '#F3EDE7', position: 'relative', overflow: 'hidden' }}>
-            <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontFamily: "'Amiri', serif", fontSize: 'clamp(200px,34vw,460px)', color: 'rgba(154,45,85,.04)', pointerEvents: 'none', userSelect: 'none', lineHeight: 1 }}>◆</span>
+          <section style={{ padding: '96px 44px', textAlign: 'center', background: '#F7F3F5', position: 'relative', overflow: 'hidden' }}>
+            <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', fontFamily: "'Amiri', serif", fontSize: 'clamp(200px,34vw,460px)', color: 'rgba(176,92,131,.04)', pointerEvents: 'none', userSelect: 'none', lineHeight: 1 }}>◆</span>
             <div style={{ position: 'relative', zIndex: 1, maxWidth: 480, margin: '0 auto' }}>
-              <div style={{ fontSize: 10, letterSpacing: '0.28em', fontWeight: 700, color: '#C4A882', textTransform: 'uppercase', marginBottom: 16 }}>NEWSLETTER</div>
-              <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(1.9rem,3vw,40px)', color: '#160B10', fontWeight: 400, margin: '0 0 12px', lineHeight: 1.2 }}>كوني أول من تعلم</h2>
+              <div style={{ fontSize: 10, letterSpacing: '0.28em', fontWeight: 700, color: '#C9A3B8', textTransform: 'uppercase', marginBottom: 16 }}>NEWSLETTER</div>
+              <h2 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(1.9rem,3vw,40px)', color: '#2E1F27', fontWeight: 400, margin: '0 0 12px', lineHeight: 1.2 }}>كوني أول من تعلم</h2>
               <p style={{ fontSize: 13.5, color: '#6A4850', lineHeight: 1.85, margin: '0 0 32px' }}>أحدث المجموعات والعروض الحصرية مباشرة إلى بريدك — قبل الجميع</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFF', border: '1px solid rgba(22,11,16,.08)', borderRadius: 999, padding: 5, boxShadow: 'rgba(22,11,16,.06) 0px 2px 8px 0px' }}>
-                <input type="email" placeholder="بريدك الإلكتروني" value={newsletterEmail} onChange={e => setNewsletterEmail(e.target.value)} style={{ flex: 1, padding: '14px 18px', border: 'none', fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: 'transparent', color: '#160B10', direction: 'rtl' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFF', border: '1px solid rgba(46,31,39,.08)', borderRadius: 999, padding: 5, boxShadow: 'rgba(46,31,39,.06) 0px 2px 8px 0px' }}>
+                <input type="email" placeholder="بريدك الإلكتروني" value={newsletterEmail} onChange={e => setNewsletterEmail(e.target.value)} style={{ flex: 1, padding: '14px 18px', border: 'none', fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: 'transparent', color: '#2E1F27', direction: 'rtl' }} />
                 <button onClick={() => {
                   if (!newsletterEmail.trim()) return;
                   try {
@@ -677,9 +701,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   } catch { localStorage.setItem('ama_newsletter_emails', JSON.stringify([newsletterEmail.trim()])); }
                   addToast('شكراً! سيتم التواصل معكِ قريباً');
                   setNewsletterEmail('');
-                }} style={{ padding: '12px 26px', background: '#9A2D55', color: '#FFF', border: 'none', borderRadius: 999, boxShadow: 'rgba(154,45,85,.32) 0px 4px 24px 0px', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', transition: 'background .15s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#7B2244'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#9A2D55'; }}>
+                }} style={{ padding: '12px 26px', background: '#B05C83', color: '#FFF', border: 'none', borderRadius: 999, boxShadow: 'rgba(176,92,131,.32) 0px 4px 24px 0px', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.06em', cursor: 'pointer', fontFamily: "'Cairo', sans-serif", whiteSpace: 'nowrap', transition: 'background .15s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#964F71'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#B05C83'; }}>
                   اشتركي
                 </button>
               </div>
@@ -687,19 +711,19 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           </section>
 
           {/* ── FOOTER ── */}
-          <footer style={{ background: '#160B10', padding: '60px 44px 28px' }}>
+          <footer style={{ background: '#A85E7C', padding: '60px 44px 28px' }}>
             <div style={{ maxWidth: 1360, margin: '0 auto' }}>
               <div className="_footer-grid" style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr 1fr 1fr', gap: 44, marginBottom: 44 }}>
                 <div>
                   <div style={{ fontFamily: "'Amiri', serif", fontSize: 28, color: '#FFF', marginBottom: 14 }}>
-                    ألماسة <span style={{ color: '#C4A882' }}>◆</span>
+                    ألماسة <span style={{ color: '#C9A3B8' }}>◆</span>
                   </div>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,.45)', lineHeight: 1.85, margin: '0 0 22px', maxWidth: 220 }}>أزياء نسائية فاخرة — البحرين<br />تصاميم تجمع الأصالة بالعصرية</p>
                   <div style={{ display: 'flex', gap: 18 }}>
                     {[{ label: 'Instagram', href: ig }, { label: 'WhatsApp', href: wa }].map(s => (
                       <a key={s.label} href={s.href} target="_blank" rel="noreferrer"
-                        style={{ fontSize: 11.5, color: '#C4A882', textDecoration: 'none', fontWeight: 700, borderBottom: '1px solid rgba(196,168,130,.3)', paddingBottom: 1, letterSpacing: '0.06em', transition: 'border-color .15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#C4A882'; }}
+                        style={{ fontSize: 11.5, color: '#C9A3B8', textDecoration: 'none', fontWeight: 700, borderBottom: '1px solid rgba(196,168,130,.3)', paddingBottom: 1, letterSpacing: '0.06em', transition: 'border-color .15s' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#C9A3B8'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(196,168,130,.3)'; }}>
                         {s.label}
                       </a>
@@ -766,7 +790,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   <div style={{ position: 'relative' }}>
                     <Search style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, color: '#9a8a85' }} />
                     <input type="text" placeholder="ابحثي..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                      style={{ width: '100%', padding: '10px 36px 10px 12px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                      style={{ width: '100%', padding: '10px 36px 10px 12px', border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
                   </div>
                 </div>
 
@@ -775,12 +799,12 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   <div style={{ fontSize: 15, fontWeight: 700, color: '#241419', marginBottom: 14 }}>الفئة</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14, color: '#4a3d40' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                      <input type="radio" name="cat" checked={selectedCategory === 'all'} onChange={() => setSelectedCategory('all')} style={{ accentColor: '#9A2D55' }} />
+                      <input type="radio" name="cat" checked={selectedCategory === 'all'} onChange={() => setSelectedCategory('all')} style={{ accentColor: '#B05C83' }} />
                       الكل ({products.length})
                     </label>
                     {categories.filter(c => c.id !== 'all').map(cat => (
                       <label key={cat.id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                        <input type="radio" name="cat" checked={selectedCategory === cat.id} onChange={() => setSelectedCategory(cat.id)} style={{ accentColor: '#9A2D55' }} />
+                        <input type="radio" name="cat" checked={selectedCategory === cat.id} onChange={() => setSelectedCategory(cat.id)} style={{ accentColor: '#B05C83' }} />
                         {cat.name}
                       </label>
                     ))}
@@ -791,7 +815,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <div style={{ padding: '16px', background: '#F3EAE2', borderRadius: 20 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: '#241419', marginBottom: 8 }}>تحتاجين مساعدة؟</div>
                   <a href={wa} target="_blank" rel="noreferrer"
-                    style={{ fontSize: 13, color: '#9A2D55', textDecoration: 'underline' }}>تواصلي معنا عبر واتساب</a>
+                    style={{ fontSize: 13, color: '#B05C83', textDecoration: 'underline' }}>تواصلي معنا عبر واتساب</a>
                 </div>
               </div>
             </aside>
@@ -803,19 +827,19 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <div style={{ position: 'relative', flex: 1 }}>
                   <Search style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, color: '#9a8a85' }} />
                   <input type="text" placeholder="ابحثي..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                    style={{ width: '100%', padding: '10px 32px 10px 10px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                    style={{ width: '100%', padding: '10px 32px 10px 10px', border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
                 </div>
               </div>
 
               {/* Mobile category tabs */}
               <div className="md:hidden" style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 20, paddingBottom: 4 }}>
                 <button onClick={() => setSelectedCategory('all')}
-                  style={{ flexShrink: 0, padding: '6px 14px', border: '1px solid', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", background: selectedCategory === 'all' ? '#9A2D55' : 'transparent', color: selectedCategory === 'all' ? '#fff' : '#241419', borderColor: selectedCategory === 'all' ? '#9A2D55' : 'rgba(154,45,85,.3)' }}>
+                  style={{ flexShrink: 0, padding: '6px 14px', border: '1px solid', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", background: selectedCategory === 'all' ? '#B05C83' : 'transparent', color: selectedCategory === 'all' ? '#fff' : '#241419', borderColor: selectedCategory === 'all' ? '#B05C83' : 'rgba(176,92,131,.3)' }}>
                   الكل
                 </button>
                 {categories.filter(c => c.id !== 'all').map(cat => (
                   <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
-                    style={{ flexShrink: 0, padding: '6px 14px', border: '1px solid', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", background: selectedCategory === cat.id ? '#9A2D55' : 'transparent', color: selectedCategory === cat.id ? '#fff' : '#241419', borderColor: selectedCategory === cat.id ? '#9A2D55' : 'rgba(154,45,85,.3)' }}>
+                    style={{ flexShrink: 0, padding: '6px 14px', border: '1px solid', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif", background: selectedCategory === cat.id ? '#B05C83' : 'transparent', color: selectedCategory === cat.id ? '#fff' : '#241419', borderColor: selectedCategory === cat.id ? '#B05C83' : 'rgba(176,92,131,.3)' }}>
                     {cat.name}
                   </button>
                 ))}
@@ -826,7 +850,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   <ShoppingBag style={{ width: 40, height: 40, margin: '0 auto 16px', color: '#ECD9DD' }} />
                   <p style={{ fontSize: 16, fontWeight: 600, color: '#241419', marginBottom: 8 }}>لا توجد منتجات مطابقة</p>
                   <button onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-                    style={{ padding: '10px 24px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, cursor: 'pointer', fontSize: 13, fontFamily: "'Cairo', sans-serif" }}>
+                    style={{ padding: '10px 24px', background: '#B05C83', color: '#fff', border: 'none', borderRadius: 999, cursor: 'pointer', fontSize: 13, fontFamily: "'Cairo', sans-serif" }}>
                     عرض الكل
                   </button>
                 </div>
@@ -834,52 +858,50 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(190px,1fr))', gap: 24 }}>
                   {filteredProducts.map(product => (
                     <div key={product.id} onClick={() => handleProductClick(product)}
-                      style={{ background: '#fff', cursor: 'pointer', display: 'flex', flexDirection: 'column', borderRadius: 28, padding: 8, boxShadow: 'rgba(22,11,16,.08) 0px 4px 6px -1px, rgba(22,11,16,.06) 0px 2px 4px -2px' }}>
+                      style={{ background: '#fff', cursor: 'pointer', display: 'flex', flexDirection: 'column', borderRadius: 28, padding: 8, boxShadow: 'rgba(46,31,39,.08) 0px 4px 6px -1px, rgba(46,31,39,.06) 0px 2px 4px -2px' }}>
                       {/* Image */}
                       <div style={{ position: 'relative', aspectRatio: '1/1', width: '100%', overflow: 'hidden', borderRadius: 20 }}>
                         {product.image ? (
                           <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         ) : (
-                          <div style={{ width: '100%', height: '100%', backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 10px ui-monospace,Menlo,monospace' }}>صورة المنتج</div>
+                          <div style={{ width: '100%', height: '100%', backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B05C83', font: '500 10px ui-monospace,Menlo,monospace' }}>صورة المنتج</div>
                         )}
                         {product.stock === 0 && (
                           <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: '#9A2D55', background: '#fff', padding: '6px 14px', borderRadius: 999, boxShadow: 'rgba(22,11,16,.06) 0px 2px 8px 0px' }}>نفدت الكمية</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#B05C83', background: '#fff', padding: '6px 14px', borderRadius: 999, boxShadow: 'rgba(46,31,39,.06) 0px 2px 8px 0px' }}>نفدت الكمية</span>
                           </div>
                         )}
                         {product.originalPrice && (
-                          <span style={{ position: 'absolute', top: 8, right: 8, background: '#B85C2E', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999 }}>
+                          <span style={{ position: 'absolute', top: 8, right: 8, background: '#C76B93', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999 }}>
                             -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
                           </span>
                         )}
                         <button onClick={e => toggleWishlist(product.id, e)}
                           style={{ position: 'absolute', top: 8, left: 8, width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                          <Heart style={{ width: 14, height: 14, color: wishlist.includes(product.id) ? '#9A2D55' : '#9a8a85', fill: wishlist.includes(product.id) ? '#9A2D55' : 'transparent' }} />
+                          <Heart style={{ width: 14, height: 14, color: wishlist.includes(product.id) ? '#B05C83' : '#9a8a85', fill: wishlist.includes(product.id) ? '#B05C83' : 'transparent' }} />
                         </button>
                       </div>
                       {/* Info */}
                       <div style={{ padding: '14px 14px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} style={{ width: 11, height: 11, fill: i < Math.round(product.rating) ? '#B08D57' : 'transparent', color: '#B08D57' }} />
+                            <Star key={i} style={{ width: 11, height: 11, fill: i < Math.round(product.rating) ? '#B05C83' : 'transparent', color: '#B05C83' }} />
                           ))}
                           <span style={{ fontSize: 11, color: '#9a8a85', marginRight: 4 }}>({product.reviewCount})</span>
                         </div>
-                        <div style={{ fontFamily: "'Amiri', serif", fontSize: 17, color: '#241419', marginBottom: 8, lineHeight: 1.3 }}>{product.name}</div>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <div>
-                            <span style={{ fontSize: 15, fontWeight: 700, color: '#9A2D55' }}>{product.price.toFixed(2)}</span>
-                            <span style={{ fontSize: 11, color: '#9A2D55', marginRight: 2 }}>د.ب</span>
-                            {product.originalPrice && (
-                              <div style={{ fontSize: 11, color: '#9a8a85', textDecoration: 'line-through' }}>{product.originalPrice.toFixed(2)} د.ب</div>
-                            )}
-                          </div>
-                          <button onClick={e => { e.stopPropagation(); handleProductClick(product); }}
-                            disabled={product.stock === 0}
-                            style={{ width: 32, height: 32, background: product.stock === 0 ? '#F3EAE2' : '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: product.stock === 0 ? 'not-allowed' : 'pointer' }}>
-                            <Plus style={{ width: 16, height: 16 }} />
-                          </button>
+                        <div style={{ fontFamily: "'Amiri', serif", fontSize: 17, color: '#241419', marginBottom: 6, lineHeight: 1.3 }}>{product.name}</div>
+                        <div style={{ marginBottom: 12 }}>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: '#B05C83' }}>{fmtBD(product.price)}</span>
+                          {product.originalPrice && (
+                            <span style={{ fontSize: 12, color: '#9a8a85', textDecoration: 'line-through', marginRight: 8 }}>{fmtBD(product.originalPrice)}</span>
+                          )}
                         </div>
+                        <button onClick={e => { e.stopPropagation(); handleProductClick(product); }}
+                          disabled={product.stock === 0}
+                          style={{ width: '100%', padding: '10px 0', background: product.stock === 0 ? '#EEE6EA' : '#B05C83', color: product.stock === 0 ? '#9a8a85' : '#fff', border: 'none', borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: product.stock === 0 ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 700, fontFamily: "'Cairo', sans-serif" }}>
+                          <ShoppingBag style={{ width: 15, height: 15 }} />
+                          {product.stock === 0 ? 'نفدت الكمية' : 'أضيفي للسلة'}
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -903,7 +925,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <div style={{ background: '#F3EAE2', padding: 20, marginBottom: 24, textAlign: 'right', borderRadius: 20 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
                   <span style={{ color: '#6b5a5f' }}>رقم التتبع:</span>
-                  <strong style={{ color: '#9A2D55', fontFamily: 'monospace' }}>{newOrder.trackingCode}</strong>
+                  <strong style={{ color: '#B05C83', fontFamily: 'monospace' }}>{newOrder.trackingCode}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
                   <span style={{ color: '#6b5a5f' }}>الإجمالي:</span>
@@ -912,11 +934,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <button onClick={() => { setTrackSearchQuery(newOrder.trackingCode); setTrackedOrder(newOrder); setActiveTab('tracking'); setCheckoutStep('cart'); }}
-                  style={{ padding: '14px 24px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                  style={{ padding: '14px 24px', background: '#B05C83', color: '#fff', border: 'none', borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                   تتبع شحنتي
                 </button>
                 <button onClick={() => { setActiveTab('home'); setCheckoutStep('cart'); setNewOrder(null); }}
-                  style={{ padding: '14px 24px', background: 'transparent', color: '#241419', border: '1px solid rgba(154,45,85,.3)', borderRadius: 999, fontSize: 14, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                  style={{ padding: '14px 24px', background: 'transparent', color: '#241419', border: '1px solid rgba(176,92,131,.3)', borderRadius: 999, fontSize: 14, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                   متابعة التسوق
                 </button>
               </div>
@@ -926,7 +948,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <ShoppingBag style={{ width: 48, height: 48, margin: '0 auto 16px', color: '#ECD9DD' }} />
               <p style={{ fontSize: 16, fontWeight: 600, color: '#241419', marginBottom: 8 }}>سلتك فارغة</p>
               <button onClick={() => setActiveTab('shop')}
-                style={{ padding: '12px 28px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, fontSize: 14, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                style={{ padding: '12px 28px', background: '#B05C83', color: '#fff', border: 'none', borderRadius: 999, fontSize: 14, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                 تصفحي المخاوير
               </button>
             </div>
@@ -937,7 +959,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 32, fontSize: 13, fontWeight: 600 }}>
                   {[['cart', 'السلة'], ['details', 'بيانات الشحن'], ['payment', 'الدفع']].map(([step, label], i) => (
                     <React.Fragment key={step}>
-                      <span style={{ color: checkoutStep === step ? '#9A2D55' : '#9a8a85' }}>{i + 1}. {label}</span>
+                      <span style={{ color: checkoutStep === step ? '#B05C83' : '#9a8a85' }}>{i + 1}. {label}</span>
                       {i < 2 && <span style={{ color: '#ECD9DD' }}>—</span>}
                     </React.Fragment>
                   ))}
@@ -952,23 +974,23 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   {checkoutStep === 'cart' && (
                     <div>
                       {cart.map((item, index) => (
-                        <div key={index} style={{ display: 'flex', gap: 22, padding: '24px 0', borderBottom: '1px solid rgba(154,45,85,.14)' }}>
-                          <div style={{ width: 120, height: 140, flexShrink: 0, backgroundImage: item.product.image ? `url(${item.product.image})` : PH, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 10px ui-monospace,Menlo,monospace' }}>
+                        <div key={index} style={{ display: 'flex', gap: 22, padding: '24px 0', borderBottom: '1px solid rgba(176,92,131,.14)' }}>
+                          <div style={{ width: 120, height: 140, flexShrink: 0, backgroundImage: item.product.image ? `url(${item.product.image})` : PH, backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B05C83', font: '500 10px ui-monospace,Menlo,monospace' }}>
                             {!item.product.image && 'صورة'}
                           </div>
                           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
                             <div style={{ fontSize: 15, fontWeight: 600, color: '#241419' }}>{item.product.name}</div>
                             <div style={{ fontSize: 13, color: '#9a8a85' }}>المقاس: {item.selectedSize} · اللون: {item.selectedColor}</div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(154,45,85,.3)', borderRadius: 999 }}>
-                                <button onClick={() => updateCartQty(index, item.quantity - 1)} style={{ width: 32, height: 34, border: 'none', background: 'none', fontSize: 14, color: '#9A2D55', cursor: 'pointer' }}>−</button>
+                              <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(176,92,131,.3)', borderRadius: 999 }}>
+                                <button onClick={() => updateCartQty(index, item.quantity - 1)} style={{ width: 32, height: 34, border: 'none', background: 'none', fontSize: 14, color: '#B05C83', cursor: 'pointer' }}>−</button>
                                 <div style={{ width: 32, textAlign: 'center', fontSize: 13 }}>{item.quantity}</div>
-                                <button onClick={() => updateCartQty(index, item.quantity + 1)} style={{ width: 32, height: 34, border: 'none', background: 'none', fontSize: 14, color: '#9A2D55', cursor: 'pointer' }}>+</button>
+                                <button onClick={() => updateCartQty(index, item.quantity + 1)} style={{ width: 32, height: 34, border: 'none', background: 'none', fontSize: 14, color: '#B05C83', cursor: 'pointer' }}>+</button>
                               </div>
                               <button onClick={() => removeFromCart(index)} style={{ border: 'none', background: 'none', color: '#9a8a85', fontSize: 13, textDecoration: 'underline', cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>إزالة</button>
                             </div>
                           </div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: '#9A2D55', alignSelf: 'center', flexShrink: 0 }}>{(item.product.price * item.quantity).toFixed(2)} د.ب</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: '#B05C83', alignSelf: 'center', flexShrink: 0 }}>{(item.product.price * item.quantity).toFixed(2)} د.ب</div>
                         </div>
                       ))}
                     </div>
@@ -986,14 +1008,14 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                         <div key={f.label}>
                           <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 6 }}>{f.label}</label>
                           <input type={f.type} placeholder={f.ph} value={f.val} onChange={e => f.set(e.target.value)}
-                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
                         </div>
                       ))}
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                         <div>
                           <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 6 }}>الدولة *</label>
                           <select value={customerCountry} onChange={e => setCustomerCountry(e.target.value)}
-                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: '#fff', boxSizing: 'border-box' }}>
+                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: '#fff', boxSizing: 'border-box' }}>
                             {['البحرين', 'السعودية', 'الكويت', 'الإمارات', 'قطر', 'عمان'].map(c => (
                               <option key={c} value={c}>{c}</option>
                             ))}
@@ -1002,17 +1024,17 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                         <div>
                           <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 6 }}>المدينة *</label>
                           <input type="text" placeholder="المنامة" value={customerCity} onChange={e => setCustomerCity(e.target.value)}
-                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
+                            style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', boxSizing: 'border-box' }} />
                         </div>
                       </div>
                       <div>
                         <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 6 }}>العنوان الكامل *</label>
                         <textarea rows={2} placeholder="طريق 1221، فيلا 93" value={customerAddress} onChange={e => setCustomerAddress(e.target.value)}
-                          style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(154,45,85,.25)', fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', resize: 'none', boxSizing: 'border-box', borderRadius: 20 }} />
+                          style={{ width: '100%', padding: '14px 16px', border: '1px solid rgba(176,92,131,.25)', fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', resize: 'none', boxSizing: 'border-box', borderRadius: 20 }} />
                       </div>
                       {/* Shipping methods */}
                       {availableShippingMethods.length === 0 && (
-                        <div style={{ padding: '12px 16px', background: '#FFF8F0', border: '1px solid rgba(154,45,85,.2)', fontSize: 13, color: '#7A5030', lineHeight: 1.8, borderRadius: 20 }}>
+                        <div style={{ padding: '12px 16px', background: '#FFF8F0', border: '1px solid rgba(176,92,131,.2)', fontSize: 13, color: '#7A5030', lineHeight: 1.8, borderRadius: 20 }}>
                           عذراً، الشحن إلى هذه المنطقة غير متاح حالياً. تواصلي معنا للاستفسار.
                         </div>
                       )}
@@ -1021,15 +1043,15 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                           <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 10, fontWeight: 600 }}>طريقة التوصيل</label>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {availableShippingMethods.map((method: any) => (
-                              <label key={method.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', border: `1px solid ${selectedShippingMethod?.id === method.id ? '#9A2D55' : 'rgba(154,45,85,.2)'}`, borderRadius: 999, cursor: 'pointer', background: selectedShippingMethod?.id === method.id ? '#F3EAE2' : '#fff' }}>
+                              <label key={method.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', border: `1px solid ${selectedShippingMethod?.id === method.id ? '#B05C83' : 'rgba(176,92,131,.2)'}`, borderRadius: 999, cursor: 'pointer', background: selectedShippingMethod?.id === method.id ? '#F3EAE2' : '#fff' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                  <input type="radio" name="shipping" checked={selectedShippingMethod?.id === method.id} onChange={() => setSelectedShippingMethod(method)} style={{ accentColor: '#9A2D55' }} />
+                                  <input type="radio" name="shipping" checked={selectedShippingMethod?.id === method.id} onChange={() => setSelectedShippingMethod(method)} style={{ accentColor: '#B05C83' }} />
                                   <div>
                                     <div style={{ fontSize: 14, fontWeight: 600, color: '#241419' }}>{method.name}</div>
                                     {method.description && <div style={{ fontSize: 12, color: '#9a8a85' }}>{method.description}</div>}
                                   </div>
                                 </div>
-                                <span style={{ fontSize: 14, fontWeight: 700, color: '#9A2D55' }}>{method.priceType === 'free' ? 'مجاني' : `${parseFloat(method.price).toFixed(3)} د.ب`}</span>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: '#B05C83' }}>{method.priceType === 'free' ? 'مجاني' : `${parseFloat(method.price).toFixed(3)} د.ب`}</span>
                               </label>
                             ))}
                           </div>
@@ -1050,8 +1072,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                           { id: 'applepay', label: 'Apple Pay', sub: 'المحفظة' },
                         ].map(m => (
                           <button key={m.id} onClick={() => setPaymentMethod(m.id as any)}
-                            style={{ padding: '12px', border: `1px solid ${paymentMethod === m.id ? '#9A2D55' : 'rgba(154,45,85,.2)'}`, borderRadius: 999, background: paymentMethod === m.id ? '#F3EAE2' : '#fff', cursor: 'pointer', textAlign: 'center', fontFamily: "'Cairo', sans-serif" }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: paymentMethod === m.id ? '#9A2D55' : '#241419' }}>{m.label}</div>
+                            style={{ padding: '12px', border: `1px solid ${paymentMethod === m.id ? '#B05C83' : 'rgba(176,92,131,.2)'}`, borderRadius: 999, background: paymentMethod === m.id ? '#F3EAE2' : '#fff', cursor: 'pointer', textAlign: 'center', fontFamily: "'Cairo', sans-serif" }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: paymentMethod === m.id ? '#B05C83' : '#241419' }}>{m.label}</div>
                             <div style={{ fontSize: 11, color: '#9a8a85' }}>{m.sub}</div>
                           </button>
                         ))}
@@ -1059,9 +1081,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                       <div style={{ padding: 16, background: '#F3EAE2', borderRadius: 20 }}>
                         {paymentMethod === 'benefit' && (
                           <div>
-                            <p style={{ fontSize: 13, fontWeight: 600, color: '#9A2D55', marginBottom: 10 }}>أدخلي رقم الهاتف لـ BenefitPay</p>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: '#B05C83', marginBottom: 10 }}>أدخلي رقم الهاتف لـ BenefitPay</p>
                             <input type="tel" placeholder="37037697" value={benefitPhone} onChange={e => setBenefitPhone(e.target.value)}
-                              style={{ width: '100%', padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: 'none', textAlign: 'center', boxSizing: 'border-box' }} />
+                              style={{ width: '100%', padding: '12px 16px', border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontSize: 14, fontFamily: "'Cairo', sans-serif", outline: 'none', textAlign: 'center', boxSizing: 'border-box' }} />
                           </div>
                         )}
                         {paymentMethod === 'knet' && (
@@ -1088,7 +1110,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 <div style={{ background: '#F3EAE2', padding: 30, height: 'fit-content', display: 'flex', flexDirection: 'column', gap: 18, borderRadius: 20 }}>
                   <h3 style={{ fontFamily: "'Amiri', serif", fontSize: 20, color: '#241419', margin: 0 }}>ملخص الطلب</h3>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderBottom: '1px solid rgba(154,45,85,.14)', paddingBottom: 16 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, borderBottom: '1px solid rgba(176,92,131,.14)', paddingBottom: 16 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#4a3d40' }}>
                       <span>المجموع الفرعي</span>
                       <span>{calculatedSubtotal.toFixed(2)} د.ب</span>
@@ -1107,7 +1129,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 700 }}>
                     <span style={{ color: '#241419' }}>الإجمالي</span>
-                    <span style={{ color: '#9A2D55' }}>{totalCost.toFixed(2)} د.ب</span>
+                    <span style={{ color: '#B05C83' }}>{totalCost.toFixed(2)} د.ب</span>
                   </div>
 
                   {/* Coupon (only on cart step) */}
@@ -1116,9 +1138,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                       <label style={{ display: 'block', fontSize: 13, color: '#6b5a5f', marginBottom: 8 }}>كوبون الخصم</label>
                       <div style={{ display: 'flex', gap: 8 }}>
                         <input type="text" placeholder="ALMAASA10" value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())}
-                          style={{ flex: 1, padding: '10px 12px', border: '1px solid rgba(154,45,85,.3)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: '#fff' }} />
+                          style={{ flex: 1, padding: '10px 12px', border: '1px solid rgba(176,92,131,.3)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none', background: '#fff' }} />
                         <button onClick={applyCoupon}
-                          style={{ padding: '10px 16px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                          style={{ padding: '10px 16px', background: '#B05C83', color: '#fff', border: 'none', borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                           تفعيل
                         </button>
                       </div>
@@ -1135,7 +1157,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   {/* Action buttons */}
                   {checkoutStep === 'cart' && (
                     <button onClick={() => setCheckoutStep('details')}
-                      style={{ padding: '15px 0', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                      style={{ padding: '15px 0', background: '#B05C83', color: '#fff', border: 'none', borderRadius: 999, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                       متابعة الطلب
                     </button>
                   )}
@@ -1145,11 +1167,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                         if (!customerName || !customerPhone || !customerAddress) { addToast('يرجى تعبئة الحقول الأساسية', 'error'); return; }
                         setCheckoutStep('payment');
                       }}
-                        style={{ padding: '15px 0', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                        style={{ padding: '15px 0', background: '#B05C83', color: '#fff', border: 'none', borderRadius: 999, fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                         إلى الدفع
                       </button>
                       <button onClick={() => setCheckoutStep('cart')}
-                        style={{ padding: '12px 0', background: 'transparent', color: '#241419', border: '1px solid rgba(154,45,85,.3)', borderRadius: 999, fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                        style={{ padding: '12px 0', background: 'transparent', color: '#241419', border: '1px solid rgba(176,92,131,.3)', borderRadius: 999, fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                         رجوع
                       </button>
                     </div>
@@ -1157,11 +1179,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   {checkoutStep === 'payment' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       <button onClick={triggerPayment} disabled={isPaying}
-                        style={{ padding: '15px 0', background: isPaying ? '#9a8a85' : '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, fontSize: 15, fontWeight: 600, cursor: isPaying ? 'wait' : 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                        style={{ padding: '15px 0', background: isPaying ? '#9a8a85' : '#B05C83', color: '#fff', border: 'none', borderRadius: 999, fontSize: 15, fontWeight: 600, cursor: isPaying ? 'wait' : 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                         {isPaying ? 'جاري الدفع...' : 'تأكيد الطلب والدفع'}
                       </button>
                       <button onClick={() => setCheckoutStep('details')}
-                        style={{ padding: '12px 0', background: 'transparent', color: '#241419', border: '1px solid rgba(154,45,85,.3)', borderRadius: 999, fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                        style={{ padding: '12px 0', background: 'transparent', color: '#241419', border: '1px solid rgba(176,92,131,.3)', borderRadius: 999, fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                         رجوع
                       </button>
                     </div>
@@ -1180,13 +1202,13 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
           <div style={{ width: '100%', maxWidth: 1240, margin: '0 auto', padding: '64px 60px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}
             className="md:grid block">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ fontSize: 13, letterSpacing: '0.25em', color: '#B08D57', fontWeight: 600 }}>قصتنا</div>
+              <div style={{ fontSize: 13, letterSpacing: '0.25em', color: '#B05C83', fontWeight: 600 }}>قصتنا</div>
               <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 'clamp(1.8rem,4vw,42px)', lineHeight: 1.3, color: '#241419', margin: 0 }}>فخامة تحمل بصمة هوية أصيلة</h1>
               <p style={{ fontSize: 15, lineHeight: 2, color: '#4a3d40' }}>
                 ولدت ألماسة من شغف بالتفاصيل التراثية الخليجية، لنقدّم لكِ مخاوير وأزياء نسائية تجمع بين الأصالة والحداثة. كل قطعة نصممها تحمل حكاية من الحرفية اليدوية والخامات الفاخرة، لنمنحكِ إطلالة تليق بلحظاتكِ المميزة.
               </p>
             </div>
-            <div style={{ height: 420, backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 12px/1.4 ui-monospace,Menlo,monospace' }}>
+            <div style={{ height: 420, backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B05C83', font: '500 12px/1.4 ui-monospace,Menlo,monospace' }}>
               صورة — ورشة التصميم
             </div>
           </div>
@@ -1201,7 +1223,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 { title: 'توصيل سريع', desc: 'تصلك طلباتك أينما كنتِ خلال أيام معدودة' },
               ].map((v, i) => (
                 <div key={i} style={{ padding: '20px 10px' }}>
-                  <div style={{ fontFamily: "'Amiri', serif", fontSize: 26, color: '#9A2D55', marginBottom: 12 }}>{v.title}</div>
+                  <div style={{ fontFamily: "'Amiri', serif", fontSize: 26, color: '#B05C83', marginBottom: 12 }}>{v.title}</div>
                   <div style={{ fontSize: 14, lineHeight: 1.9, color: '#4a3d40' }}>{v.desc}</div>
                 </div>
               ))}
@@ -1230,13 +1252,13 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                 <input placeholder="الاسم الكامل" value={contactName} onChange={e => setContactName(e.target.value)}
-                  style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
+                  style={{ padding: 16, border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
                 <input placeholder="رقم الجوال" value={contactPhone} onChange={e => setContactPhone(e.target.value)}
-                  style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
+                  style={{ padding: 16, border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
                 <input placeholder="البريد الإلكتروني" value={contactEmail} onChange={e => setContactEmail(e.target.value)}
-                  style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
+                  style={{ padding: 16, border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none' }} />
                 <textarea placeholder="رسالتكِ" rows={5} value={contactMsg} onChange={e => setContactMsg(e.target.value)}
-                  style={{ padding: 16, border: '1px solid rgba(154,45,85,.25)', fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none', resize: 'vertical', borderRadius: 20 }} />
+                  style={{ padding: 16, border: '1px solid rgba(176,92,131,.25)', fontFamily: "'Cairo', sans-serif", fontSize: 14, outline: 'none', resize: 'vertical', borderRadius: 20 }} />
                 <button onClick={() => {
                   if (!contactName || !contactMsg) { addToast('يرجى تعبئة الاسم والرسالة', 'error'); return; }
                   try {
@@ -1247,7 +1269,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                   addToast('تم إرسال رسالتكِ، سنتواصل معكِ قريباً');
                   setTimeout(() => { setContactName(''); setContactPhone(''); setContactEmail(''); setContactMsg(''); }, 2000);
                 }}
-                  style={{ padding: 16, background: '#9A2D55', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, borderRadius: 999, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                  style={{ padding: 16, background: '#B05C83', color: '#fff', border: 'none', fontSize: 15, fontWeight: 600, borderRadius: 999, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                   إرسال الرسالة
                 </button>
               </div>
@@ -1260,13 +1282,13 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 { label: 'إنستغرام', value: settings?.instagramUsername || 'almaasa.bh' },
                 { label: 'أوقات العمل', value: 'السبت – الخميس: ٩ص – ١١م' },
               ].map((info, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid rgba(154,45,85,.14)', fontSize: 14 }}>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid rgba(176,92,131,.14)', fontSize: 14 }}>
                   <span style={{ fontWeight: 600, color: '#241419' }}>{info.label}</span>
                   <span style={{ color: '#4a3d40' }}>{info.value}</span>
                 </div>
               ))}
               <a href={wa} target="_blank" rel="noreferrer"
-                style={{ display: 'block', textAlign: 'center', padding: '14px 0', background: '#9A2D55', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 600, borderRadius: 999, fontFamily: "'Cairo', sans-serif" }}>
+                style={{ display: 'block', textAlign: 'center', padding: '14px 0', background: '#B05C83', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 600, borderRadius: 999, fontFamily: "'Cairo', sans-serif" }}>
                 تواصلي عبر واتساب
               </a>
             </div>
@@ -1276,24 +1298,24 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
       {/* ── TRACKING PAGE ──────────────────────────────────────── */}
       {activeTab === 'tracking' && (
-        <main style={{ minHeight: '60vh', background: '#FBF7F2', padding: '60px 20px' }}>
+        <main style={{ minHeight: '60vh', background: '#FFFFFF', padding: '60px 20px' }}>
           <div style={{ maxWidth: 600, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
-              <div style={{ width: 60, height: 60, background: '#9A2D55', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <div style={{ width: 60, height: 60, background: '#B05C83', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                 <Truck style={{ width: 28, height: 28, color: '#fff' }} />
               </div>
               <h1 style={{ fontFamily: "'Amiri', serif", fontSize: 32, color: '#241419', marginBottom: 8 }}>تتبع شحنتكِ</h1>
               <p style={{ fontSize: 14, color: '#6b5a5f' }}>أدخلي رقم التتبع أو رقم الهاتف لمتابعة شحنتكِ</p>
             </div>
 
-            <div style={{ background: '#fff', padding: 32, borderRadius: 28, boxShadow: 'rgba(22,11,16,.08) 0px 4px 6px -1px, rgba(22,11,16,.06) 0px 2px 4px -2px' }}>
+            <div style={{ background: '#fff', padding: 32, borderRadius: 28, boxShadow: 'rgba(46,31,39,.08) 0px 4px 6px -1px, rgba(46,31,39,.06) 0px 2px 4px -2px' }}>
               <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
                 <input type="text" placeholder="رقم التتبع (AL-XXXXX-BH) أو الهاتف..."
                   value={trackSearchQuery} onChange={e => setTrackSearchQuery(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleTrackSearch(); }}
-                  style={{ flex: 1, padding: '12px 16px', border: '1px solid rgba(154,45,85,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
+                  style={{ flex: 1, padding: '12px 16px', border: '1px solid rgba(176,92,131,.25)', borderRadius: 999, fontSize: 13, fontFamily: "'Cairo', sans-serif", outline: 'none' }} />
                 <button onClick={handleTrackSearch}
-                  style={{ padding: '12px 20px', background: '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                  style={{ padding: '12px 20px', background: '#B05C83', color: '#fff', border: 'none', borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                   تتبع
                 </button>
               </div>
@@ -1310,9 +1332,9 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#F3EAE2', padding: '16px 20px', marginBottom: 24, borderRadius: 20 }}>
                       <div>
                         <div style={{ fontSize: 11, color: '#9a8a85', fontWeight: 600 }}>رقم التتبع</div>
-                        <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#9A2D55', fontSize: 18 }}>{trackedOrder.trackingCode}</div>
+                        <div style={{ fontFamily: 'monospace', fontWeight: 700, color: '#B05C83', fontSize: 18 }}>{trackedOrder.trackingCode}</div>
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', background: trackedOrder.shippingStatus === 'delivered' ? '#d4edda' : trackedOrder.shippingStatus === 'shipped' ? '#d1ecf1' : '#F3EAE2', color: trackedOrder.shippingStatus === 'delivered' ? '#155724' : trackedOrder.shippingStatus === 'shipped' ? '#0c5460' : '#9A2D55', borderRadius: 999 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, padding: '6px 14px', background: trackedOrder.shippingStatus === 'delivered' ? '#d4edda' : trackedOrder.shippingStatus === 'shipped' ? '#d1ecf1' : '#F3EAE2', color: trackedOrder.shippingStatus === 'delivered' ? '#155724' : trackedOrder.shippingStatus === 'shipped' ? '#0c5460' : '#B05C83', borderRadius: 999 }}>
                         {trackedOrder.shippingStatus === 'delivered' ? 'تم التسليم ✓' : trackedOrder.shippingStatus === 'shipped' ? 'قيد الشحن' : trackedOrder.shippingStatus === 'processing' ? 'جاري التجهيز' : 'قيد الانتظار'}
                       </span>
                     </div>
@@ -1320,8 +1342,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     <div style={{ position: 'relative', paddingRight: 24 }}>
                       {trackedOrder.timeline.map((event, idx) => (
                         <div key={idx} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', gap: 16, paddingBottom: 24 }}>
-                          <div style={{ position: 'absolute', right: -12, top: 4, width: 16, height: 16, borderRadius: '50%', border: `3px solid ${idx === trackedOrder.timeline.length - 1 ? '#9A2D55' : '#ECD9DD'}`, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            {idx === trackedOrder.timeline.length - 1 && <div style={{ width: 6, height: 6, background: '#9A2D55', borderRadius: '50%' }} />}
+                          <div style={{ position: 'absolute', right: -12, top: 4, width: 16, height: 16, borderRadius: '50%', border: `3px solid ${idx === trackedOrder.timeline.length - 1 ? '#B05C83' : '#ECD9DD'}`, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {idx === trackedOrder.timeline.length - 1 && <div style={{ width: 6, height: 6, background: '#B05C83', borderRadius: '50%' }} />}
                           </div>
                           <div style={{ background: '#F3EAE2', padding: '12px 16px', flex: 1, borderRadius: 20 }}>
                             <div style={{ fontSize: 11, color: '#9a8a85', fontFamily: 'monospace' }}>{event.date}</div>
@@ -1334,11 +1356,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
                     <div style={{ marginTop: 16, padding: 14, background: '#F3EAE2', fontSize: 13, color: '#6b5a5f', textAlign: 'center', borderRadius: 20 }}>
                       استفسار؟ تواصلي معنا على{' '}
-                      <a href={wa} style={{ color: '#9A2D55', textDecoration: 'underline' }}>واتساب</a>
+                      <a href={wa} style={{ color: '#B05C83', textDecoration: 'underline' }}>واتساب</a>
                     </div>
                   </motion.div>
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '40px 0', color: '#9a8a85', border: '1px dashed rgba(154,45,85,.2)', borderRadius: 20 }}>
+                  <div style={{ textAlign: 'center', padding: '40px 0', color: '#9a8a85', border: '1px dashed rgba(176,92,131,.2)', borderRadius: 20 }}>
                     <Clock style={{ width: 32, height: 32, color: '#ECD9DD', margin: '0 auto 10px' }} />
                     <p style={{ fontSize: 13, fontWeight: 600 }}>أدخلي رقم الطلب أو الهاتف للبدء</p>
                   </div>
@@ -1352,7 +1374,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       {/* ══════════════════════════════════════════════════════════
           FOOTER
       ══════════════════════════════════════════════════════════ */}
-      <footer style={{ background: '#160B10', color: '#EADFD8', display: 'flex', justifyContent: 'center', fontFamily: "'Cairo', sans-serif" }}>
+      <footer style={{ background: '#A85E7C', color: '#EADFD8', display: 'flex', justifyContent: 'center', fontFamily: "'Cairo', sans-serif" }}>
         <div style={{ width: '100%', maxWidth: 1240, padding: '50px 40px', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 30, textAlign: 'right' }}
           className="md:grid block">
           {/* Brand */}
@@ -1363,7 +1385,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* Quick links */}
           <div style={{ fontSize: 13, lineHeight: 2.4, color: '#d8c9c2' }}>
-            <div style={{ color: '#B08D57', fontWeight: 600, marginBottom: 6 }}>روابط سريعة</div>
+            <div style={{ color: '#B05C83', fontWeight: 600, marginBottom: 6 }}>روابط سريعة</div>
             {[
               { label: 'المخاوير', page: 'shop' as Page },
               { label: 'من نحن', page: 'about' as Page },
@@ -1379,7 +1401,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
           {/* Contact */}
           <div style={{ fontSize: 13, lineHeight: 2.4, color: '#d8c9c2' }}>
-            <div style={{ color: '#B08D57', fontWeight: 600, marginBottom: 6 }}>تواصلي معنا</div>
+            <div style={{ color: '#B05C83', fontWeight: 600, marginBottom: 6 }}>تواصلي معنا</div>
             <div>واتساب: {settings?.whatsappNumber || '05xxxxxxxx'}</div>
             <div>إنستغرام: {settings?.instagramUsername || 'almaasa.bh'}</div>
             <div style={{ marginTop: 12, display: 'flex', gap: 10 }}>
@@ -1404,7 +1426,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
       </div>
 
       {/* ── MOBILE BOTTOM NAV ──────────────────────────────────── */}
-      <div className="md:hidden" style={{ position: 'fixed', bottom: 0, right: 0, left: 0, zIndex: 50, background: '#FBF7F2', borderTop: '1px solid rgba(154,45,85,.18)' }}>
+      <div className="md:hidden" style={{ position: 'fixed', bottom: 0, right: 0, left: 0, zIndex: 50, background: '#FFFFFF', borderTop: '1px solid rgba(176,92,131,.18)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '8px 4px' }}>
           {[
             { icon: Home, label: 'الرئيسية', page: 'home' as Page },
@@ -1413,11 +1435,11 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             { icon: Truck, label: 'تتبع', page: 'tracking' as Page },
           ].map(({ icon: Icon, label, page, badge }) => (
             <button key={page} onClick={() => setActiveTab(page)}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 12px', background: 'none', border: 'none', cursor: 'pointer', position: 'relative', color: activeTab === page ? '#9A2D55' : '#9a8a85' }}>
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 12px', background: 'none', border: 'none', cursor: 'pointer', position: 'relative', color: activeTab === page ? '#B05C83' : '#9a8a85' }}>
               <Icon style={{ width: 20, height: 20 }} />
               <span style={{ fontSize: 10, fontFamily: "'Cairo', sans-serif", fontWeight: activeTab === page ? 600 : 400 }}>{label}</span>
               {badge != null && badge > 0 && (
-                <span style={{ position: 'absolute', top: 0, right: 8, background: '#9A2D55', color: '#fff', fontSize: 9, fontWeight: 700, width: 14, height: 14, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ position: 'absolute', top: 0, right: 8, background: '#B05C83', color: '#fff', fontSize: 9, fontWeight: 700, width: 14, height: 14, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {badge}
                 </span>
               )}
@@ -1445,7 +1467,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 {selectedProduct.image ? (
                   <img src={selectedProduct.image} alt={selectedProduct.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
-                  <div style={{ width: '100%', height: '100%', minHeight: 320, backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9A2D55', font: '500 12px/1.4 ui-monospace,Menlo,monospace' }}>صورة المنتج</div>
+                  <div style={{ width: '100%', height: '100%', minHeight: 320, backgroundImage: PH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#B05C83', font: '500 12px/1.4 ui-monospace,Menlo,monospace' }}>صورة المنتج</div>
                 )}
                 <button onClick={() => setSelectedProduct(null)}
                   style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -1453,7 +1475,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 </button>
                 <button onClick={e => toggleWishlist(selectedProduct.id, e)}
                   style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                  <Heart style={{ width: 14, height: 14, color: '#9A2D55', fill: wishlist.includes(selectedProduct.id) ? '#9A2D55' : 'transparent' }} />
+                  <Heart style={{ width: 14, height: 14, color: '#B05C83', fill: wishlist.includes(selectedProduct.id) ? '#B05C83' : 'transparent' }} />
                 </button>
               </div>
 
@@ -1469,17 +1491,17 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                 {/* Stars */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} style={{ width: 14, height: 14, fill: i < Math.round(selectedProduct.rating) ? '#B08D57' : 'transparent', color: '#B08D57' }} />
+                    <Star key={i} style={{ width: 14, height: 14, fill: i < Math.round(selectedProduct.rating) ? '#B05C83' : 'transparent', color: '#B05C83' }} />
                   ))}
                   <span style={{ fontSize: 12, color: '#9a8a85' }}>({selectedProduct.reviewCount} تقييم)</span>
                 </div>
 
                 {/* Price */}
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                  <span style={{ fontSize: 28, fontWeight: 700, color: '#9A2D55' }}>{selectedProduct.price.toFixed(2)}</span>
-                  <span style={{ fontSize: 14, color: '#9A2D55' }}>د.ب</span>
+                  <span style={{ fontSize: 28, fontWeight: 800, color: '#B05C83' }}>{fmtBD(selectedProduct.price)}</span>
+
                   {selectedProduct.originalPrice && (
-                    <span style={{ fontSize: 14, color: '#9a8a85', textDecoration: 'line-through' }}>{selectedProduct.originalPrice.toFixed(2)} د.ب</span>
+                    <span style={{ fontSize: 14, color: '#9a8a85', textDecoration: 'line-through' }}>{fmtBD(selectedProduct.originalPrice)}</span>
                   )}
                 </div>
 
@@ -1492,7 +1514,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {selectedProduct.sizes.map(size => (
                         <button key={size} onClick={() => setChosenSize(size)}
-                          style={{ padding: '8px 18px', border: `1px solid ${chosenSize === size ? '#9A2D55' : 'rgba(154,45,85,.25)'}`, borderRadius: 999, background: chosenSize === size ? '#9A2D55' : 'transparent', color: chosenSize === size ? '#fff' : '#241419', fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                          style={{ padding: '8px 18px', border: `1px solid ${chosenSize === size ? '#B05C83' : 'rgba(176,92,131,.25)'}`, borderRadius: 999, background: chosenSize === size ? '#B05C83' : 'transparent', color: chosenSize === size ? '#fff' : '#241419', fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                           {size}
                         </button>
                       ))}
@@ -1507,7 +1529,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {selectedProduct.colors.map(color => (
                         <button key={color} onClick={() => setChosenColor(color)}
-                          style={{ padding: '8px 18px', border: `1px solid ${chosenColor === color ? '#9A2D55' : 'rgba(154,45,85,.25)'}`, borderRadius: 999, background: chosenColor === color ? '#F3EAE2' : 'transparent', color: '#241419', fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                          style={{ padding: '8px 18px', border: `1px solid ${chosenColor === color ? '#B05C83' : 'rgba(176,92,131,.25)'}`, borderRadius: 999, background: chosenColor === color ? '#F3EAE2' : 'transparent', color: '#241419', fontSize: 13, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                           {color}
                         </button>
                       ))}
@@ -1517,13 +1539,13 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
                 {/* Qty + Add to cart */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(154,45,85,.3)', borderRadius: 999 }}>
-                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: 36, height: 42, border: 'none', background: 'none', fontSize: 16, color: '#9A2D55', cursor: 'pointer' }}>−</button>
+                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(176,92,131,.3)', borderRadius: 999 }}>
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: 36, height: 42, border: 'none', background: 'none', fontSize: 16, color: '#B05C83', cursor: 'pointer' }}>−</button>
                     <span style={{ width: 36, textAlign: 'center', fontSize: 14, fontWeight: 600 }}>{quantity}</span>
-                    <button onClick={() => setQuantity(q => q + 1)} style={{ width: 36, height: 42, border: 'none', background: 'none', fontSize: 16, color: '#9A2D55', cursor: 'pointer' }}>+</button>
+                    <button onClick={() => setQuantity(q => q + 1)} style={{ width: 36, height: 42, border: 'none', background: 'none', fontSize: 16, color: '#B05C83', cursor: 'pointer' }}>+</button>
                   </div>
                   <button onClick={handleAddToCart} disabled={selectedProduct.stock === 0}
-                    style={{ flex: 1, padding: '14px 20px', background: selectedProduct.stock === 0 ? '#9a8a85' : '#9A2D55', color: '#fff', border: 'none', borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: selectedProduct.stock === 0 ? 'not-allowed' : 'pointer', fontFamily: "'Cairo', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    style={{ flex: 1, padding: '14px 20px', background: selectedProduct.stock === 0 ? '#9a8a85' : '#B05C83', color: '#fff', border: 'none', borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: selectedProduct.stock === 0 ? 'not-allowed' : 'pointer', fontFamily: "'Cairo', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <ShoppingBag style={{ width: 16, height: 16 }} />
                     {selectedProduct.stock === 0 ? 'نفدت الكمية' : 'أضيفي للسلة'}
                   </button>
@@ -1531,7 +1553,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
 
                 {/* Size guide link */}
                 <button onClick={() => setShowSizeGuide('g-1')}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A2D55', fontSize: 12, textDecoration: 'underline', textAlign: 'right', fontFamily: "'Cairo', sans-serif" }}>
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#B05C83', fontSize: 12, textDecoration: 'underline', textAlign: 'right', fontFamily: "'Cairo', sans-serif" }}>
                   📏 دليل المقاسات
                 </button>
               </div>
@@ -1548,7 +1570,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               style={{ background: '#FFFFFF', width: '100%', maxWidth: 480, padding: 28, maxHeight: '80vh', overflowY: 'auto', borderRadius: 28 }}
               onClick={e => e.stopPropagation()}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid rgba(154,45,85,.14)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid rgba(176,92,131,.14)' }}>
                 <div style={{ fontFamily: "'Amiri', serif", fontSize: 22, color: '#241419' }}>آراء زبائن ألماسة</div>
                 <button onClick={() => setShowReviewsPopup(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9a8a85' }}>
                   <X style={{ width: 18, height: 18 }} />
@@ -1560,7 +1582,7 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                       <strong style={{ fontSize: 14, color: '#241419' }}>{rev.customerName}</strong>
                       <div style={{ display: 'flex', gap: 2 }}>
-                        {Array.from({ length: rev.rating }).map((_, i) => <Star key={i} style={{ width: 12, height: 12, fill: '#B08D57', color: '#B08D57' }} />)}
+                        {Array.from({ length: rev.rating }).map((_, i) => <Star key={i} style={{ width: 12, height: 12, fill: '#B05C83', color: '#B05C83' }} />)}
                       </div>
                     </div>
                     <p style={{ fontSize: 13, color: '#4a3d40', lineHeight: 1.7, margin: 0, fontStyle: 'italic' }}>"{rev.comment}"</p>
@@ -1580,8 +1602,8 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
             <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
               style={{ background: '#FFFFFF', width: '100%', maxWidth: 520, padding: 28, borderRadius: 28 }}
               onClick={e => e.stopPropagation()}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid rgba(154,45,85,.14)' }}>
-                <span style={{ fontFamily: "'Amiri', serif", fontSize: 20, color: '#9A2D55' }}>{sizeGuides.find(g => g.id === showSizeGuide)?.name || 'دليل المقاسات'}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid rgba(176,92,131,.14)' }}>
+                <span style={{ fontFamily: "'Amiri', serif", fontSize: 20, color: '#B05C83' }}>{sizeGuides.find(g => g.id === showSizeGuide)?.name || 'دليل المقاسات'}</span>
                 <button onClick={() => setShowSizeGuide(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9a8a85' }}>
                   <X style={{ width: 18, height: 18 }} />
                 </button>
@@ -1589,20 +1611,20 @@ export default function Storefront({ onNavigateToAdmin, activeTab, setActiveTab 
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', fontSize: 12, textAlign: 'right', borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: '#F3EAE2', color: '#9A2D55' }}>
+                    <tr style={{ background: '#F3EAE2', color: '#B05C83' }}>
                       {['المقاس', 'الصدر', 'الطول', 'الخصر', 'الكم'].map(h => (
-                        <th key={h} style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', fontWeight: 700 }}>{h}</th>
+                        <th key={h} style={{ padding: '10px 12px', border: '1px solid rgba(176,92,131,.14)', fontWeight: 700 }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {sizeGuides.find(g => g.id === showSizeGuide)?.sizes.map((row, idx) => (
-                      <tr key={idx} style={{ background: idx % 2 === 0 ? '#FBF7F2' : '#F3EAE2' }}>
-                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', fontWeight: 700, color: '#9A2D55' }}>{row.label}</td>
-                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', color: '#4a3d40' }}>{row.chest}</td>
-                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', color: '#4a3d40' }}>{row.length}</td>
-                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', color: '#4a3d40' }}>{row.waist}</td>
-                        <td style={{ padding: '10px 12px', border: '1px solid rgba(154,45,85,.14)', color: '#4a3d40' }}>{row.sleeve}</td>
+                      <tr key={idx} style={{ background: idx % 2 === 0 ? '#FFFFFF' : '#F3EAE2' }}>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(176,92,131,.14)', fontWeight: 700, color: '#B05C83' }}>{row.label}</td>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(176,92,131,.14)', color: '#4a3d40' }}>{row.chest}</td>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(176,92,131,.14)', color: '#4a3d40' }}>{row.length}</td>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(176,92,131,.14)', color: '#4a3d40' }}>{row.waist}</td>
+                        <td style={{ padding: '10px 12px', border: '1px solid rgba(176,92,131,.14)', color: '#4a3d40' }}>{row.sleeve}</td>
                       </tr>
                     ))}
                   </tbody>
